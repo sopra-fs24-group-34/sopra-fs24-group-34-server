@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 //
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -75,6 +76,7 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
   }
+  
     public AuthenticationResponseDTO loginUser(User loginUser) {
         User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
@@ -85,4 +87,31 @@ public class UserService {
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");}
     }
+
+
+  public User getUser(Long user_id) {
+    List <User> AllUsers = getUsers();
+    for (User user: AllUsers) {
+      if ((user.getId()).equals(user_id)) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  public void updateUser(User user, Long user_id) {
+    User my_user = getUser(user_id); // smailalijagic: find the user in database
+    assert my_user != null; // smailalijagic: make sure user exists
+    // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
+    if (!Objects.equals(user.getUsername(), "") && !checkIfUserExists(user)) {
+      my_user.setUsername(user.getUsername()); // smailalijagic: update username
+    }
+    // smailalijagic: check that password is not empty
+    if (!Objects.equals(user.getPassword(), "")) {
+      my_user.setPassword(user.getPassword()); // smailalijagic: update password
+    }
+    // smailalijagic: usericon can be null
+    my_user.setUsericon(user.getUsericon()); // smailalijagic: update usericon
+
+  }
 }

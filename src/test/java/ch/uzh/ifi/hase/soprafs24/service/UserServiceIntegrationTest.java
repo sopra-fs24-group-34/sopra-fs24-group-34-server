@@ -74,3 +74,4 @@ public class UserServiceIntegrationTest {
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));
   }
 }
+
