@@ -3,6 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
 import javax.persistence.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 /**
@@ -26,7 +28,7 @@ public class User implements Serializable {
   private Long id;
 
   @Column(nullable = false)
-  private String name;
+  private String password;
 
   @Column(nullable = false, unique = true)
   private String username;
@@ -37,6 +39,9 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
+  @Column(nullable = true)
+  private Image usericon;
+
   public Long getId() {
     return id;
   }
@@ -45,12 +50,12 @@ public class User implements Serializable {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getPassword() {
+    return password;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public String getUsername() {
@@ -76,4 +81,13 @@ public class User implements Serializable {
   public void setStatus(UserStatus status) {
     this.status = status;
   }
+
+  public Image getUsericon() {
+    return usericon;
+  }
+
+  public void setUsericon(Image usericon) {
+    this.usericon = usericon;
+  }
+
 }

@@ -3,10 +3,12 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,4 +56,17 @@ public class UserController {
     // convert internal representation of user back to API
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
+
+  @PutMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void updateUser(@RequestBody UserPutDTO userPutDTO, @PathVariable("id") String id) {
+    User user = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+    try {
+      userService.updateUser(user, Long.valueOf(id));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find this user");
+    }
+  }
+
 }
