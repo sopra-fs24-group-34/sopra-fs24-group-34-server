@@ -65,16 +65,4 @@ public class UserController {
         return userService.loginUser(loginUser);
   }
 
-  @PutMapping("/users/{userId}")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public void updateUser(@RequestBody UserPutDTO userPutDTO, @PathVariable("id") String id) {
-    User user = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
-    try {
-      userService.updateUser(user, Long.valueOf(id));
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find this user");
-    }
-  }
-
 }

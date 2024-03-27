@@ -39,8 +39,6 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
-  @Column(nullable = true)
-  private Image usericon;
 
   public Long getId() {
     return id;
@@ -80,14 +78,6 @@ public class User implements Serializable {
 
   public void setStatus(UserStatus status) {
     this.status = status;
-  }
-
-  public Image getUsericon() {
-    return usericon;
-  }
-
-  public void setUsericon(Image usericon) {
-    this.usericon = usericon;
   }
 
 }
