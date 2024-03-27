@@ -11,6 +11,8 @@ public class UserPostDTO {
 
   public void setPassword(String password) {
     this.password = password;}
+    return password;
+  }
 
   public String getUsername() {
     return username;
