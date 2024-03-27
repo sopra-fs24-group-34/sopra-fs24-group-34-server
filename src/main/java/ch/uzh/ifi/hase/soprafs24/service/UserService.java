@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.service;
-
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -32,24 +33,28 @@ public class UserService {
 
   @Autowired
   public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+      this.userRepository = userRepository;
+    }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
   }
 
-  public User createUser(User newUser) {
-    newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+  public AuthenticationResponseDTO createUser(User newUser) {
+
     checkIfUserExists(newUser);
-    // saves the given entity but data is only persisted in the database once
+    newUser.setStatus(UserStatus.ONLINE);
+    newUser.setToken(UUID.randomUUID().toString());
+
+
+      // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
     userRepository.flush();
 
+
     log.debug("Created Information for User: {}", newUser);
-    return newUser;
+    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
   }
 
   /**
@@ -64,16 +69,20 @@ public class UserService {
    */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByName = userRepository.findByName(userToBeCreated.getName());
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the name", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByName != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "name", "is"));
+    if (userByUsername != null) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
   }
+    public AuthenticationResponseDTO loginUser(User loginUser) {
+        User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
+
+        if (existingUser != null) {
+            // User is authenticated
+            existingUser.setStatus(UserStatus.ONLINE);
+            return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");}
+    }
 }
