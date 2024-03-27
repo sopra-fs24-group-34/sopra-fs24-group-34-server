@@ -8,7 +8,7 @@ public class UserPutDTO {
 
   private String username;
 
-  private Image usericon;
+  private Image usericon; // smailalijagic: check this again
 
   private String token;
 
