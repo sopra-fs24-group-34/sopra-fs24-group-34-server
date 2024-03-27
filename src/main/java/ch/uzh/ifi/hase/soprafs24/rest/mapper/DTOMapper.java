@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -33,11 +34,10 @@ public interface DTOMapper {
   @Mapping(source = "status", target = "status")
   UserGetDTO convertEntityToUserGetDTO(User user);
 
-  @Mapping(source = "username", target = "username") // smailalijagic: handle username
-  @Mapping(source = "password", target = "password") // smailalijagic: handle password
-  @Mapping(source = "usericon", target = "usericon") // smailalijagic: handle icon/image
-  @Mapping(source = "token", target = "token") // smailalijagic: verify user
-  @Mapping(source = "id", target = "id") // smailalijagic: verify user
-  User convertUserPutDTOtoEntity(UserPutDTO userPutDTO);
+
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "token", target = "token")
+  AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
 
 }
+
