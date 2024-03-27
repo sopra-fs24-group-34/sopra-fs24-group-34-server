@@ -8,7 +8,7 @@
 |  Date  |  Links (to GitHub issues)  |  Description  |
 -------------------------------------------------------
 
-### Aligajic Smail
+### Alijagic Smail
 
 ### Giuliani Dario
 
