@@ -12,7 +12,7 @@
 
 ### Giuliani Dario
 -------------------------------------------------------
-|  27.03.2024  |  Links (to GitHub issues)  |  Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent  |
+|  27.03.2024  |  #26 #27  |  Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent  |
 -------------------------------------------------------
 
 ### Jukic Nedim
