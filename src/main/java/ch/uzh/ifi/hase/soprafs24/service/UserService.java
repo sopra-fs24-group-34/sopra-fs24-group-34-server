@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -86,5 +87,30 @@ public class UserService {
             return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");}
+    }
+
+    public User putUser(User updatedUser, Long userId){
+        checkIfUserExistsUpdate(updatedUser, userId);
+        User exsistingUser = userRepository.findUserById(userId);
+        exsistingUser.setUsername(updatedUser.getUsername());
+        updatedUser = userRepository.save(exsistingUser);
+        userRepository.flush();
+
+
+        return updatedUser;
+    }
+
+    private void checkIfUserExistsUpdate(User userToBeUpdated, Long userId) {
+        User userByUsername = userRepository.findByUsername(userToBeUpdated.getUsername());
+        Optional<User> Optionaluser = userRepository.findById(userId);
+        User existingUser = Optionaluser.orElse(null);
+        if (existingUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist");
+        }
+        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+        if (userByUsername != null && existingUser != userByUsername) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(baseErrorMessage, "username", "is"));
+        }
     }
 }

@@ -39,5 +39,10 @@ public interface DTOMapper {
   @Mapping(source = "token", target = "token")
   AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
 
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "username", target = "username")
+  @Mapping(source = "status", target = "status")
+  User convertUserPutDTOtoEntity(UserPutDTO userPutDTO);
+
 }
 
