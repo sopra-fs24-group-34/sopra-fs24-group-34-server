@@ -1,11 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import org.hibernate.mapping.Array;
+import org.mapstruct.Mapping;
 
 import javax.persistence.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Internal User Representation
@@ -38,6 +41,15 @@ public class User implements Serializable {
 
   @Column(nullable = false)
   private UserStatus status;
+
+  @Column(nullable = true)
+  private String usericon; // smailalijagic: added --> String datatype correct?
+
+  @Column(nullable = true)
+  private Long[] userfriendlist; // smailalijagic: userfriendlist contains userId of other users
+
+  @Column(nullable = true)
+  private Long[] usergamelobbylist; // smailalijagic: contains all lobby id that a user created
 
 
   public Long getId() {
@@ -78,6 +90,30 @@ public class User implements Serializable {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public String getUsericon() {
+    return usericon;
+  }
+
+  public void setUsericon(String usericon) {
+    this.usericon = usericon;
+  }
+
+  public Long[] getUserfriendlist() {
+    return userfriendlist;
+  }
+
+  public void setUserfriendlist(Long[] userfriendlist) {
+    this.userfriendlist = userfriendlist;
+  }
+
+  public Long[] getUsergamelobbylist() {
+    return usergamelobbylist;
+  }
+
+  public void setUsergamelobbylist(Long[] usergamelobbylist) {
+    this.usergamelobbylist = usergamelobbylist;
   }
 
 }

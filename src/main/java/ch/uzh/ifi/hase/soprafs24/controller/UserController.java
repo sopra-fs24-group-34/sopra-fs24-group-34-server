@@ -55,14 +55,37 @@ public class UserController {
     return userService.createUser(userInput);
   }
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
-        // convert API user to internal representation
-        User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+    // convert API user to internal representation
+    User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-        return userService.loginUser(loginUser);
+    return userService.loginUser(loginUser);
   }
+
+  @PutMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void updateUser(@RequestBody UserPutDTO userPutDTO, @PathVariable("userId") String id) {
+      User user = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+      try {
+          userService.updateUser(user, Long.valueOf(id));
+      } catch (Exception e) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not convert id check: UserController.java/updateUser");
+      }
+  }
+
+  @PostMapping("/logout/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void logoutUser() {
+    // smailalijagic: to be implemented
+    // set user to OFFLINE
+  }
+
+
+
 
 }

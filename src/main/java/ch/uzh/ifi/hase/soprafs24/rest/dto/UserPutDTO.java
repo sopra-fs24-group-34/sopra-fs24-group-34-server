@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import java.awt.*;
 
 public class UserPutDTO {
   // smailalijagic: all updatable data
@@ -8,11 +7,15 @@ public class UserPutDTO {
 
   private String username;
 
-  private Image usericon; // smailalijagic: check this again
+  private String usericon; // smailalijagic: check this again --> String correct datatype?
 
   private String token;
 
   private Long id;
+
+  private Long[] userfriendlist; // smailalijagic: adding and removing friends from friendlist
+
+  private Long[] usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
 
   public String getPassword() {
     return password;
@@ -30,11 +33,11 @@ public class UserPutDTO {
     this.username = username;
   }
 
-  public Image getUsericon() {
+  public String getUsericon() {
     return usericon;
   }
 
-  public void setUsericon(Image usericon) {
+  public void setUsericon(String usericon) {
     this.usericon = usericon;
   }
 
@@ -52,6 +55,22 @@ public class UserPutDTO {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public Long[] getUserfriendlist() {
+    return userfriendlist;
+  }
+
+  public void setUserfriendlist(Long[] userfriendlist) {
+    this.userfriendlist = userfriendlist;
+  }
+
+  public Long[] getUsergamelobbylist() {
+    return usergamelobbylist;
+  }
+
+  public void setUsergamelobbylist(Long[] usergamelobbylist) {
+    this.usergamelobbylist = usergamelobbylist;
   }
 
 }
