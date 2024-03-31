@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+
 import java.awt.*;
 
 public class UserPutDTO {
@@ -7,6 +9,9 @@ public class UserPutDTO {
   private String password;
 
   private String username;
+
+
+  private UserStatus status;
 
   private Image usericon; // smailalijagic: check this again
 
@@ -53,5 +58,13 @@ public class UserPutDTO {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public UserStatus getStatus() {
+        return status;
+    }
+
+  public void setStatus(UserStatus id) {
+        this.status = status;
+    }
 
 }
