@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -68,23 +69,62 @@ public class UserService {
    * @throws org.springframework.web.server.ResponseStatusException
    * @see User
    */
-  private void checkIfUserExists(User userToBeCreated) {
+  private Boolean checkIfUserExists(User userToBeCreated) {
+    // smailalijagic: changed to boolean
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
     String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
+    return false; // smailalijagic: user = null --> does not exist yet
   }
   
-    public AuthenticationResponseDTO loginUser(User loginUser) {
-        User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
+  public AuthenticationResponseDTO loginUser(User loginUser) {
+    User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
-        if (existingUser != null) {
-            // User is authenticated
-            existingUser.setStatus(UserStatus.ONLINE);
-            return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");}
+    if (existingUser != null) {
+      // User is authenticated
+      existingUser.setStatus(UserStatus.ONLINE);
+      return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");}
+  }
+
+  public User updateUser(User updatedUser, Long userId){
+    //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
+    User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
+
+    // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
+    if (!Objects.equals(updatedUser.getUsername(), "") && !checkIfUserExists(updatedUser)) {
+      exsistingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
     }
+    if (!Objects.equals(updatedUser.getPassword(), "")) {
+      exsistingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
+    }
+    exsistingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
+    exsistingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
+    exsistingUser.setUsericon(updatedUser.getUsericon()); // smailalijagic: update usericon
+
+    updatedUser = userRepository.save(exsistingUser);
+    userRepository.flush();
+
+
+    return updatedUser;
+  }
+
+//  private void checkIfUserExistsUpdate(User userToBeUpdated, Long userId) {
+//    // smailalijagic: we have too many check if user exists functions --> why not have one function?
+//    User userByUsername = userRepository.findByUsername(userToBeUpdated.getUsername());
+//    Optional<User> Optionaluser = userRepository.findById(userId);
+//    User existingUser = Optionaluser.orElse(null);
+//    if (existingUser == null) {
+//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist");
+//    }
+//    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+//    if (userByUsername != null && existingUser != userByUsername) {
+//      throw new ResponseStatusException(HttpStatus.CONFLICT,
+//              String.format(baseErrorMessage, "username", "is"));
+//    }
+//  }
 }

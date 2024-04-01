@@ -65,4 +65,18 @@ public class UserController {
         return userService.loginUser(loginUser);
   }
 
+    @PutMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public UserGetDTO updateUser(@PathVariable ("userId") String id, @RequestBody UserPutDTO userPutDTO) {
+      // smailalijagic: rename function to updateUser
+      Long userId = Long.valueOf(id); // smailalijagic: added
+      User userInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+
+      User updatedUser = userService.updateUser(userInput, userId); // smailalijagic: rename method to updateUser
+
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(updatedUser);
+
+    }
+
 }
