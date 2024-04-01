@@ -77,7 +77,7 @@ public class UserService {
     if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
-    return true;
+    return false; // smailalijagic: user = null --> does not exist yet
   }
   
   public AuthenticationResponseDTO loginUser(User loginUser) {
@@ -92,8 +92,8 @@ public class UserService {
   }
 
   public User updateUser(User updatedUser, Long userId){
-    checkIfUserExistsUpdate(updatedUser, userId);
-    User exsistingUser = userRepository.findUserById(userId);
+    //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
+    User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
     // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
     if (!Objects.equals(updatedUser.getUsername(), "") && !checkIfUserExists(updatedUser)) {
@@ -113,18 +113,18 @@ public class UserService {
     return updatedUser;
   }
 
-  private void checkIfUserExistsUpdate(User userToBeUpdated, Long userId) {
-    // smailalijagic: we have too many check if user exists functions --> why not have one function?
-    User userByUsername = userRepository.findByUsername(userToBeUpdated.getUsername());
-    Optional<User> Optionaluser = userRepository.findById(userId);
-    User existingUser = Optionaluser.orElse(null);
-    if (existingUser == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist");
-    }
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && existingUser != userByUsername) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT,
-              String.format(baseErrorMessage, "username", "is"));
-    }
-  }
+//  private void checkIfUserExistsUpdate(User userToBeUpdated, Long userId) {
+//    // smailalijagic: we have too many check if user exists functions --> why not have one function?
+//    User userByUsername = userRepository.findByUsername(userToBeUpdated.getUsername());
+//    Optional<User> Optionaluser = userRepository.findById(userId);
+//    User existingUser = Optionaluser.orElse(null);
+//    if (existingUser == null) {
+//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist");
+//    }
+//    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+//    if (userByUsername != null && existingUser != userByUsername) {
+//      throw new ResponseStatusException(HttpStatus.CONFLICT,
+//              String.format(baseErrorMessage, "username", "is"));
+//    }
+//  }
 }
