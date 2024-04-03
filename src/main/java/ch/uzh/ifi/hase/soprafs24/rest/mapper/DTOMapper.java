@@ -41,6 +41,9 @@ public interface DTOMapper {
   @Mapping(source = "usericon", target = "usericon")
   @Mapping(source = "userfriendlist", target = "userfriendlist")
   @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
+  @Mapping(source = "token", target = "token")
+  @Mapping(source = "totalplayed", target = "totalplayed")
+  @Mapping(source = "totalwins", target = "totalwins")
   User convertUserPutDTOtoEntity(UserPutDTO userPutDTO); // smailalijagic: all updatable data
 
 
