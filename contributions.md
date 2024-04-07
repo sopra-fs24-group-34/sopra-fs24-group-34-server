@@ -12,6 +12,7 @@
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 |  27.03.2024  |  #100, #101  |  Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)|
+|  07.04.2024  |  #54, #58  |  Chat Server should work fine and is complete?, starting game from lobby is implemented, added some additional REST files for Lobby|
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Giuliani Dario
