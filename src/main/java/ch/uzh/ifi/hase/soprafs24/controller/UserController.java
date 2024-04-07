@@ -55,28 +55,28 @@ public class UserController {
     return userService.createUser(userInput);
   }
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
-        // convert API user to internal representation
-        User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+    // convert API user to internal representation
+    User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-        return userService.loginUser(loginUser);
+    return userService.loginUser(loginUser);
   }
 
-    @PutMapping("/users/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
-    public UserGetDTO updateUser(@PathVariable ("userId") String id, @RequestBody UserPutDTO userPutDTO) {
-      // smailalijagic: rename function to updateUser
-      Long userId = Long.valueOf(id); // smailalijagic: added
-      User userInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+  @PutMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public UserGetDTO updateUser(@PathVariable ("userId") String id, @RequestBody UserPutDTO userPutDTO) {
+    // smailalijagic: rename function to updateUser
+    Long userId = Long.valueOf(id); // smailalijagic: added
+    User userInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
 
-      User updatedUser = userService.updateUser(userInput, userId); // smailalijagic: rename method to updateUser
+    User updatedUser = userService.updateUser(userInput, userId); // smailalijagic: rename method to updateUser
 
-      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(updatedUser);
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(updatedUser);
 
-    }
+  }
 
 }

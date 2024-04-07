@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
@@ -59,6 +60,10 @@ public interface DTOMapper {
   @Mapping(source = "messages", target = "message")
   MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
   // source = Chat, target = MessageGetDTO
+
+  @Mapping(source = "id", target = "lobbyid")
+  Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
+  // source = LobbyDeleteDTO, target = Lobby
 
 }
 
