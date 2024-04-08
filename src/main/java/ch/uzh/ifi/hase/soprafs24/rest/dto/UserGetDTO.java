@@ -9,6 +9,8 @@ public class UserGetDTO {
   private String username;
   private UserStatus status;
 
+  // smailalijagic: get player stats???
+
   public Long getId() {
     return id;
   }

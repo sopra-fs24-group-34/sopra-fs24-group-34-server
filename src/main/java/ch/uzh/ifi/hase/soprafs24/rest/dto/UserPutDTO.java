@@ -1,8 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.awt.*;
+import java.util.List;
 
 public class UserPutDTO {
   // smailalijagic: all updatable data
@@ -18,9 +21,13 @@ public class UserPutDTO {
 
   private Long id;
 
-  private Long[] userfriendlist; // smailalijagic: adding and removing friends from friendlist
+  private List<User> userfriendlist; // smailalijagic: adding and removing friends from friendlist
 
-  private Long[] usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
+  private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
+
+  private Long totalplayed; // smailalijagic: natural number in range [0, n)
+
+  private Long totalwins; // smailalijagic: natural number in range [0, n)
 
   public String getPassword() {
     return password;
@@ -70,20 +77,36 @@ public class UserPutDTO {
         this.status = status;
     }
 
-  public Long[] getUserfriendlist() {
+  public List<User> getUserfriendlist() {
     return userfriendlist;
   }
 
-  public void setUserfriendlist(Long[] userfriendlist) {
+  public void setUserfriendlist(List<User> userfriendlist) {
     this.userfriendlist = userfriendlist;
   }
 
-  public Long[] getUsergamelobbylist() {
+  public List<Lobby> getUsergamelobbylist() {
     return usergamelobbylist;
   }
 
-  public void setUsergamelobbylist(Long[] usergamelobbylist) {
+  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
     this.usergamelobbylist = usergamelobbylist;
+  }
+
+  public Long getTotalplayed() {
+    return totalplayed;
+  }
+
+  public void setTotalplayed(Long totalplayed) {
+    this.totalplayed = totalplayed;
+  }
+
+  public Long getTotalwins() {
+    return totalwins;
+  }
+
+  public void setTotalwins(Long totalwins) {
+    this.totalwins = totalwins;
   }
 
 }

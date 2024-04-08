@@ -1,10 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Chat;
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -41,12 +40,30 @@ public interface DTOMapper {
   @Mapping(source = "usericon", target = "usericon")
   @Mapping(source = "userfriendlist", target = "userfriendlist")
   @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
+  @Mapping(source = "token", target = "token")
+  @Mapping(source = "totalplayed", target = "totalplayed")
+  @Mapping(source = "totalwins", target = "totalwins")
   User convertUserPutDTOtoEntity(UserPutDTO userPutDTO); // smailalijagic: all updatable data
 
 
   @Mapping(source = "id", target = "id")
   @Mapping(source = "token", target = "token")
   AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
+
+
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "message", target = "messages")
+  Chat convertMessagePostDTOtoEntity(MessagePostDTO messagePostDTO); // smailalijagic: added, issue #58
+  // source = MessagePostDTO, target = Chat
+
+  @Mapping(source = "id", target = "id")
+  @Mapping(source = "messages", target = "message")
+  MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
+  // source = Chat, target = MessageGetDTO
+
+  @Mapping(source = "id", target = "lobbyid")
+  Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
+  // source = LobbyDeleteDTO, target = Lobby
 
 }
 

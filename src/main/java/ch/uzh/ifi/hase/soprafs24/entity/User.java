@@ -45,12 +45,17 @@ public class User implements Serializable {
   @Column(nullable = true)
   private String usericon; // smailalijagic: added --> String datatype correct?
 
-  @Column(nullable = true)
-  private Long[] userfriendlist; // smailalijagic: userfriendlist contains userId of other users
+  @ManyToMany(cascade = CascadeType.ALL) // smailalijagic: user can have many friends and be friends with many
+  private List<User> userfriendlist; // smailalijagic: userfriendlist contains Users
+
+  @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
+  private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
 
   @Column(nullable = true)
-  private Long[] usergamelobbylist; // smailalijagic: contains all lobby id that a user created
+  private Long totalplayed; // smailalijagic: number of played games
 
+  @Column(nullable = true)
+  private Long totalwins; // smailalijagic: number of won games
 
   public Long getId() {
     return id;
@@ -100,20 +105,36 @@ public class User implements Serializable {
     this.usericon = usericon;
   }
 
-  public Long[] getUserfriendlist() {
+  public List<User> getUserfriendlist() {
     return userfriendlist;
   }
 
-  public void setUserfriendlist(Long[] userfriendlist) {
+  public void setUserfriendlist(List<User> userfriendlist) {
     this.userfriendlist = userfriendlist;
   }
 
-  public Long[] getUsergamelobbylist() {
+  public List<Lobby> getUsergamelobbylist() {
     return usergamelobbylist;
   }
 
-  public void setUsergamelobbylist(Long[] usergamelobbylist) {
+  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
     this.usergamelobbylist = usergamelobbylist;
+  }
+
+  public Long getTotalplayed() {
+    return totalplayed;
+  }
+
+  public void setTotalplayed(Long totalplayed) {
+    this.totalplayed = totalplayed;
+  }
+
+  public Long getTotalwins() {
+    return totalwins;
+  }
+
+  public void setTotalwins(Long totalwins) {
+    this.totalwins = totalwins;
   }
 
 }
