@@ -19,7 +19,7 @@
 -------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 |  27.03.2024  |  #26, #27  |  Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
-|  07.04.2024  |  #12, #13, User Story #11  | Add image fetching from AP, saving to Database and getting all images if needed. (Some fetched images are not suited, need to look further into it)|
+|  10.04.2024  |  #12, #13, User Story #11  | Add image fetching from AP, saving to Database and getting all images if needed. (Some fetched images are not suited, need to look further into it)|
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### Jukic Nedim
