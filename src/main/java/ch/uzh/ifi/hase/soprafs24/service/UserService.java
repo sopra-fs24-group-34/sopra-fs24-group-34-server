@@ -92,7 +92,7 @@ public class UserService {
   }
 
   public User updateUser(User updatedUser, Long userId){
-    //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
+    // checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
     User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
     // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username

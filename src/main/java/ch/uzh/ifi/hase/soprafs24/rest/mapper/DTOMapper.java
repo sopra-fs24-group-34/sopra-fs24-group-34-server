@@ -1,10 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -50,6 +48,11 @@ public interface DTOMapper {
   @Mapping(source = "id", target = "id")
   @Mapping(source = "token", target = "token")
   AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
+
+
+
+  @Mapping(source = "lobbyid", target = "lobbyid")
+  Lobby convertLobbyPostDTOtoEntity (LobbyPostDTO lobbyPostDTO);
 
 }
 

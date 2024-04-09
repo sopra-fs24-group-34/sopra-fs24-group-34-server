@@ -18,6 +18,8 @@ public class Lobby implements Serializable {
 
   private Long invited_userid; // smailalijagic: every lobby can hold two players
 
+  private String lobbyToken;
+
   public Long getLobbyid() {
     return lobbyid;
   }
@@ -26,12 +28,21 @@ public class Lobby implements Serializable {
     this.lobbyid = lobbyid;
   }
 
+
   public User getUser() {
     return user;
   }
 
   public void setUser(User user) {
-    this.user = user;
+        this.user = user;
+    }
+
+  public String getlobbyToken(){
+      return lobbyToken;
+  }
+
+  public void setToken(String lobbyToken){
+      this.lobbyToken = lobbyToken;
   }
 
   public Long getInvited_userid() {
