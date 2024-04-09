@@ -42,6 +42,10 @@ public class LobbyService {
     return this.lobbyRepository.findAll();
   }
 
+  public Lobby getLobby(Long lobbyId) {
+    return this.lobbyRepository.findByLobbyid(lobbyId);
+  }
+
   public Boolean checkIfLobbyExists(Long lobbyid) {
     // smailalijagic: changed to boolean
     Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid);
