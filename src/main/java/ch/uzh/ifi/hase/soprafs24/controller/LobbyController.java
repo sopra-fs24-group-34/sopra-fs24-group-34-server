@@ -9,26 +9,32 @@ import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class LobbyController {
 
-  private final LobbyService lobbyService;
+    private final LobbyService lobbyService;
 
-  LobbyController(LobbyService lobbyService) {
-    this.lobbyService = lobbyService;
-  }
+    public LobbyController(LobbyService lobbyService) {
+        this.lobbyService = lobbyService;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 
 
-
-
-  @PostMapping("/lobbies/create")
+  @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lobby createLobby() {
-    // smailalijagic: created lobby -> needs to return lobby which will be added to usergamelobbylist
-    return null;
+  public Lobby createlobby(@PathVariable("userId") Long userId) {
+
+     return lobbyService.createlobby(userId);
   }
 
   @PutMapping("/lobbies/settings/{lobbyId}")

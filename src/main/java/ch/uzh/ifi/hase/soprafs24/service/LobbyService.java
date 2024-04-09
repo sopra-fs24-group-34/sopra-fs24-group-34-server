@@ -1,31 +1,35 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+//
+import ch.uzh.ifi.hase.soprafs24.entity.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
+import java.util.UUID;
+
 
 @Service
 @Transactional
 public class LobbyService {
 
-  private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
+    private final Logger log = LoggerFactory.getLogger(LobbyService.class);
 
-  private final UserRepository userRepository; // smailalijagic: needed to verify user
-
-  @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository) {
-    this.lobbyRepository = lobbyRepository;
-    this.userRepository = userRepository;
-  }
+    private final LobbyRepository lobbyRepository;
+    private final UserRepository userRepository;
+    @Autowired
+    public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier ("userRepository") UserRepository userRepository) {
+        this.lobbyRepository = lobbyRepository;
+        this.userRepository = userRepository;
+    }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
@@ -70,4 +74,15 @@ public class LobbyService {
     }
   }
 
+    public Lobby createlobby(Long userId){
+        Lobby newlobby = new Lobby();
+        newlobby.setToken(UUID.randomUUID().toString());
+        newlobby.setUser(userRepository.findUserById(userId));
+
+        newlobby = lobbyRepository.save(newlobby);
+        lobbyRepository.flush();
+
+        log.debug("Created Information for Lobby: {}", newlobby);
+        return newlobby;
+    }
 }
