@@ -75,14 +75,18 @@ public class LobbyService {
   }
 
     public Lobby createlobby(Long userId){
-        Lobby newlobby = new Lobby();
-        newlobby.setToken(UUID.randomUUID().toString());
-        newlobby.setUser(userRepository.findUserById(userId));
+        try {
+            Lobby newlobby = new Lobby();
+            newlobby.setToken(UUID.randomUUID().toString());
+            newlobby.setUser(userRepository.findUserById(userId));
 
-        newlobby = lobbyRepository.save(newlobby);
-        lobbyRepository.flush();
+            newlobby = lobbyRepository.save(newlobby);
+            lobbyRepository.flush();
 
-        log.debug("Created Information for Lobby: {}", newlobby);
-        return newlobby;
+            log.debug("Created Information for Lobby: {}", newlobby);
+            return newlobby;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby could not be created");
+        }
     }
 }
