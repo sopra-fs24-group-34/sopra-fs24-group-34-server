@@ -73,9 +73,9 @@ public class UserPutDTO {
         return status;
     }
 
-  public void setStatus(UserStatus id) {
-        this.status = status;
-    }
+  public void setStatus(UserStatus satus) {
+    this.status = status;
+  }
 
   public List<User> getUserfriendlist() {
     return userfriendlist;
