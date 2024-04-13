@@ -13,8 +13,8 @@ public class Lobby implements Serializable {
   @GeneratedValue
   private Long lobbyid;
 
-  @ManyToOne(cascade = CascadeType.ALL)
-  private User user; // smailalijagic: every lobby belongs to exactly one user
+  //@ManyToOne(cascade = CascadeType.ALL)
+  private Long creator_userid; // smailalijagic: every lobby belongs to exactly one user
 
   private Long invited_userid; // smailalijagic: every lobby can hold two players
 
@@ -28,14 +28,22 @@ public class Lobby implements Serializable {
     this.lobbyid = lobbyid;
   }
 
-
-  public User getUser() {
-    return user;
+  public Long getCreator_userid() {
+    return creator_userid;
   }
 
-  public void setUser(User user) {
-        this.user = user;
-    }
+  public void setCreator_userid(Long creator_userid) {
+    this.creator_userid = creator_userid;
+  }
+
+
+  //public User getUser() {
+  //  return user;
+  //}
+
+  //public void setUser(User user) {
+  //  this.user = user;
+  //}
 
   public String getlobbyToken(){
       return lobbyToken;

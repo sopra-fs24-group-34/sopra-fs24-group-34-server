@@ -76,6 +76,23 @@ public interface DTOMapper {
   Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
   // source = LobbyDeleteDTO, target = Lobby
 
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  @Mapping(source = "invited_userid", target = "invited_userid")
+  LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
+  // source = Lobby, target = LobbyGetDTO
+
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  @Mapping(source = "invited_userid", target = "invited_userid")
+  @Mapping(source = "lobbyToken", target = "lobbyToken")
+  LobbyPutDTO convertEntityToLobbyPutDTO(Lobby lobby);
+
+//  @Mapping(source = "id", target = "lobbyid")
+//  @Mapping(source = "creator_userid", target = "creator_userid")
+//  @Mapping(source = "invited_userid", target = "invited_userid")
+//  @Mapping(source = "lobbyToken", target = "lobbyToken")
+//  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
 }
 
