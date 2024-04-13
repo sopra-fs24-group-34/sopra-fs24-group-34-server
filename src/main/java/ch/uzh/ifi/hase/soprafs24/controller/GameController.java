@@ -2,11 +2,20 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 public class GameController {
-  @PostMapping("/game/{gameId}/start")
+
+    private final GameService gameService;
+
+    GameController(GameService gameService) {
+        this.gameService = gameService;
+    }
+
+
+    @PostMapping("/game/{gameId}/start")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public void createGame(@PathVariable("gameId") String gameid, User user1, User user2, Lobby lobby) {
@@ -16,6 +25,15 @@ public class GameController {
     // 3. User2 online?
     // 4. remove lobby
     // 5. load game --> game logic (follows)
+  }
+
+  @PostMapping("/game/character/choose")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseBody
+  public void chooseImage(@RequestBody Long imageId){
+
+      gameService.chooseimage(imageId);
+
   }
 
   @PutMapping("/game/{gameId}/select")
