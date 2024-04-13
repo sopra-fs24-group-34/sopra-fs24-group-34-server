@@ -104,3 +104,6 @@ To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you st
 
 ## Testing
 Have a look here: https://www.baeldung.com/spring-boot-testing
+
+## DockerHub
+Link to server: https://hub.docker.com/repository/docker/sopragroup34/server/general
