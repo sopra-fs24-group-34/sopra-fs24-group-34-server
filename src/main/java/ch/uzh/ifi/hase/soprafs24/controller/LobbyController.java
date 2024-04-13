@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyDeleteDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class LobbyController {
@@ -52,13 +55,22 @@ public class LobbyController {
     // smailalijagic: update all lobby settings
   }
 
-  @GetMapping("lobbies/join/{lobbyId}")
+  @PutMapping("lobbies/join/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Long joinLobby(@PathVariable("lobbyId") String lobbyid) {
+  public Long joinLobby(@PathVariable("lobbyId") String id) {
     // smailalijagic: check if lobby exists
+    Long lobbyId = Long.valueOf(id);
+    //assert lobbyService.checkIfLobbyExists(lobbyId);
+    //Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+    // smailalijagic: create guest_user
+    //User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User guestUser = lobbyService.createGuestUser();
+    Long guestUserId = guestUser.getId();
+    // smailalijagic: update lobby
+    //lobby.setInvited_userid(guestUserId); // smailalijagic: update lobby
     // smailalijagic: load lobby screen
-    return null;
+    return lobbyId;
   }
 
   @DeleteMapping("/lobbies/{lobbyId}/start")
