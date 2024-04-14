@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
+
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
@@ -27,10 +28,20 @@ public interface DTOMapper {
   @Mapping(source = "username", target = "username")
   User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "password", target = "password")
-  @Mapping(source = "username", target = "username")
+  //@Mapping(source = "id", target = "id")
+  //@Mapping(source = "password", target = "password")
+  //@Mapping(source = "username", target = "username")
+  //@Mapping(source = "status", target = "status")
+  @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
   @Mapping(source = "status", target = "status")
+  @Mapping(source = "username", target = "username")
+  @Mapping(source = "password", target = "password")
+  @Mapping(source = "usericon", target = "usericon")
+  @Mapping(source = "userfriendlist", target = "userfriendlist")
+  @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
+  @Mapping(source = "token", target = "token")
+  @Mapping(source = "totalplayed", target = "totalplayed")
+  @Mapping(source = "totalwins", target = "totalwins")
   UserGetDTO convertEntityToUserGetDTO(User user);
 
   @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
@@ -64,6 +75,7 @@ public interface DTOMapper {
   @Mapping(source = "id", target = "lobbyid")
   Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
   // source = LobbyDeleteDTO, target = Lobby
+
 
 }
 

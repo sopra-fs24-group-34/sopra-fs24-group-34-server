@@ -1,15 +1,22 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyDeleteDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class LobbyController {
@@ -20,31 +27,46 @@ public class LobbyController {
     this.lobbyService = lobbyService;
   }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
 
 
-
-  @PostMapping("/lobbies/create")
+  @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lobby createLobby() {
-    // smailalijagic: created lobby -> needs to return lobby which will be added to usergamelobbylist
-    return null;
+  public Lobby createlobby(@PathVariable("userId") Long userId) {
+
+     return lobbyService.createlobby(userId);
   }
 
   @PutMapping("/lobbies/settings/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public void updateLobby(@PathVariable("lobbyId") String lobbyId) {
+  public void updateLobby(@PathVariable("lobbyId") String id) {
     // smailalijagic: change lobby settings --> setting attributes need to be defined first
+    Long lobbyId = Long.valueOf(id);
+    Lobby updatedLobby = lobbyService.getLobby(lobbyId);
+    // smailalijagic: update all lobby settings
   }
 
-  @GetMapping("lobbies/join/{lobbyId}")
+  @PutMapping("lobbies/join/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Long joinLobby(@PathVariable("lobbyId") String lobbyid) {
+  public Long joinLobby(@PathVariable("lobbyId") String id) {
     // smailalijagic: check if lobby exists
+    Long lobbyId = Long.valueOf(id);
+    //assert lobbyService.checkIfLobbyExists(lobbyId);
+    //Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+    // smailalijagic: create guest_user
+    //User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+    User guestUser = lobbyService.createGuestUser();
+    Long guestUserId = guestUser.getId();
+    // smailalijagic: update lobby
+    //lobby.setInvited_userid(guestUserId); // smailalijagic: update lobby
     // smailalijagic: load lobby screen
-    return null;
+    return lobbyId;
   }
 
   @DeleteMapping("/lobbies/{lobbyId}/start")

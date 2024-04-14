@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
+import java.util.List;
+
 public class LobbyPostDTO {
 
   private Long id;
@@ -11,5 +13,6 @@ public class LobbyPostDTO {
   public void setId(Long id) {
     this.id = id;
   }
+
 
 }
