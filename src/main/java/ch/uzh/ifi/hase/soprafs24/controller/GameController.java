@@ -30,11 +30,25 @@ public class GameController {
   @PostMapping("/game/character/choose")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @ResponseBody
-  public void chooseImage(@RequestBody Long imageId){
+  public void chooseImage(@RequestBody Long imageId, Long playerId){
+      // till
+      // 1. ImageID exists?
+      // 2. chosencharacter still null?
 
-      gameService.chooseimage(imageId);
+      gameService.chooseimage(imageId, playerId);
 
   }
+
+    @PostMapping("/game/character/choose")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseBody
+    public void guessImage(@RequestBody Long imageId){
+
+        gameService.guessimage(imageId);
+
+    }
+
+
 
   @PutMapping("/game/{gameId}/select")
   @ResponseStatus(HttpStatus.NO_CONTENT)
