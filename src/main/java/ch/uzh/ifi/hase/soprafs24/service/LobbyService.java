@@ -64,7 +64,7 @@ public class LobbyService {
   public AuthenticationResponseDTO createGuestUser() {
     User newUser = createUser();
     newUser.setUsername("Guest" + newUser.getId());
-    newUser.setStatus(UserStatus.ONLINE);
+    newUser.setStatus(UserStatus.INLOBBY);
     newUser.setToken(UUID.randomUUID().toString());
 
     // saves the given entity but data is only persisted in the database once

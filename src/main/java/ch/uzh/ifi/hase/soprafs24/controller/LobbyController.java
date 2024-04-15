@@ -70,6 +70,8 @@ public class LobbyController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public AuthenticationResponseDTO joinLobbyAsGuest(@PathVariable("lobbyId") String id) {
+    // smailalijagic: update lobby for guest
+    // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
     Long lobbyId = Long.valueOf(id);
     if (lobbyService.checkIfLobbyExists(lobbyId)) {
       Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
@@ -86,6 +88,14 @@ public class LobbyController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
     }
   }
+
+  @PutMapping("users/{userId}/lobbies/join/{lobbyId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void joinLobbyAsRegistered(@RequestBody UserGetDTO userGetDTO ,@PathVariable("lobbyId") String id) {
+    // smailalijagic: update lobby for registered users
+  }
+
 
 
 

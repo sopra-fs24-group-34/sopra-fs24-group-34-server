@@ -28,12 +28,23 @@ public class GameController {
     return true;
   }
 
+  @PostMapping("/game/{gameId}/pick")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Boolean pickChar(@PathVariable("gameId") String gameId, String charURL) {
+    // smailalijagic:
+    // 1. pick char
+    // 2. return true
+    return true;
+  }
+
   @DeleteMapping("/game/{gameId}/delete")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public void deleteGame(@PathVariable("gameId") String gameid, User user1, User user2) {
     // smailalijagic:
     // delete game from database
+    // delete chat from database
     // update stats
     // load new page
   }

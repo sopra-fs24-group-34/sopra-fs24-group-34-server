@@ -62,12 +62,12 @@ public interface DTOMapper {
   AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
 
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "message", target = "messages")
+  //@Mapping(source = "id", target = "id")
+  @Mapping(source = "message", target = "lastmessage")
   Chat convertMessagePostDTOtoEntity(MessagePostDTO messagePostDTO); // smailalijagic: added, issue #58
   // source = MessagePostDTO, target = Chat
 
-  @Mapping(source = "id", target = "id")
+  //@Mapping(source = "id", target = "id")
   @Mapping(source = "messages", target = "message")
   MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
   // source = Chat, target = MessageGetDTO
