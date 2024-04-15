@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.controller.GameController;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import com.zaxxer.hikari.SQLExceptionOverride;
@@ -20,7 +21,11 @@ public class GameService {
     this.gameRepository = gameRepository;
   }
 
-  public Boolean checkIfGameExists(Long gameId) {
+  public void chooseimage(Long imageId) {
+
+    }
+
+    public Boolean checkIfGameExists(Long gameId) {
     try {
       assert gameRepository.findByGameid(gameId) != null;
       return true;

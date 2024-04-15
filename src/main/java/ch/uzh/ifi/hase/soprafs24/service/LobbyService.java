@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -111,14 +112,23 @@ public class LobbyService {
   }
 
     public Lobby createlobby(Long userId){
-        Lobby newlobby = new Lobby();
-        newlobby.setToken(UUID.randomUUID().toString());
-        newlobby.setUser(userRepository.findUserById(userId));
+        try {
+            Lobby newlobby = new Lobby();
+            User creator = userRepository.findUserById(userId);
+            newlobby.setToken(UUID.randomUUID().toString());
+            newlobby.setUser(userId);
 
-        newlobby = lobbyRepository.save(newlobby);
-        lobbyRepository.flush();
+            newlobby = lobbyRepository.save(newlobby);
+            lobbyRepository.flush();
 
-        log.debug("Created Information for Lobby: {}", newlobby);
-        return newlobby;
+            List<Lobby> lobbyList = creator.getUsergamelobbylist();
+            lobbyList.add(newlobby);
+            creator.setUsergamelobbylist(lobbyList);
+
+            log.debug("Created Information for Lobby: {}", newlobby);
+            return newlobby;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby could not be created");
+        }
     }
 }
