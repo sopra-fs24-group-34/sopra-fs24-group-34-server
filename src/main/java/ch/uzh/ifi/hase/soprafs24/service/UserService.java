@@ -43,6 +43,14 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
+    public User getUserById(Long userId) {
+        try {
+            return userRepository.findById(userId).get();
+        } catch(Exception e) {
+            return null;
+        }
+    }
+
     public AuthenticationResponseDTO createUser(User newUser) {
 
         checkIfUserExists(newUser);
