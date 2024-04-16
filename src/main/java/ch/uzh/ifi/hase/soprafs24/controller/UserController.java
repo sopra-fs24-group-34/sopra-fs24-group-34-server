@@ -46,6 +46,7 @@ public class UserController {
     return userGetDTOs;
   }
 
+  //nedim-j: copied from M1, please adjust if needed
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
