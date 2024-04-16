@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * User Controller
@@ -44,6 +45,35 @@ public class UserController {
     }
     return userGetDTOs;
   }
+
+  //nedim-j: copied from M1, please adjust if needed
+    @GetMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public UserGetDTO getUser(@PathVariable(name="userId") String userIdAsStr) {
+
+        Long userId;
+        if(userIdAsStr == null) {
+            userId = null;
+        } else {
+            userId = Long.parseLong(userIdAsStr, 10);
+        }
+
+        User userById = new User();
+        try {
+            userById = userService.getUserById(userId);
+        } catch(NoSuchElementException e) {
+            userById = null;
+        }
+
+        if(userById != null) {
+            return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userById);
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User with userId " + userId + " does not exist");
+        }
+    }
 
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
