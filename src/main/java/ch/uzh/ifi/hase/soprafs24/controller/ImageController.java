@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 import java.util.ArrayList;
 import java.util.List;
-
 @RestController
 public class ImageController {
 
@@ -23,18 +23,13 @@ public class ImageController {
     }
 
     @GetMapping("/images/fetch-and-save")
-    public String fetchAndSaveImages() {
+    public String fetchAndSaveImages() { //fetches from database and saves to database
         unsplashService.saveRandomPortraitImagesToDatabase(5); //should be 20, for now 5 because of the api limitation
         return "Successfully fetched and saved images to the database.";
     }
-    @GetMapping("/images/random")
-    public String getRandomImage() {
-        List<String> imageUrls = unsplashService.getAllImageUrlsFromDatabase();
-        if (!imageUrls.isEmpty()) {
-            int randomIndex = (int) (Math.random() * imageUrls.size());
-            return imageUrls.get(randomIndex);
-        } else {
-            return "No images found in the database.";
-        }
+    @GetMapping("/images")
+    public List<ImageDTO> getImageUrls(@RequestParam(defaultValue = "10") int count) {
+        //gets images from database
+        return unsplashService.getImageUrlsFromDatabase(count);
     }
 }
