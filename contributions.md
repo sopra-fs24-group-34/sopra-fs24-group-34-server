@@ -7,7 +7,7 @@
 | 27.03.2024  | Smail Aligajic | [#100], [#101] | Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)  |
 | 27.03.2024 | Dario Giuliani | [#26], [#27] | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
 | 02.04.2024 | Liam Kontopulos | [#50] | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
-| 02.04.2024 | Nedim Jukic | | |
+| 02.04.2024 | Nedim Jukic | [#23], [#24] | Basic implementation of Menu, with Leaderboard, Friends and Profile. Need  to improve style and add correct API calls. |
 | 28.03.2024 | Till Sollberger | [#98] | Added the implementation to update the User profile, the second task went missing. So I'm gonna do more than two for the next week. |
 
 
@@ -17,8 +17,8 @@
 |---|---|---|---|
 | 07.04.2024 | Smail Aligajic | [#54}, [#58} | Chat Server should work fine and is complete?, starting game from lobby is implemented, added some additional REST files for Lobby |
 | 01.04.2024 | Dario Giuliani |  | |
-| 02.04.2024 | Liam Kontopulos | | |
-| 02.04.2024 | Nedim Jukic | | |
+| 02.04.2024 | Liam Kontopulos | -| -|
+| 02.04.2024 | Nedim Jukic | -| -|
 | 10.04.2024 | Till Sollberger | [#44], [#46] | Creation of the lobby and handling of failures. |
 
 
@@ -29,7 +29,7 @@
 | 31.03.2024 | Smail Aligajic | | |
 | 01.04.2024 | Dario Giuliani | | |
 | 02.04.2024 | Liam Kontopulos | | |
-| 02.04.2024 | Nedim Jukic | | |
+| 15.04.2024 | Nedim Jukic | [#15], [#34], [#35], [#42]| Implementation of Lobby, fixes to Menu. |
 | 02.04.2024 | Till Sollberger | | |
 
 
