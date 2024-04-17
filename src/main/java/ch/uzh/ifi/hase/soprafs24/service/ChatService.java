@@ -45,7 +45,8 @@ public class ChatService {
     if (message.length() > Chat.MAX_MESSAGE_LENGTH) {
       message = message.substring(0, Chat.MAX_MESSAGE_LENGTH); // smailalijagic: only return first 250 characters
     }
-    existingchat.addMessage(message, userid);
+    String myMessage = user.getUsername() + ": " + message;
+    existingchat.addMessage(myMessage, userid);
 
     chat = chatRepository.save(existingchat);
     chatRepository.flush();
