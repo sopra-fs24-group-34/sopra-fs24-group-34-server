@@ -115,6 +115,13 @@ public class UserService {
 
         return updatedUser;
     }
+    public User getUserById(Long userId) {
+        try {
+            return userRepository.findById(userId).get();
+        } catch(Exception e) {
+            return null;
+        }
+    }
 
     // public List<User> getUsers() {
     // return this.userRepository.findAll();}
