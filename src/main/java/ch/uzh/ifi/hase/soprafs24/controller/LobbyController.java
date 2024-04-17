@@ -27,10 +27,10 @@ public class LobbyController {
     this.lobbyService = lobbyService;
   }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<String> handleException(Exception ex) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+  }
 
   @GetMapping("/lobbies")
   @ResponseStatus(HttpStatus.OK)
@@ -45,6 +45,14 @@ public class LobbyController {
       lobbyGetDTOs.add(DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
     }
     return lobbyGetDTOs;
+  }
+
+  @GetMapping("lobbies/{lobbyId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public LobbyGetDTO getLobby(@PathVariable("lobbyId") Long lobbyId) {
+    Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
+    return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby); // smailalijagic: convert lobby to api representation and return it
   }
 
 
@@ -66,10 +74,18 @@ public class LobbyController {
     // smailalijagic: update all lobby settings
   }
 
-  @PutMapping("lobbies/join/{lobbyId}")
+  @GetMapping("/lobbies/settings/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public AuthenticationResponseDTO joinLobbyAsGuest(@PathVariable("lobbyId") String id) {
+  public Lobby getLobbySettings(@PathVariable("lobbyId") String id) {
+    // smailalijagic: return lobby settings to client
+    return null;
+  }
+
+  @PutMapping("lobbies/join/{lobbyId}/{guestId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id, @RequestBody UserGetDTO userGetDTO) {
     // smailalijagic: update lobby for guest
     // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
     Long lobbyId = Long.valueOf(id);
@@ -78,26 +94,16 @@ public class LobbyController {
       if (lobby.getInvited_userid() != null) {
         throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
       }
-      AuthenticationResponseDTO user = lobbyService.createGuestUser(); // smailalijagic: create guest_user
-      lobbyService.addGuestToLobby(lobby, user); // smailalijagic: update lobby
+      User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO);
+      lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
 
-      return user; // smailalijagic: return api representation
+      return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
       // smailalijagic: load lobby screen
 
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
     }
   }
-
-  @PutMapping("users/{userId}/lobbies/join/{lobbyId}")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public void joinLobbyAsRegistered(@RequestBody UserGetDTO userGetDTO ,@PathVariable("lobbyId") String id) {
-    // smailalijagic: update lobby for registered users
-  }
-
-
-
 
   @DeleteMapping("/lobbies/{lobbyId}/start")
   @ResponseStatus(HttpStatus.OK)

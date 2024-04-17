@@ -46,37 +46,37 @@ public class LobbyService {
     return userByUsername != null;// smailalijagic: user = null --> does not exist yet
   }
 
-  private User createUser() {
-    User user = new User();
-    user.setUsername("Guest");
-    user.setPassword("12345"); // smailalijagic: default password
-    user.setStatus(UserStatus.ONLINE);
-    user.setToken(UUID.randomUUID().toString());
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    user = userRepository.save(user);
-    userRepository.flush();
-    // getUserId() --> 1
-    log.debug("Created Information for User: {}", user);
-    return user;
-  }
-
-  public AuthenticationResponseDTO createGuestUser() {
-    User newUser = createUser();
-    newUser.setUsername("Guest" + newUser.getId());
-    newUser.setStatus(UserStatus.INLOBBY);
-    newUser.setToken(UUID.randomUUID().toString());
-
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    newUser = userRepository.save(newUser);
-    userRepository.flush();
-
-    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
-    // Guest1
-    // Id: 1
-    // password: 12345
-  }
+//  private User createUser() {
+//    User user = new User();
+//    user.setUsername("Guest");
+//    user.setPassword("12345"); // smailalijagic: default password
+//    user.setStatus(UserStatus.ONLINE);
+//    user.setToken(UUID.randomUUID().toString());
+//    // saves the given entity but data is only persisted in the database once
+//    // flush() is called
+//    user = userRepository.save(user);
+//    userRepository.flush();
+//    // getUserId() --> 1
+//    log.debug("Created Information for User: {}", user);
+//    return user;
+//  }
+//
+//  public AuthenticationResponseDTO createGuestUser() {
+//    User newUser = createUser();
+//    newUser.setUsername("Guest" + newUser.getId());
+//    newUser.setStatus(UserStatus.INLOBBY);
+//    newUser.setToken(UUID.randomUUID().toString());
+//
+//    // saves the given entity but data is only persisted in the database once
+//    // flush() is called
+//    newUser = userRepository.save(newUser);
+//    userRepository.flush();
+//
+//    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
+//    // Guest1
+//    // Id: 1
+//    // password: 12345
+//  }
 
   public List<Lobby> getLobbies() {
     return this.lobbyRepository.findAll();
@@ -131,9 +131,9 @@ public class LobbyService {
     return true;
   }
 
-  public void addGuestToLobby(Lobby lobby, AuthenticationResponseDTO guest) {
-    Long guestId = guest.getId();
-    lobby.setInvited_userid(guestId);
+  public void addUserToLobby(Lobby lobby, User user) {
+    Long userId = user.getId();
+    lobby.setInvited_userid(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
   }
