@@ -1,13 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import ch.uzh.ifi.hase.soprafs24.entity.User;
-
-public class LobbyGetDTO {
+public class LobbyPutDTO {
   private Long id;
 
   private Long creator_userid;
 
   private Long invited_userid;
+
+  private String lobbyToken;
 
   public Long getId() {
     return id;
@@ -31,6 +31,14 @@ public class LobbyGetDTO {
 
   public void setInvited_userid(Long invited_userid) {
     this.invited_userid = invited_userid;
+  }
+
+  public String getLobbyToken() {
+    return lobbyToken;
+  }
+
+  public void setLobbyToken(String lobbyToken) {
+    this.lobbyToken = lobbyToken;
   }
 
 }

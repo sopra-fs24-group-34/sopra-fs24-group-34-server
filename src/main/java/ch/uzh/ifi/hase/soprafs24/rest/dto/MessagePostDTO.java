@@ -3,24 +3,24 @@ import java.util.List;
 
 public class MessagePostDTO {
   // smailalijagic: writing messages
-  private Long id;
+  //private Long id;
 
-  private List<String> messages;
+  private String message; // smailalijagic: client --> server: sending String
 
-  public Long getId() {
-    return id;
-  }
+  //public Long getId() {
+  //  return id;
+  //}
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+  //public void setId(Long id) {
+  //  this.id = id;
+  //}
 
-  public List<String> getMessage() {
-    return messages;
+  public String getMessage() {
+    return message;
   }
 
   public void setMessage(String message) {
-    this.messages.add(message);
+    this.message = message;
   }
 
 }

@@ -1,9 +1,12 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -22,33 +25,32 @@ public class ChatController {
     this.chatService = chatService;
   }
 
-  @PostMapping("/game/{gameId}") // smailalijagic: use gameId to check if a game exists
+  @PostMapping("/game/{gameId}/chat/{userId}") // smailalijagic: use gameId to check if a game exists
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public String addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String id) {
-    Long gameid = Long.valueOf(id); // smailalijagic: added
-    // assert GameService.checkIfGameExists(gameId); // smailalijagic: how to check this???
-    Chat message = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
-    chatService.addMessage(message.toString());
-    return message.toString(); // smailalijagic: needed?
+  public void addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
+    // smailalijagic: get gameId
+    Long gameid = Long.valueOf(game_id); // smailalijagic: added
+    // smailalijagic: get message
+    Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO); // smailalijagic: convert api representation to entity
+    // smailalijagic: get userId
+    Long userid = Long.valueOf(user_id);
+    // smailalijagic: update chat
+    chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
   }
 
-  @GetMapping("/game/{gameId}")
+  @GetMapping("/game/{gameId}/chat")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<MessageGetDTO> getAllMessages(@PathVariable("gameId") Long id) {
+  public MessageGetDTO getAllMessages(@PathVariable("gameId") String id) {
+    // smailalijagic: get gameId
     Long gameid = Long.valueOf(id); // smailalijagic: added
-    // assert GameService.checkIfGameExists(gameId); // smailalijagic: how to check this???
-    // fetch all users in the internal representation
-    List<Chat> messages = chatService.getMessages();
-    List<MessageGetDTO> messageGetDTOs = new ArrayList<>();
-
-    // convert each user to the API representation
-    for (Chat message : messages) {
-      messageGetDTOs.add(DTOMapper.INSTANCE.convertEntityToMessageGetDTO(message));
-    }
-
-    return messageGetDTOs;
+    // smailalijagic: get Game --> get chat
+    Game game = chatService.getGame(gameid);
+    // smailalijagic: get Chat
+    Chat chat = game.getChat();
+    // smailalijagic: return api repr of chat
+    return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
   }
 }
 

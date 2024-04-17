@@ -1,15 +1,22 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyDeleteDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class LobbyController {
@@ -20,31 +27,82 @@ public class LobbyController {
     this.lobbyService = lobbyService;
   }
 
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<String> handleException(Exception ex) {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+  }
+
+  @GetMapping("/lobbies")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<LobbyGetDTO> getAllLobbies() {
+    // fetch all users in the internal representation
+    List<Lobby> lobbies = lobbyService.getLobbies();
+    List<LobbyGetDTO> lobbyGetDTOs = new ArrayList<>();
+
+    // convert each user to the API representation
+    for (Lobby lobby : lobbies) {
+      lobbyGetDTOs.add(DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby));
+    }
+    return lobbyGetDTOs;
+  }
+
+  @GetMapping("lobbies/{lobbyId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public LobbyGetDTO getLobby(@PathVariable("lobbyId") Long lobbyId) {
+    Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
+    return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby); // smailalijagic: convert lobby to api representation and return it
+  }
 
 
-
-  @PostMapping("/lobbies/create")
+  @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lobby createLobby() {
-    // smailalijagic: created lobby -> needs to return lobby which will be added to usergamelobbylist
-    return null;
+  public Lobby createlobby(@PathVariable("userId") Long userId) {
+
+     return lobbyService.createlobby(userId);
   }
 
   @PutMapping("/lobbies/settings/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public void updateLobby(@PathVariable("lobbyId") String lobbyId) {
+  public void updateLobby(@PathVariable("lobbyId") String id) {
     // smailalijagic: change lobby settings --> setting attributes need to be defined first
+    Long lobbyId = Long.valueOf(id);
+    Lobby updatedLobby = lobbyService.getLobby(lobbyId);
+    // smailalijagic: update all lobby settings
   }
 
-  @GetMapping("lobbies/join/{lobbyId}")
+  @GetMapping("/lobbies/settings/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Long joinLobby(@PathVariable("lobbyId") String lobbyid) {
-    // smailalijagic: check if lobby exists
-    // smailalijagic: load lobby screen
+  public Lobby getLobbySettings(@PathVariable("lobbyId") String id) {
+    // smailalijagic: return lobby settings to client
     return null;
+  }
+
+  @PutMapping("lobbies/join/{lobbyId}/{guestId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id, @RequestBody UserGetDTO userGetDTO) {
+    // smailalijagic: update lobby for guest
+    // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
+    Long lobbyId = Long.valueOf(id);
+    if (lobbyService.checkIfLobbyExists(lobbyId)) {
+      Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+      if (lobby.getInvited_userid() != null) {
+        throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
+      }
+      User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO);
+      lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+
+      return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
+      // smailalijagic: load lobby screen
+
+    } else {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
+    }
   }
 
   @DeleteMapping("/lobbies/{lobbyId}/start")

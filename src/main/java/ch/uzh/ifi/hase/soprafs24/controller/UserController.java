@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * User Controller
@@ -45,6 +46,16 @@ public class UserController {
     return userGetDTOs;
   }
 
+  // nedim-j: copied from M1, please adjust if needed
+  // smailalijagic: adjusted
+  @GetMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO getUser(@PathVariable("userId") Long userid) {
+    User user = userService.getUser(userid);
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+  }
+
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
@@ -65,6 +76,23 @@ public class UserController {
     return userService.loginUser(loginUser);
   }
 
+  @PostMapping("guestuser/join/lobbies/{lobbyId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public AuthenticationResponseDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
+    // smailalijagic:
+    // Set default name: Guest
+    // and password: 12345
+    // in client
+    User guestUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+
+    return userService.createGuestUser(guestUser); // smailalijagic: isGuest == true --> name: Guest + {guestId}
+
+  }
+
+
+
+
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
@@ -78,5 +106,9 @@ public class UserController {
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(updatedUser);
 
   }
+
+
+
+
 
 }
