@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
 import ch.uzh.ifi.hase.soprafs24.service.UnsplashService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
@@ -22,7 +23,7 @@ public class ImageController {
         this.imageRepository = imageRepository;
     }
 
-    @GetMapping("/images/fetch-and-save")
+    @PostMapping("/images/saving")
     public String fetchAndSaveImages() { //fetches from database and saves to database
         unsplashService.saveRandomPortraitImagesToDatabase(5); //should be 20, for now 5 because of the api limitation
         return "Successfully fetched and saved images to the database.";

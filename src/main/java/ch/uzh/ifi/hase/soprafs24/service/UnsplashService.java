@@ -22,7 +22,6 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 public class UnsplashService {
     private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
 
-
     @Autowired
     private ImageRepository imageRepository;
 
