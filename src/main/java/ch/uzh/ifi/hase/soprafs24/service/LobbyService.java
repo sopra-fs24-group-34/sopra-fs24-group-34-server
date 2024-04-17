@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,34 +46,37 @@ public class LobbyService {
     return userByUsername != null;// smailalijagic: user = null --> does not exist yet
   }
 
-  private User createUser() {
-    User user = new User();
-    user.setUsername("Guest");
-    user.setPassword("12345"); // smailalijagic: default password
-    user.setStatus(UserStatus.ONLINE);
-    user.setToken(UUID.randomUUID().toString());
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    user = userRepository.save(user);
-    userRepository.flush();
-    // getUserId() --> 1
-    log.debug("Created Information for User: {}", user);
-    return user;
-  }
-
-  public User createGuestUser() {
-    User temp_user = createUser();
-    Long temp_user_id = temp_user.getId();
-    String username = temp_user.getUsername() + temp_user_id; // smailalijagic: default name: Guestnull --> Guest1, Guest2
-    User guestUser = userRepository.findUserById(temp_user_id);
-    guestUser.setUsername(username);
-    temp_user = userRepository.save(guestUser);
-    userRepository.flush();
-    return temp_user;
-    // Guest1
-    // Id: 1
-    // password: 12345
-  }
+//  private User createUser() {
+//    User user = new User();
+//    user.setUsername("Guest");
+//    user.setPassword("12345"); // smailalijagic: default password
+//    user.setStatus(UserStatus.ONLINE);
+//    user.setToken(UUID.randomUUID().toString());
+//    // saves the given entity but data is only persisted in the database once
+//    // flush() is called
+//    user = userRepository.save(user);
+//    userRepository.flush();
+//    // getUserId() --> 1
+//    log.debug("Created Information for User: {}", user);
+//    return user;
+//  }
+//
+//  public AuthenticationResponseDTO createGuestUser() {
+//    User newUser = createUser();
+//    newUser.setUsername("Guest" + newUser.getId());
+//    newUser.setStatus(UserStatus.INLOBBY);
+//    newUser.setToken(UUID.randomUUID().toString());
+//
+//    // saves the given entity but data is only persisted in the database once
+//    // flush() is called
+//    newUser = userRepository.save(newUser);
+//    userRepository.flush();
+//
+//    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
+//    // Guest1
+//    // Id: 1
+//    // password: 12345
+//  }
 
   public List<Lobby> getLobbies() {
     return this.lobbyRepository.findAll();
@@ -110,15 +114,28 @@ public class LobbyService {
     }
   }
 
-    public Lobby createlobby(Long userId){
-        Lobby newlobby = new Lobby();
-        newlobby.setToken(UUID.randomUUID().toString());
-        newlobby.setUser(userRepository.findUserById(userId));
+  public Lobby createlobby(Long userId){
+    Lobby newlobby = new Lobby();
+    newlobby.setToken(UUID.randomUUID().toString());
+    newlobby.setCreator_userid(userId);
 
-        newlobby = lobbyRepository.save(newlobby);
-        lobbyRepository.flush();
+    newlobby = lobbyRepository.save(newlobby);
+    lobbyRepository.flush();
 
-        log.debug("Created Information for Lobby: {}", newlobby);
-        return newlobby;
-    }
+    log.debug("Created Information for Lobby: {}", newlobby);
+    return newlobby;
+  }
+
+  public Boolean updateLobby(Lobby lobby) {
+    // smailalijagic: change settings
+    return true;
+  }
+
+  public void addUserToLobby(Lobby lobby, User user) {
+    Long userId = user.getId();
+    lobby.setInvited_userid(userId);
+    lobby = lobbyRepository.save(lobby);
+    lobbyRepository.flush();
+  }
+
 }

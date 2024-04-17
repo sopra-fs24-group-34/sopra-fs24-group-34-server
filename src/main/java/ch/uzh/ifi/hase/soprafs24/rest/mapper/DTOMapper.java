@@ -28,10 +28,9 @@ public interface DTOMapper {
   @Mapping(source = "username", target = "username")
   User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
-  //@Mapping(source = "id", target = "id")
-  //@Mapping(source = "password", target = "password")
-  //@Mapping(source = "username", target = "username")
-  //@Mapping(source = "status", target = "status")
+  @Mapping(source = "id", target = "id")
+  User convertUserGetDTOtoEntity(UserGetDTO userGetDTO);
+
   @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
   @Mapping(source = "status", target = "status")
   @Mapping(source = "username", target = "username")
@@ -62,12 +61,12 @@ public interface DTOMapper {
   AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
 
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "message", target = "messages")
+  //@Mapping(source = "id", target = "id")
+  @Mapping(source = "message", target = "lastmessage")
   Chat convertMessagePostDTOtoEntity(MessagePostDTO messagePostDTO); // smailalijagic: added, issue #58
   // source = MessagePostDTO, target = Chat
 
-  @Mapping(source = "id", target = "id")
+  //@Mapping(source = "id", target = "id")
   @Mapping(source = "messages", target = "message")
   MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
   // source = Chat, target = MessageGetDTO
@@ -76,6 +75,28 @@ public interface DTOMapper {
   Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
   // source = LobbyDeleteDTO, target = Lobby
 
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  @Mapping(source = "invited_userid", target = "invited_userid")
+  LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
+  // source = Lobby, target = LobbyGetDTO
+
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  @Mapping(source = "invited_userid", target = "invited_userid")
+  @Mapping(source = "lobbyToken", target = "lobbyToken")
+  LobbyPutDTO convertEntityToLobbyPutDTO(Lobby lobby);
+
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  LobbyPostDTO covertEntityToLobbyPostDTO(Lobby lobby);
+  // source = Lobby, target = LobbyGetDTO
+
+//  @Mapping(source = "id", target = "lobbyid")
+//  @Mapping(source = "creator_userid", target = "creator_userid")
+//  @Mapping(source = "invited_userid", target = "invited_userid")
+//  @Mapping(source = "lobbyToken", target = "lobbyToken")
+//  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
 }
 
