@@ -4,7 +4,7 @@
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
-| 27.03.2024  | Smail Alijagic | [#100] (https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/100), [#101] (https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/101) | Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)  |
+| 27.03.2024  | Smail Alijagic | [#100](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/100), [#101](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/101) | Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)  |
 | 27.03.2024 | Dario Giuliani | [#26] (https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/26), [#27] | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
 | 02.04.2024 | Liam Kontopulos | [#50](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/pull/50) | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
 | 02.04.2024 | Nedim Jukic | [#23], [#24] | Basic implementation of Menu, with Leaderboard, Friends and Profile. Need  to improve style and add correct API calls. |
@@ -15,7 +15,7 @@
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
-| 07.04.2024 | Smail Alijagic | [#54], [#58] | Chat Server should work fine and is complete?, starting game from lobby is implemented, added some additional REST files for Lobby |
+| 07.04.2024 | Smail Alijagic | [#54](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/54), [#58](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/58) | Chat Server should work fine and is complete?, starting game from lobby is implemented, added some additional REST files for Lobby |
 | 01.04.2024 | Dario Giuliani |  | |
 | 02.04.2024 | Liam Kontopulos | -| -|
 | 02.04.2024 | Nedim Jukic | -| -|
@@ -26,7 +26,7 @@
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
-| 31.03.2024 | Smail Alijagic | | |
+| 31.03.2024 | Smail Alijagic | [#16](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/16), [#49](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/49) | when lobby id is entered a unregistered user is navigated to the lobby, strikes prepared |
 | 01.04.2024 | Dario Giuliani | | |
 | 16.04.2024 | Liam Kontopulos | [#56](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/pull/56) | More or less implemented the Game page; [#56] is a pull request containing the closed issues (only inserted 17.04.2024). |
 | 15.04.2024 | Nedim Jukic | [#15], [#34], [#35], [#42]| Implementation of Lobby, fixes to Menu. |
@@ -37,7 +37,7 @@
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
-| 31.03.2024 | Smail Alijagic | | |
+| 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat|
 | 01.04.2024 | Dario Giuliani | | |
 | 02.04.2024 | Liam Kontopulos | | |
 | 02.04.2024 | Nedim Jukic | | |
