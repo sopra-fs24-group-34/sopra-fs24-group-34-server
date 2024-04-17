@@ -131,9 +131,9 @@ public class LobbyService {
     return true;
   }
 
-  public void addGuestToLobby(Lobby lobby, AuthenticationResponseDTO guest) {
-    Long guestId = guest.getId();
-    lobby.setInvited_userid(guestId);
+  public void addUserToLobby(Lobby lobby, User user) {
+    Long userId = user.getId();
+    lobby.setInvited_userid(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
   }

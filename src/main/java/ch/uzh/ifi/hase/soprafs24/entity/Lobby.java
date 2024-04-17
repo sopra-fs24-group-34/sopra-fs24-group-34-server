@@ -20,6 +20,9 @@ public class Lobby implements Serializable {
 
   private String lobbyToken;
 
+  @OneToOne(cascade = CascadeType.ALL)
+  private Game game = new Game();
+
   public Long getLobbyid() {
     return lobbyid;
   }
@@ -61,4 +64,11 @@ public class Lobby implements Serializable {
     this.invited_userid = invited_userid;
   }
 
+  public Game getGame() {
+    return game;
+  }
+
+  public void setGame(Game game) {
+    this.game = game;
+  }
 }

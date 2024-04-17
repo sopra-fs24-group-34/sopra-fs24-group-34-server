@@ -6,16 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 public class GameController {
-  @PostMapping("/game/{gameId}/start")
+  @PostMapping("/lobbies/{lobbyId}/startgame")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public void createGame(@PathVariable("gameId") String gameid, User user1, User user2, Lobby lobby) {
+  public Long createGame(@PathVariable("lobbyId") String lobbyid, User user1, User user2) {
     // smailalijagic:
     // 1. correct Lobby
     // 2. User1 online?
     // 3. User2 online?
     // 4. remove lobby
     // 5. load game --> game logic (follows)
+    return null;
   }
 
   @PutMapping("/game/{gameId}/select")

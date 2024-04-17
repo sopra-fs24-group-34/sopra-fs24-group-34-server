@@ -28,10 +28,9 @@ public interface DTOMapper {
   @Mapping(source = "username", target = "username")
   User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
-  //@Mapping(source = "id", target = "id")
-  //@Mapping(source = "password", target = "password")
-  //@Mapping(source = "username", target = "username")
-  //@Mapping(source = "status", target = "status")
+  @Mapping(source = "id", target = "id")
+  User convertUserGetDTOtoEntity(UserGetDTO userGetDTO);
+
   @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
   @Mapping(source = "status", target = "status")
   @Mapping(source = "username", target = "username")
@@ -87,6 +86,11 @@ public interface DTOMapper {
   @Mapping(source = "invited_userid", target = "invited_userid")
   @Mapping(source = "lobbyToken", target = "lobbyToken")
   LobbyPutDTO convertEntityToLobbyPutDTO(Lobby lobby);
+
+  @Mapping(source = "lobbyid", target = "id")
+  @Mapping(source = "creator_userid", target = "creator_userid")
+  LobbyPostDTO covertEntityToLobbyPostDTO(Lobby lobby);
+  // source = Lobby, target = LobbyGetDTO
 
 //  @Mapping(source = "id", target = "lobbyid")
 //  @Mapping(source = "creator_userid", target = "creator_userid")
