@@ -3,25 +3,25 @@
 ## <font style="color: #00d7ff">Week 1 *(25.03 – 02.04)*</font>
 
 
-=======
+
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
 | 27.03.2024  | Smail Alijagic | [#100](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/100), [#101](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/101) | Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)  |
 | 27.03.2024 | Dario Giuliani | [#26](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/26), [#27] | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
 | 02.04.2024 | Liam Kontopulos | [#50](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/pull/50) | Implementation of Login & Register, additional prepared/corrected most of the files so now they should be consistent |
 | 02.04.2024 | Nedim Jukic | [#23](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/23), [#24](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/24) | Basic implementation of Menu, with Leaderboard, Friends and Profile. Need  to improve style and add correct API calls. |
-| 28.03.2024 | Till Sollberger | [#98] | Added the implementation to update the User profile, the second task went missing. So I'm gonna do more than two for the next week. |
+| 28.03.2024 | Till Sollberger | [#98](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/98) | Added the implementation to update the User profile, the second task went missing. So I'm gonna do more than two for the next week. |
 
 
 ## <font style="color: #9d979f">Week 1½ *(03.04 – 09.04)*</font>
 
-| Date | Name | Links to Github Issues | Comments |
-|---|---|---|---|
+| Date | Name | Links to Github Issues                                                                                                                                                 | Comments |
+|---|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
 | 07.04.2024 | Smail Alijagic | [#54](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/54), [#58](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/58) | Chat Server should work fine and is complete?, starting game from lobby is implemented, added some additional REST files for Lobby |
-| 01.04.2024 | Dario Giuliani |  | |
-| 02.04.2024 | Liam Kontopulos | -| -|
-| 02.04.2024 | Nedim Jukic | -| -|
-| 10.04.2024 | Till Sollberger | [#44], [#46] | Creation of the lobby and handling of failures. |
+| 01.04.2024 | Dario Giuliani |                                                                                                                                                                        | |
+| 02.04.2024 | Liam Kontopulos | -                                                                                                                                                                      | -|
+| 02.04.2024 | Nedim Jukic | -                                                                                                                                                                      | -|
+| 10.04.2024 | Till Sollberger | [#44](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/44), [#46](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/46) | Creation of the lobby and handling of failures. |
 
 
 ## <font style="color: #00d7ff">Week 2 *(10.04 – 16.04)*</font>
