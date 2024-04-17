@@ -39,12 +39,7 @@ public class LobbyService {
     return this.userRepository.findAll();
   }
 
-  public Boolean checkIfUserExists(User userToBeCreated) {
-    // smailalijagic: changed to boolean
-    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
-    return userByUsername != null;// smailalijagic: user = null --> does not exist yet
-  }
 
   private User createUser() {
     User user = new User();
@@ -83,12 +78,6 @@ public class LobbyService {
     return this.lobbyRepository.findByLobbyid(lobbyId);
   }
 
-  public Boolean checkIfLobbyExists(Long lobbyid) {
-    // smailalijagic: changed to boolean
-    Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid);
-
-    return lobbyById != null;// smailalijagic: lobby = null --> does not exist yet
-  }
 
   public Boolean isLobbyOwner(User user, Long lobbyid) {
     List<Lobby> lobbyList = user.getUsergamelobbylist(); // smailalijagic: get all created lobbies
@@ -99,36 +88,49 @@ public class LobbyService {
         return true;
       }
     }
-
     return false;
   }
 
-  public void deleteLobby(Lobby lobby) {
-    try {
-      lobbyRepository.delete(lobby);
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find the lobby");
-    }
+  public Long createlobby(Long userId){
+      try {
+          Lobby newlobby = new Lobby();
+          User creator = userRepository.findUserById(userId);
+          newlobby.setToken(UUID.randomUUID().toString());
+          newlobby.setUser(userId);
+
+          newlobby = lobbyRepository.save(newlobby);
+          lobbyRepository.flush();
+
+          List<Lobby> lobbyList = creator.getUsergamelobbylist();
+          lobbyList.add(newlobby);
+          creator.setUsergamelobbylist(lobbyList);
+
+          log.debug("Created Information for Lobby: {}", newlobby);
+          return newlobby.getLobbyid();
+      } catch (Exception e) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby could not be created");
+      }
   }
 
-    public Lobby createlobby(Long userId){
-        try {
-            Lobby newlobby = new Lobby();
-            User creator = userRepository.findUserById(userId);
-            newlobby.setToken(UUID.randomUUID().toString());
-            newlobby.setUser(userId);
+  public void deleteLobby(Lobby lobby) {
+      try {
+          lobbyRepository.delete(lobby);
+      } catch (Exception e) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find the lobby");
+      }
+  }
 
-            newlobby = lobbyRepository.save(newlobby);
-            lobbyRepository.flush();
+  public Boolean checkIfUserExists(User userToBeCreated) {
+      // smailalijagic: changed to boolean
+      User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
-            List<Lobby> lobbyList = creator.getUsergamelobbylist();
-            lobbyList.add(newlobby);
-            creator.setUsergamelobbylist(lobbyList);
+      return userByUsername != null;// smailalijagic: user = null --> does not exist yet
+  }
 
-            log.debug("Created Information for Lobby: {}", newlobby);
-            return newlobby;
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby could not be created");
-        }
-    }
+  public Boolean checkIfLobbyExists(Long lobbyid) {
+      // smailalijagic: changed to boolean
+      Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid);
+
+      return lobbyById != null;// smailalijagic: lobby = null --> does not exist yet
+  }
 }

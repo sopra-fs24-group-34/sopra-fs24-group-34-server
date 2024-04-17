@@ -9,16 +9,16 @@ public class Image {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Long imageId;
 
     private String url;
 
     public Long getId() {
-        return id;
+        return imageId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long imageId) {
+        this.imageId = imageId;
     }
 
     public String getUrl() {

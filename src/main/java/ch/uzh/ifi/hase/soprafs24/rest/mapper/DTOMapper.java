@@ -1,9 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 
-import ch.uzh.ifi.hase.soprafs24.entity.Chat;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -77,6 +75,12 @@ public interface DTOMapper {
   // source = LobbyDeleteDTO, target = Lobby
 
 
+  /**
+  @Mapping(source = "gameid", target = "gameid")
+  @Mapping(source = "playerid", target = "playerid")
+  @Mapping(source = "imageid", target = "imageid")
+  Guess convertGuessPostDTOtoEntity(GuessPostDTO guessPostDTO);
+  */
 
 }
 

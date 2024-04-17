@@ -4,15 +4,16 @@ import java.util.List;
 
 public class LobbyPostDTO {
 
-  private Long id;
+  private Long lobbyid;
 
   public Long getId() {
-    return id;
+    return lobbyid;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void setId(Long lobbyid) {
+    this.lobbyid = lobbyid;
   }
+
 
 
 }

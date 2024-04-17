@@ -44,32 +44,19 @@ public class UserService {
     }
 
     public AuthenticationResponseDTO createUser(User newUser) {
-
         checkIfUserExists(newUser);
         newUser.setStatus(UserStatus.ONLINE);
         newUser.setToken(UUID.randomUUID().toString());
-
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
-
         log.debug("Created Information for User: {}", newUser);
         return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
     }
 
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
     private Boolean checkIfUserExists(User userToBeCreated) {
         // smailalijagic: changed to boolean
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
@@ -95,7 +82,6 @@ public class UserService {
     }
 
     public User updateUser(User updatedUser, Long userId) {
-        //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
         User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
         // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
@@ -116,33 +102,5 @@ public class UserService {
         return updatedUser;
     }
 
-    // public List<User> getUsers() {
-    // return this.userRepository.findAll();}
 
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
-
-
-//  private void checkIfUserExistsUpdate(User userToBeUpdated, Long userId) {
-//    // smailalijagic: we have too many check if user exists functions --> why not have one function?
-//    User userByUsername = userRepository.findByUsername(userToBeUpdated.getUsername());
-//    Optional<User> Optionaluser = userRepository.findById(userId);
-//    User existingUser = Optionaluser.orElse(null);
-//    if (existingUser == null) {
-//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist");
-//    }
-//    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-//    if (userByUsername != null && existingUser != userByUsername) {
-//      throw new ResponseStatusException(HttpStatus.CONFLICT,
-//              String.format(baseErrorMessage, "username", "is"));
-//    }
-//  }
 }

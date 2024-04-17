@@ -36,8 +36,9 @@ public class LobbyController {
   @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lobby createlobby(@PathVariable("userId") Long userId) {
-
+  public Long createlobby(@PathVariable("userId") Long userId) {
+      // till: create a lobby --> token and id generated Host is set
+      // returns lobby id
      return lobbyService.createlobby(userId);
   }
 

@@ -29,7 +29,6 @@ public class Lobby implements Serializable {
     this.lobbyid = lobbyid;
   }
 
-
   public Long getUser() {
     return creatorid;
   }
