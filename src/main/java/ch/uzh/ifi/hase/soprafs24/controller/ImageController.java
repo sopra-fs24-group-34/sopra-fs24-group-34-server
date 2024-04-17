@@ -4,10 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Image;
 import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
 import ch.uzh.ifi.hase.soprafs24.service.UnsplashService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,5 +29,9 @@ public class ImageController {
     public List<ImageDTO> getImageUrls(@RequestParam(defaultValue = "10") int count) {
         //gets images from database
         return unsplashService.getImageUrlsFromDatabase(count);
+    }
+    @DeleteMapping("/images/{imageId}")
+    public void deleteImage(@PathVariable Long imageId) {
+        UnsplashService.deleteImage(imageId, imageRepository);
     }
 }
