@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24;
 
+import ch.uzh.ifi.hase.soprafs24.service.PusherService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 @RestController
 @SpringBootApplication
@@ -21,7 +23,8 @@ public class Application {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public String helloWorld() {
-    return "The application is running.";
+      //new PusherService();
+      return "The application is running.";
   }
 
   @Bean
