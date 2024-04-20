@@ -81,6 +81,8 @@ public class GameUserService {
             return false;
         } else {
             player.setStrikes(player.getStrikes() + 1);
+            playerRepository.save(player);
+            playerRepository.flush();
             return true;
         }
     }

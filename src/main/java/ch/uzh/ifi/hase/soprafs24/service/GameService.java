@@ -41,7 +41,7 @@ public class GameService {
     public Player selectimage(Guess guess) {
         checkIfImageExists(guess.getImageId());
 
-        Player player = gameUserService.getUser(guess.getGameId());
+        Player player = gameUserService.getUser(guess.getPlayerId());
 
         if (player.getChosencharacter() == null) {
             player.setChosencharacter(guess.getImageId());

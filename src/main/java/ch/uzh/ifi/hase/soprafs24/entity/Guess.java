@@ -14,13 +14,13 @@ public class Guess {
 
 
 
-    @Column(name = "game_id")
+
     private Long gameId;
 
-    @Column(name = "player_id")
+
     private Long playerId;
 
-    @Column(name = "image_id")
+
     private Long imageId;
 
     public Long getId() {
