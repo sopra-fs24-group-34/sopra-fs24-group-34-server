@@ -17,14 +17,17 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.pusher.rest.Pusher;
 
 @RestController
 public class LobbyController {
 
   private final LobbyService lobbyService;
+  private final Pusher pusher;
 
-  LobbyController(LobbyService lobbyService) {
-    this.lobbyService = lobbyService;
+  LobbyController(LobbyService lobbyService, Pusher pusher) {
+      this.lobbyService = lobbyService;
+      this.pusher = pusher;
   }
 
   @ExceptionHandler(Exception.class)
@@ -96,6 +99,9 @@ public class LobbyController {
       }
       User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO); // smailalijagic: get user
       lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+
+      //nedim-j: adjust if needed
+      pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
 
       return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
       // smailalijagic: load lobby screen
