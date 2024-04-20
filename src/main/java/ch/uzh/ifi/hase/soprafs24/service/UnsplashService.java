@@ -62,4 +62,17 @@ public class UnsplashService {
             return Collections.emptyList();
         }
     }
+
+    public Image createimage() {
+        Image image = new Image();
+
+        image = imageRepository.save(image);
+        imageRepository.flush();
+
+        return image;
+    }
+
+    public Image getimage(Long imageid) {
+        return imageRepository.findByImageId(imageid);
+    }
 }

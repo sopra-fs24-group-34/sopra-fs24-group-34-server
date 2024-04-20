@@ -1,50 +1,60 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 public class Guess {
 
-    @EmbeddedId
-    private GuessKey id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
     // Other attributes and methods
 
-    public GuessKey getId() {
+
+
+    @Column(name = "game_id")
+    private Long gameId;
+
+    @Column(name = "player_id")
+    private Long playerId;
+
+    @Column(name = "image_id")
+    private Long imageId;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(GuessKey id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Embeddable
-    public static class GuessKey implements Serializable {
-        @Column(name = "gameid")
-        private Long gameid;
-
-        @Column(name = "playerid")
-        private Long playerid;
-
-        @Column(name = "imageid")
-        private Long imageid;
-
     public Long getGameId() {
-        return gameid;
+        return gameId;
+    }
+
+    public void setGameId(Long gameid) {
+        this.gameId = gameid;
     }
 
     public Long getPlayerId(){
-        return playerid;
+        return playerId;
     }
+
+    public void setPlayerId(Long playerid) {
+            this.playerId = playerid;
+        }
 
     public Long getImageId() {
-        return imageid;
+        return imageId;
     }
 
-    }
+    public void setImageId(Long imageid) {
+            this.imageId = imageid;
+        }
+
+
 }
 

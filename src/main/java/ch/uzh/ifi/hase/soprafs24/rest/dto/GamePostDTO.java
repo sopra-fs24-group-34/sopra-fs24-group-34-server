@@ -6,23 +6,33 @@ public class GamePostDTO {
 
   private Long gameid;
 
-  private List<Long> playerid;
+  private Long creatorid;
+
+  private Long invitedplayerid;
 
 
-  private Long getGameid() {
+  public Long getGameid() {
     return gameid;
   }
 
-  private void setGameid(Long gameid) {
+  public void setGameid(Long gameid) {
     this.gameid = gameid;
   }
 
-  private List<Long> getPlayerid() {
-        return playerid;
+  public Long getCreatorid(){
+      return creatorid;
+  }
+
+  public void setCreatorid(Long creatorid){
+      this.creatorid = creatorid;
+  }
+
+  public Long getInvitedplayerid() {
+        return invitedplayerid;
     }
 
-  private void setPlayerid(Long gameid) {
-        this.playerid = playerid;
+  public void setInvitedplayeridid(Long invitedplayerid) {
+        this.invitedplayerid = invitedplayerid;
     }
 
 }

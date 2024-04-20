@@ -75,12 +75,20 @@ public interface DTOMapper {
   // source = LobbyDeleteDTO, target = Lobby
 
 
-  /**
-  @Mapping(source = "gameid", target = "gameid")
-  @Mapping(source = "playerid", target = "playerid")
-  @Mapping(source = "imageid", target = "imageid")
+  @Mapping(source = "gameid", target = "gameId")
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
   Guess convertGuessPostDTOtoEntity(GuessPostDTO guessPostDTO);
-  */
+
+
+  @Mapping(source = "creatorid", target = "creatorId")
+  @Mapping(source = "invitedplayerid", target = "invitedPlayerId")
+  Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+
+
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
+  Guess convertGuessPutDTOtoEmtity(GuessPostDTO guessPostDTO);
 
 }
 

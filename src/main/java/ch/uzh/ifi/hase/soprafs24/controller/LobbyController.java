@@ -32,6 +32,15 @@ public class LobbyController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
+   @GetMapping("/lobbies/{lobbyid}")
+   @ResponseStatus(HttpStatus.OK)
+   @ResponseBody
+   public Lobby getlobby(@PathVariable("lobbyid") Long lobbyid){
+
+      return lobbyService.getlobby(lobbyid);
+   }
+
+
 
   @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)

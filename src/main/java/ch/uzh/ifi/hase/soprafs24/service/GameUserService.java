@@ -34,14 +34,14 @@ public class GameUserService {
     }
 
 
-    public Player getUser(Long playerid){
-        return playerRepository.findPlayerById(playerid);
+    public Player getUser(Long playerId){
+        return playerRepository.findByPlayerId(playerId);
     }
 
 
     public Player createplayer(Long userid){
         Player player = new Player();
-        player.setPlayerid(userid);
+        player.setPlayerId(userid);
 
         //saving PLayer to repository
         player = playerRepository.save(player);
@@ -54,22 +54,22 @@ public class GameUserService {
 
     public Long getChosenCharacterofOpponent(Game game, Long playerid) {
         // till: get players from the game
-        Long creatorid = game.getCreatorid();
+        Long creatorid = game.getCreatorId();
 
 
         // create Long for opponentplayerid
         Long opponentid;
         // Find the opponent player (the player who is not the one making the guess)
         if (playerid.equals(creatorid)){
-            opponentid = game.getInvitedPlayerid();
+            opponentid = game.getInvitedPlayerId();
         } else {
-            opponentid = game.getCreatorid();
+            opponentid = game.getCreatorId();
         }
 
         // get player to get chosencharacter
-        Player opponent = playerRepository.findPlayerById(opponentid);
+        Player opponent = playerRepository.findByPlayerId(opponentid);
 
-        return opponent.getchosencharacter();
+        return opponent.getChosencharacter();
 
 
     }
@@ -83,6 +83,13 @@ public class GameUserService {
             player.setStrikes(player.getStrikes() + 1);
             return true;
         }
+    }
+
+
+
+    public void saveplayerchanges(Player player){
+        playerRepository.save(player);
+        playerRepository.flush();
     }
 
 
@@ -118,10 +125,10 @@ public class GameUserService {
 
     public Boolean checkIfPlayerinGame(Game game, Long playerid){
         // till: get players from the game
-        playerRepository.findPlayerById(playerid);
+        playerRepository.findByPlayerId(playerid);
 
         // check if the player is in the game players list, returns true when in game and false when not
-        return game.getCreatorid().equals(playerid) || game.getInvitedPlayerid().equals(playerid);
+        return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
 
 
 
@@ -129,4 +136,6 @@ public class GameUserService {
 
 
     }
+
+
 }

@@ -133,4 +133,8 @@ public class LobbyService {
 
       return lobbyById != null;// smailalijagic: lobby = null --> does not exist yet
   }
+
+    public Lobby getlobby(Long lobbyid) {
+     return lobbyRepository.findByLobbyid(lobbyid);
+    }
 }

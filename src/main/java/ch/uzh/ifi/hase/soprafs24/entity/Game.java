@@ -11,34 +11,34 @@ public class Game {
 
   @Id
   @GeneratedValue
-  private Long gameid;
+  private Long gameId;
 
-  private Long creatorid;
+  private Long creatorId;
 
-  private Long invitedplayerid;
+  private Long invitedPlayerId;
 
-  public String getGameid() {
-    return "game_" + gameid;
+  public Long getGameId() {
+    return gameId;
   }
 
-  public void setGameid(Long gameid) {
-    this.gameid = gameid;
+  public void setGameId(Long gameId) {
+    this.gameId = gameId;
   }
 
-  public Long getCreatorid(){
-      return creatorid;
+  public Long getCreatorId(){
+      return creatorId;
   }
 
-  public void setCreatorid(Long creatorid){
-      this.creatorid = creatorid;
+  public void setCreatorId(Long creatorid){
+      this.creatorId = creatorid;
   }
 
-  public Long getInvitedPlayerid(){
-        return invitedplayerid;
+  public Long getInvitedPlayerId(){
+        return invitedPlayerId;
     }
 
-  public void setInvitedPlayerid(Long invitedPlayerid){
-        this.invitedplayerid = invitedPlayerid;
+  public void setInvitedPlayerId(Long invitedPlayerid){
+        this.invitedPlayerId = invitedPlayerid;
     }
 
 }

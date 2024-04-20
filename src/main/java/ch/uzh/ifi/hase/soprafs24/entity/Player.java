@@ -4,15 +4,16 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @Entity
-public class Player {
+public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
-    private Long playerid;
+    private Long playerId;
 
 
     @Column(nullable = true)
@@ -22,15 +23,15 @@ public class Player {
     private int strikes;
 
 
-    public Long getPlayerid() {
-        return playerid;
+    public Long getPlayerId() {
+        return playerId;
     }
 
-    public void setPlayerid(Long playerid) {
-        this.playerid = playerid;
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
     }
 
-    public Long getchosencharacter() {
+    public Long getChosencharacter() {
         return chosencharacter;
     }
 

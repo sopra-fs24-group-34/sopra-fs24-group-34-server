@@ -4,9 +4,9 @@ import ch.uzh.ifi.hase.soprafs24.entity.Image;
 import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
 import ch.uzh.ifi.hase.soprafs24.service.UnsplashService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +21,24 @@ public class ImageController {
         this.unsplashService = unsplashService;
         this.imageRepository = imageRepository;
     }
+
+
+    @PostMapping("/image/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public Image createimage(){
+        // method to check with postman
+        return unsplashService.createimage();
+    }
+
+    @GetMapping("/image/{imageId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Image getImage(@PathVariable("imageId") Long imageid){
+        // method to check with postman
+        return unsplashService.getimage(imageid);
+    }
+
 
     @GetMapping("/images/fetch-and-save")
     public String fetchAndSaveImages() {

@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,134 +22,130 @@ import java.util.List;
 @Service
 @Transactional
 public class GameService {
-  private final GameRepository gameRepository;
+    private final GameRepository gameRepository;
 
-  private final ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
-  private final GameUserService gameUserService;
-
-
-
-
-  @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService) {
-    this.gameRepository = gameRepository;
-    this.imageRepository = imageRepository;
-    this.gameUserService = gameUserService;
-  }
-
-
-  //
-  // Not done yet
-  //
-  public void creategame(Long lobbyid, Long user1id, Long user2id) {
-    // till: check if both players exist
-    gameUserService.checkIfUserExists(user1id);
-    gameUserService.checkIfUserExists(user2id);
-    // till: check if both players are online
-    gameUserService.checkIfUserOnline(user1id);
-    gameUserService.checkIfUserOnline(user2id);
-    // till: checks if the user is actually the creator of the lobby
-    gameUserService.checkForCorrectLobby(lobbyid, user1id);
-
-
-    // till: create a new game
-    Game game = new Game();
-    // till: create 2 players
-    Player player1 = new Player();
-    Player player2 = new Player();
-
-
-    // create List of players and set it
-
-    game.setCreatorid(player1.getPlayerid());
+    private final GameUserService gameUserService;
 
 
 
 
-
-
-
-
-
-  }
-
-
-
-  public void chooseimage(Long imageId, Long playerId) {
-    checkIfImageExists(imageId);
-
-    Player player = gameUserService.getUser(playerId);    //player gets searched to set the chosen character of that player
-    if (player.getchosencharacter() == null){
-        player.setChosencharacter(imageId);
-    }
-    else{
-        throw new IllegalStateException("The player has already chosen a character.");  //if player has already chosen character Exception is thrown
-    }
+    @Autowired
+    public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService) {
+        this.gameRepository = gameRepository;
+        this.imageRepository = imageRepository;
+        this.gameUserService = gameUserService;
     }
 
-  public Boolean guessimage(Guess guess) {
-      Guess.GuessKey id = guess.getId(); // Get the embedded key
-      Long gameId = id.getGameId(); // Get the gameId
-      Long playerId = id.getPlayerId(); // Get the playerId
-      Long imageId = id.getImageId(); // Get the imageId
+    public Player selectimage(Guess guess) {
+        checkIfImageExists(guess.getImageId());
 
-      // till: check if game exists
-      checkIfGameExists(gameId);
-      // till: check if imageId exists
-      checkIfImageExists(imageId);
-      // till: check if Player is in the game
-      Game game = gameRepository.findByGameid(gameId);
-      gameUserService.checkIfPlayerinGame(game, playerId);
+        Player player = gameUserService.getUser(guess.getGameId());
 
-      // get the chosen character of the Opponent
-      Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
-
-      if (oppChosenCharacter.equals(imageId)){
-          return true;
-      } else if (gameUserService.increaseandcheckStrikes(playerId)) {
-          return false;
-      } else {
-          throw new IllegalStateException();
-      }
-
-  }
+        if (player.getChosencharacter() == null) {
+            player.setChosencharacter(guess.getImageId());
+            gameUserService.saveplayerchanges(player);
+        }
+        else {
+            throw new IllegalStateException("The player has already chosen a character.");
+        }
+        return player;
+    }
 
 
 
-  public Boolean checkIfGameExists(Long gameId) {
-      try {
-          assert gameRepository.findByGameid(gameId) != null;
-          return true;
-      }
-      catch (Exception e) {
-          return false;
-      }
-  }
+    //
+    // Not done yet
+    //
+    public Game creategame(Long lobbyid, Game game) {
+        // till: check if both players exist
+        gameUserService.checkIfUserExists(game.getCreatorId());
+        gameUserService.checkIfUserExists(game.getInvitedPlayerId());
+        // till: check if both players are online
+        gameUserService.checkIfUserOnline(game.getCreatorId());
+        gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
+        // till: checks if the user is actually the creator of the lobby
+        gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
 
-  public Boolean checkIfImageExists(Long imageId) {
-      try {
-          if (imageRepository.findByImageId(imageId) != null) {
-              return true;
-          } else {
-              throw new ImageNotFoundException("Image with ID " + imageId + " not found");
-          }
-      } catch (ImageNotFoundException e) {
-          // Log the exception or handle it as needed
-          return false;
-      }
-  }
+        // till: create 2 players
+        Player player1 = new Player();
+        Player player2 = new Player();
+        //save the changes
+        gameUserService.saveplayerchanges(player1);
+        gameUserService.saveplayerchanges(player2);
 
-  public class ImageNotFoundException extends Exception {
+        // Set the game's players
+        game.setCreatorId(player1.getPlayerId());
+        game.setInvitedPlayerId(player2.getPlayerId());
 
-      public ImageNotFoundException(String message) {
-          super(message);
+        // save changes to game
+        gameRepository.save(game);
+
+        return game;
 
 
-      }
-  }
+    }
+
+    public Boolean guesssimage(Guess guess){
+        //till: check if game exists
+        checkIfGameExists(guess.getGameId());
+        //till: check if Imageid exists
+        checkIfImageExists(guess.getImageId());
+        //till: check if player is in the game
+        Game game = gameRepository.findByGameId(guess.getGameId());
+        gameUserService.checkIfPlayerinGame(game, guess.getPlayerId());
+
+        //get the chosencharacter of the Opponent
+        Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, guess.getPlayerId());
+
+        if (oppChosenCharacter.equals(guess.getImageId())){
+            return true;
+        } else if (gameUserService.increaseandcheckStrikes(guess.getPlayerId())){
+            return false;
+        } else {
+            throw new IllegalStateException();
+        }
+
+    }
+
+
+    //
+    // Check functions
+    //
+
+
+    public Boolean checkIfGameExists(Long gameId) {
+        try {
+            assert gameRepository.findByGameId(gameId) != null;
+            return true;
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    public Boolean checkIfImageExists(Long imageId) {
+        try {
+            if (imageRepository.findByImageId(imageId) != null) {
+                return true;
+            } else {
+                throw new ImageNotFoundException("Image with ID " + imageId + " not found");
+            }
+        } catch (ImageNotFoundException e) {
+            // Log the exception or handle it as needed
+            return false;
+        }
+    }
+
+    public class ImageNotFoundException extends Exception {
+
+        public ImageNotFoundException(String message) {
+            super(message);
+
+
+        }
+    }
 }
-
-
-
