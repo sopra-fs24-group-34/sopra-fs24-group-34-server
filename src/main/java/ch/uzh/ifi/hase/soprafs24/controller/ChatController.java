@@ -31,12 +31,10 @@ public class ChatController {
   @PostMapping("/game/{gameId}/chat/{userId}") // smailalijagic: use gameId to check if a game exists
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public MessageGetDTO addMessage(@RequestBody MessagePostDTO messagePostDTO) {//, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
-    //Long gameid = Long.valueOf(game_id); // smailalijagic: get gameId
-    Long gameid = Long.valueOf("2");
+  public MessageGetDTO addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
+    Long gameid = Long.valueOf(game_id); // smailalijagic: get gameId
     Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO); // smailalijagic: convert api representation to entity
-    //Long userid = Long.valueOf(user_id); // smailalijagic: get userId
-    Long userid = Long.valueOf("1");
+    Long userid = Long.valueOf(user_id); // smailalijagic: get userId
     chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
 
     // smailalijagic: trigger a Pusher event to notify clients about the new chat message
@@ -44,6 +42,21 @@ public class ChatController {
 
     return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat); // smailalijagic: return api representation of chat
 
+  }
+
+  @GetMapping("chats")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Chat> getChats() {
+    return chatService.getChats();
+  }
+
+  @GetMapping("chats/{chatId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Chat getChat(@PathVariable("chatId") String id) {
+    Long chatid = Long.valueOf(id);
+    return chatService.getChat(chatid);
   }
 
   @GetMapping("/game/{gameId}/chat")

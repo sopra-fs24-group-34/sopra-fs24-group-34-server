@@ -10,15 +10,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
 
+
   @Autowired
-  GameController(GameService gameService, GameUserService gameUserService) {
+  GameController(GameService gameService, GameUserService gameUserService, LobbyService lobbyService) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
+  }
+
+  @GetMapping("/games")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Game> getGames() {
+    return gameService.getGames();
+  }
+
+  @GetMapping("/games/{gameId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Game getGame(@PathVariable("gameId") String id) {
+    Long gameid = Long.valueOf(id);
+    return gameService.getGame(gameid);
   }
 
   @PostMapping("/game/{lobbyid}/start")

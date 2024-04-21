@@ -88,10 +88,34 @@ public class LobbyController {
     return null;
   }
 
+//  @PutMapping("lobbies/join/{lobbyId}/{userId}")
+//  @ResponseStatus(HttpStatus.OK)
+//  @ResponseBody
+//  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+//    // smailalijagic: update lobby for guest
+//    // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
+//    Long lobbyId = Long.valueOf(id1);
+//    Long userId = Long.valueOf(id2);
+//    if (lobbyService.checkIfLobbyExists(lobbyId)) {
+//      Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+//      if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
+//        throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
+//      }
+//      User user = lobbyService.getUser(userId); // smailalijagic: get user
+//      lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+//
+//      return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
+//      // smailalijagic: load lobby screen
+//
+//    } else {
+//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
+//    }
+//  }
+
   @PutMapping("lobbies/join/{lobbyId}/{userId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+  public Lobby joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
     // smailalijagic: update lobby for guest
     // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
     Long lobbyId = Long.valueOf(id1);
@@ -103,8 +127,7 @@ public class LobbyController {
       }
       User user = lobbyService.getUser(userId); // smailalijagic: get user
       lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
-
-      return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
+      return lobby; // smailalijagic: return api representation
       // smailalijagic: load lobby screen
 
     } else {
