@@ -26,7 +26,6 @@ public class GameController {
 
 
 
-
   @PostMapping("/game/{lobbyid}/start")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
@@ -42,30 +41,6 @@ public class GameController {
       return gameService.creategame(lobbyid, game);
 
   }
-
-  @PostMapping("/player/{playerid}")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public Player createplayer(@PathVariable ("playerid") Long playerid) {
-      // method to create a player to check with Postman
-
-      Player player = gameUserService.createplayer(playerid);
-
-      return player;
-
-    }
-
-  @GetMapping("/player/{playerid}")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Player getplayer(@PathVariable("playerid") Long playerid){
-      // method to get a player to check with Postman
-      Player player = gameUserService.getUser(playerid);
-
-      return player;
-
-  }
-
 
 
   @PutMapping("/game/character/choose")
@@ -89,11 +64,8 @@ public class GameController {
 
         Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
 
-        return gameService.guesssimage(guess);
+        return gameService.guessimage(guess);
     }
-
-
-
 
 
   @DeleteMapping("/game/{gameId}/delete")
@@ -105,5 +77,41 @@ public class GameController {
     // update stats
     // load new page
   }
+
+  //
+  // Functions to check with Postman
+  //
+  @PostMapping("/player/create")
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public Player createplayer() {
+      // method to create a player, to check with Postman
+      Player player = gameUserService.createplayer();
+
+      return player;
+
+  }
+
+  @GetMapping("/player/{playerid}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Player getplayer(@PathVariable("playerid") Long playerid){
+      // method to get a player to check with Postman
+      Player player = gameUserService.getUser(playerid);
+
+      return player;
+
+  }
+
+  @GetMapping("/game/get/{gameid}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Game getgame(@PathVariable("gameid") Long gameid) {
+      // method to get a player to check with Postman
+      Game game = gameService.getGame(gameid);
+
+      return game;
+  }
+
 
 }

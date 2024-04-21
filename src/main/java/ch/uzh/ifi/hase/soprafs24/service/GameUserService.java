@@ -39,9 +39,8 @@ public class GameUserService {
     }
 
 
-    public Player createplayer(Long userid){
+    public Player createplayer(){
         Player player = new Player();
-        player.setPlayerId(userid);
 
         //saving PLayer to repository
         player = playerRepository.save(player);
@@ -69,6 +68,11 @@ public class GameUserService {
         // get player to get chosencharacter
         Player opponent = playerRepository.findByPlayerId(opponentid);
 
+        try {
+            return opponent.getChosencharacter();
+        } catch (NullPointerException e){
+
+        }
         return opponent.getChosencharacter();
 
 
@@ -128,7 +132,9 @@ public class GameUserService {
     public Boolean checkIfPlayerinGame(Game game, Long playerid){
         // till: get players from the game
         playerRepository.findByPlayerId(playerid);
-
+        if (game == null) {
+            throw new IllegalArgumentException("Game cannot be null");
+        }
         // check if the player is in the game players list, returns true when in game and false when not
         return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
 

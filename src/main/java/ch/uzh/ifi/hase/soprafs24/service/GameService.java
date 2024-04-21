@@ -38,26 +38,7 @@ public class GameService {
         this.gameUserService = gameUserService;
     }
 
-    public Player selectimage(Guess guess) {
-        checkIfImageExists(guess.getImageId());
 
-        Player player = gameUserService.getUser(guess.getPlayerId());
-
-        if (player.getChosencharacter() == null) {
-            player.setChosencharacter(guess.getImageId());
-            gameUserService.saveplayerchanges(player);
-        }
-        else {
-            throw new IllegalStateException("The player has already chosen a character.");
-        }
-        return player;
-    }
-
-
-
-    //
-    // Not done yet
-    //
     public Game creategame(Long lobbyid, Game game) {
         // till: check if both players exist
         gameUserService.checkIfUserExists(game.getCreatorId());
@@ -82,13 +63,34 @@ public class GameService {
 
         // save changes to game
         gameRepository.save(game);
+        gameRepository.flush();
 
         return game;
 
 
     }
 
-    public Boolean guesssimage(Guess guess){
+    public Player selectimage(Guess guess) {
+        //till: check if game exists
+        checkIfGameExists(guess.getGameId());
+        // check: if IMage exists
+        checkIfImageExists(guess.getImageId());
+        //check if player is in game but throws error always
+
+        // till: get the player, to set the chosen character
+        Player player = gameUserService.getUser(guess.getPlayerId());
+
+        if (player.getChosencharacter() == null) {
+            player.setChosencharacter(guess.getImageId());
+            gameUserService.saveplayerchanges(player);
+        }
+        else {
+            throw new IllegalStateException("The player has already chosen a character.");
+        }
+        return player;
+    }
+
+    public Boolean guessimage(Guess guess){
         //till: check if game exists
         checkIfGameExists(guess.getGameId());
         //till: check if Imageid exists
@@ -100,15 +102,22 @@ public class GameService {
         //get the chosencharacter of the Opponent
         Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, guess.getPlayerId());
 
+        //check if guess is correct, and check strikes
         if (oppChosenCharacter.equals(guess.getImageId())){
             return true;
         } else if (gameUserService.increaseandcheckStrikes(guess.getPlayerId())){
             return false;
         } else {
-            throw new IllegalStateException();
+            System.out.println("3rd strike! The game is over");
+            throw new IllegalStateException(); // Game over, end of game needs to be handled
         }
 
     }
+
+    public Game getGame(Long gameid) {
+        return gameRepository.findByGameId(gameid);
+    }
+
 
 
     //
@@ -135,7 +144,7 @@ public class GameService {
                 throw new ImageNotFoundException("Image with ID " + imageId + " not found");
             }
         } catch (ImageNotFoundException e) {
-            // Log the exception or handle it as needed
+            System.out.println(e.getMessage());
             return false;
         }
     }
