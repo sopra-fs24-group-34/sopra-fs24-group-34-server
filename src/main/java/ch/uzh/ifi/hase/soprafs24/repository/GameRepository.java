@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository("gameRepository")
 public interface GameRepository extends JpaRepository<Game, Long> {
   // smailalijagic: define any custom query methods if needed --> see Olat video
-  Game findByGameid(Long gameid);
+  Game findByGameId(Long gameid);
 }

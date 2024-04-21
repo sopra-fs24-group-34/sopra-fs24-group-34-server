@@ -1,42 +1,75 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@RestController
 public class GameController {
-  @PostMapping("/lobbies/{lobbyId}/startgame")
+  private final GameService gameService;
+  private final GameUserService gameUserService;
+
+  @Autowired
+  GameController(GameService gameService, GameUserService gameUserService) {
+    this.gameService = gameService;
+    this.gameUserService = gameUserService;
+  }
+
+  @PostMapping("/game/{lobbyid}/start")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Long createGame(@PathVariable("lobbyId") String lobbyid, User user1, User user2) {
+  public Game createGame(@PathVariable("lobbyid") Long lobbyid, @RequestBody GamePostDTO gamePostDTO) {
     // smailalijagic:
-    // 1. correct Lobby
+    // 1. correct Lobby, till: gameid is not created yet, compare with lobbyid
     // 2. User1 online?
     // 3. User2 online?
     // 4. remove lobby
     // 5. load game --> game logic (follows)
-    return null;
+    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+    return gameService.creategame(lobbyid, game);
   }
 
-  @PutMapping("/game/{gameId}/select")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PostMapping("/player/{playerid}")
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Boolean playGame(@PathVariable("gameId") String gameid, User user1, User user2) {
-    // smailalijagic:
-    // correct guess --> return true --> deleteGame(...)
-    // false guess --> return false and decrease total guesses by 1
-    return true;
+  public Player createplayer(@PathVariable ("playerid") Long playerid) {
+    // method to create a player to check with Postman
+    Player player = gameUserService.createplayer(playerid);
+    return player;
   }
 
-  @PostMapping("/game/{gameId}/pick")
+  @GetMapping("/player/{playerid}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Boolean pickChar(@PathVariable("gameId") String gameId, String charURL) {
-    // smailalijagic:
-    // 1. pick char
-    // 2. return true
-    return true;
+  public Player getplayer(@PathVariable("playerid") Long playerid){
+    // method to get a player to check with Postman
+    Player player = gameUserService.getUser(playerid);
+    return player;
+  }
+
+  @PutMapping("/game/character/choose")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseBody
+  public Player chooseImage(@RequestBody GuessPostDTO guessPostDTO){
+    // till:
+    // 1. ImageID exists?
+    // 2. chosencharacter still null?
+    Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+    return gameService.selectimage(guess);
+  }
+
+  @PostMapping("/game/character/guess")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @ResponseBody
+  public Boolean guessImage(@RequestBody GuessPostDTO guessPostDTO){
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    return gameService.guesssimage(guess);
   }
 
   @DeleteMapping("/game/{gameId}/delete")
@@ -45,10 +78,7 @@ public class GameController {
   public void deleteGame(@PathVariable("gameId") String gameid, User user1, User user2) {
     // smailalijagic:
     // delete game from database
-    // delete chat from database
     // update stats
     // load new page
   }
-
-
 }

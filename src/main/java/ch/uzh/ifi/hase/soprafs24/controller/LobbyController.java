@@ -47,20 +47,26 @@ public class LobbyController {
     return lobbyGetDTOs;
   }
 
+//  @GetMapping("lobbies/{lobbyId}")
+//  @ResponseStatus(HttpStatus.OK)
+//  @ResponseBody
+//  public LobbyGetDTO getLobby(@PathVariable("lobbyId") Long lobbyId) {
+//    Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
+//    return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby); // smailalijagic: convert lobby to api representation and return it
+//  }
+
   @GetMapping("lobbies/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LobbyGetDTO getLobby(@PathVariable("lobbyId") Long lobbyId) {
-    Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
-    return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby); // smailalijagic: convert lobby to api representation and return it
+  public Lobby getLobby(@PathVariable("lobbyId") Long lobbyId) {
+    return lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
   }
 
 
   @PostMapping("/lobbies/create/{userId}")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public Lobby createlobby(@PathVariable("userId") Long userId) {
-
+  public Long createlobby(@PathVariable("userId") Long userId) {
      return lobbyService.createlobby(userId);
   }
 
@@ -82,19 +88,20 @@ public class LobbyController {
     return null;
   }
 
-  @PutMapping("lobbies/join/{lobbyId}")
+  @PutMapping("lobbies/join/{lobbyId}/{userId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id, @RequestBody UserGetDTO userGetDTO) {
+  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
     // smailalijagic: update lobby for guest
     // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
-    Long lobbyId = Long.valueOf(id);
+    Long lobbyId = Long.valueOf(id1);
+    Long userId = Long.valueOf(id2);
     if (lobbyService.checkIfLobbyExists(lobbyId)) {
       Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
       if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
         throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
       }
-      User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO); // smailalijagic: get user
+      User user = lobbyService.getUser(userId); // smailalijagic: get user
       lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
 
       return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
@@ -104,6 +111,7 @@ public class LobbyController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
     }
   }
+
 
   @DeleteMapping("/lobbies/{lobbyId}/start")
   @ResponseStatus(HttpStatus.OK)
@@ -126,7 +134,4 @@ public class LobbyController {
     // smailalijagic: some return statement...
     return true;
   }
-
-
-
 }

@@ -76,8 +76,8 @@ public class UserController {
     return userService.loginUser(loginUser);
   }
 
-  @PostMapping("guestuser/join/lobbies/{lobbyId}")
-  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("/guestuser/create")
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public AuthenticationResponseDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
     // smailalijagic:
@@ -89,9 +89,6 @@ public class UserController {
     return userService.createGuestUser(guestUser); // smailalijagic: isGuest == true --> name: Guest + {guestId}
 
   }
-
-
-
 
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -106,9 +103,4 @@ public class UserController {
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(updatedUser);
 
   }
-
-
-
-
-
 }
