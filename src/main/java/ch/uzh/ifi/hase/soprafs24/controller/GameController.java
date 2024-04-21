@@ -9,16 +9,19 @@ import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import com.pusher.rest.Pusher;
 
 @RestController
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
+  private final Pusher pusher;
 
   @Autowired
-  GameController(GameService gameService, GameUserService gameUserService) {
+  GameController(GameService gameService, GameUserService gameUserService, Pusher pusher) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
+      this.pusher = pusher;
   }
 
   @PostMapping("/game/{lobbyid}/start")
@@ -32,6 +35,9 @@ public class GameController {
     // 4. remove lobby
     // 5. load game --> game logic (follows)
     Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+
+    pusher.trigger("lobby-events", "game-started", game);
+
     return gameService.creategame(lobbyid, game);
   }
 

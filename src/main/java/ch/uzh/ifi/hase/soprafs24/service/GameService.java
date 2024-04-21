@@ -53,8 +53,9 @@ public class GameService {
     gameUserService.checkIfUserExists(game.getCreatorId());
     gameUserService.checkIfUserExists(game.getInvitedPlayerId());
     // till: check if both players are online
-    gameUserService.checkIfUserOnline(game.getCreatorId());
-    gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
+      //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
+    //gameUserService.checkIfUserOnline(game.getCreatorId());
+    //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
     // till: checks if the user is actually the creator of the lobby
     gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
