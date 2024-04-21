@@ -17,14 +17,17 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import com.pusher.rest.Pusher;
 
 @RestController
 public class LobbyController {
 
   private final LobbyService lobbyService;
+  private final Pusher pusher;
 
-  LobbyController(LobbyService lobbyService) {
-    this.lobbyService = lobbyService;
+  LobbyController(LobbyService lobbyService, Pusher pusher) {
+      this.lobbyService = lobbyService;
+      this.pusher = pusher;
   }
 
   @ExceptionHandler(Exception.class)
@@ -82,7 +85,7 @@ public class LobbyController {
     return null;
   }
 
-  @PutMapping("lobbies/join/{lobbyId}/{guestId}")
+  @PutMapping("lobbies/join/{lobbyId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id, @RequestBody UserGetDTO userGetDTO) {
@@ -91,11 +94,14 @@ public class LobbyController {
     Long lobbyId = Long.valueOf(id);
     if (lobbyService.checkIfLobbyExists(lobbyId)) {
       Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
-      if (lobby.getInvited_userid() != null) {
+      if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
         throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
       }
-      User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO);
+      User user = DTOMapper.INSTANCE.convertUserGetDTOtoEntity(userGetDTO); // smailalijagic: get user
       lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+
+      //nedim-j: adjust if needed
+      pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
 
       return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
       // smailalijagic: load lobby screen
