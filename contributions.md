@@ -40,7 +40,7 @@
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
 | 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat|
-| 01.04.2024 | Dario Giuliani | | |
+| 01.04.2024 | Dario Giuliani |[#1] (https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/1) | PopUp Window accessible from Lobby with Explaination of the game. |
 | 02.04.2024 | Liam Kontopulos | | |
 | 02.04.2024 | Nedim Jukic | | |
 | 02.04.2024 | Till Sollberger | | |
