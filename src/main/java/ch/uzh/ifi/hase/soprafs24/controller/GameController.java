@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import com.pusher.rest.Pusher;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class GameController {
   private final GameService gameService;
@@ -21,7 +24,22 @@ public class GameController {
   GameController(GameService gameService, GameUserService gameUserService, Pusher pusher) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
-      this.pusher = pusher;
+    this.pusher = pusher;
+  }
+
+  @GetMapping("/games")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Game> getGames() {
+    return gameService.getGames();
+  }
+
+  @GetMapping("/games/{gameId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Game getGame(@PathVariable("gameId") String id) {
+    Long gameid = Long.valueOf(id);
+    return gameService.getGame(gameid);
   }
 
   @PostMapping("/game/{lobbyid}/start")

@@ -108,6 +108,7 @@ public interface DTOMapper {
   @Mapping(source = "creatorid", target = "creatorId")
   @Mapping(source = "invitedplayerid", target = "invitedPlayerId")
   Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+  // source = GamePostDTO, target = Game
 
   @Mapping(source = "playerid", target = "playerId")
   @Mapping(source = "imageid", target = "imageId")

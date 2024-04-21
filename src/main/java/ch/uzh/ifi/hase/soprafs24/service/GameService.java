@@ -1,12 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Guess;
-import ch.uzh.ifi.hase.soprafs24.entity.Player;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
-import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +19,22 @@ public class GameService {
   private final GameRepository gameRepository;
   private final ImageRepository imageRepository;
   private final GameUserService gameUserService;
+  private final LobbyRepository lobbyRepository;
+
   @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
+    this.lobbyRepository = lobbyRepository;
+  }
+
+  public List<Game> getGames() {
+    return this.gameRepository.findAll();
+  }
+
+  public Game getGame(Long gameid) {
+    return this.gameRepository.findByGameId(gameid);
   }
 
   public Player selectimage(Guess guess) {
@@ -49,6 +55,7 @@ public class GameService {
   // Not done yet
   //
   public Game creategame(Long lobbyid, Game game) {
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
     // till: check if both players exist
     gameUserService.checkIfUserExists(game.getCreatorId());
     gameUserService.checkIfUserExists(game.getInvitedPlayerId());
@@ -72,6 +79,8 @@ public class GameService {
 
     // save changes to game
     gameRepository.save(game);
+
+    lobby.setGame(game); // smailalijagic: add game to lobby
 
     return game;
   }

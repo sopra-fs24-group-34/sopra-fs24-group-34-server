@@ -136,4 +136,9 @@ public class UserService {
 
     return updatedUser;
   }
+
+  public void deleteGuestUser(Long id) {
+    this.userRepository.deleteById(id);
+  }
+
 }

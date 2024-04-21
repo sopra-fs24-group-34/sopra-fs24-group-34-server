@@ -94,7 +94,7 @@ public class LobbyController {
   @PutMapping("lobbies/join/{lobbyId}/{userId}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LobbyPutDTO joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+  public Lobby joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
     // smailalijagic: update lobby for guest
     // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
     Long lobbyId = Long.valueOf(id1);
@@ -110,7 +110,8 @@ public class LobbyController {
       //nedim-j: adjust if needed
       pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
 
-      return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
+      //return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
+      return lobby; // smailalijagic: return api representation
       // smailalijagic: load lobby screen
 
     } else {
