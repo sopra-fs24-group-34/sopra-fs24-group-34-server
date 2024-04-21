@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 
-import ch.uzh.ifi.hase.soprafs24.entity.Chat;
-import ch.uzh.ifi.hase.soprafs24.entity.Image;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -103,5 +100,17 @@ public interface DTOMapper {
 //  @Mapping(source = "lobbyToken", target = "lobbyToken")
 //  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
+  @Mapping(source = "gameid", target = "gameId")
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
+  Guess convertGuessPostDTOtoEntity(GuessPostDTO guessPostDTO);
+
+  @Mapping(source = "creatorid", target = "creatorId")
+  @Mapping(source = "invitedplayerid", target = "invitedPlayerId")
+  Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
+  Guess convertGuessPutDTOtoEmtity(GuessPostDTO guessPostDTO);
 }
 

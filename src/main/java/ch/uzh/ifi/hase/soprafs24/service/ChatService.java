@@ -32,7 +32,7 @@ public class ChatService {
 
   //@Transactional
   public void addMessage(Chat chat, Long userid, Long gameid) {
-    Game game = gameRepository.findByGameid(gameid);
+    Game game = gameRepository.findByGameId(gameid);
     Chat existingchat = game.getChat();
     if (game.getChat() != chat) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "chat not found"); // smailalijagic: double check
@@ -61,7 +61,7 @@ public class ChatService {
 
   public Game getGame(Long gameid) {
     try {
-      return this.gameRepository.findByGameid(gameid);
+      return this.gameRepository.findByGameId(gameid);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
     }

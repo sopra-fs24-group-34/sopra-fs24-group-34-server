@@ -25,11 +25,11 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 public class UnsplashService {
     private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
 
-    @Autowired
-    private ImageRepository imageRepository;
+  @Autowired
+  private ImageRepository imageRepository;
 
-    @Value("${unsplash.api.accessKey}")
-    private String accessKey;
+  @Value("${unsplash.api.accessKey}")
+  private String accessKey;
 
     public void saveRandomPortraitImagesToDatabase(int count) {
         try {
