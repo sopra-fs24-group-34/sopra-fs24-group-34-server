@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import com.pusher.rest.Pusher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -20,23 +21,42 @@ import java.util.stream.Collectors;
 @RestController
 public class ChatController {
   private final ChatService chatService;
+  private final Pusher pusher;
 
-  public ChatController(ChatService chatService) {
+  public ChatController(ChatService chatService, Pusher pusher) {
     this.chatService = chatService;
+    this.pusher = pusher;
   }
 
   @PostMapping("/game/{gameId}/chat/{userId}") // smailalijagic: use gameId to check if a game exists
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public void addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
-    // smailalijagic: get gameId
-    Long gameid = Long.valueOf(game_id); // smailalijagic: added
-    // smailalijagic: get message
+  public MessageGetDTO addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
+    Long gameid = Long.valueOf(game_id); // smailalijagic: get gameId
     Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO); // smailalijagic: convert api representation to entity
-    // smailalijagic: get userId
-    Long userid = Long.valueOf(user_id);
-    // smailalijagic: update chat
+    Long userid = Long.valueOf(user_id); // smailalijagic: get userId
     chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
+
+    // smailalijagic: trigger a Pusher event to notify clients about the new chat message
+    pusher.trigger("chat_channel", "new_message", chat.getLastmessage());
+
+    return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat); // smailalijagic: return api representation of chat
+
+  }
+
+  @GetMapping("chats")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<Chat> getChats() {
+    return chatService.getChats();
+  }
+
+  @GetMapping("chats/{chatId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Chat getChat(@PathVariable("chatId") String id) {
+    Long chatid = Long.valueOf(id);
+    return chatService.getChat(chatid);
   }
 
   @GetMapping("/game/{gameId}/chat")

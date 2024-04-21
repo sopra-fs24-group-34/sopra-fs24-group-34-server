@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.NoSuchElementException;
 
 /**
  * User Controller
@@ -76,8 +77,8 @@ public class UserController {
     return userService.loginUser(loginUser);
   }
 
-  @PostMapping("guestuser/join/lobbies/{lobbyId}")
-  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("/guestuser/create")
+  @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public AuthenticationResponseDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
     // smailalijagic:
@@ -89,9 +90,6 @@ public class UserController {
     return userService.createGuestUser(guestUser); // smailalijagic: isGuest == true --> name: Guest + {guestId}
 
   }
-
-
-
 
   @PutMapping("/users/{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -107,8 +105,12 @@ public class UserController {
 
   }
 
-
-
-
+  @DeleteMapping("guestuser/{guestuserId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public void deleteGuestUser(@PathVariable("guestuserId") String id) {
+    Long guestuserId = Long.valueOf(id);
+    userService.deleteGuestUser(guestuserId);
+  }
 
 }

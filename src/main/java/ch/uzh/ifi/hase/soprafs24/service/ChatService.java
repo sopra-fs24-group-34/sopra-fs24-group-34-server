@@ -30,22 +30,30 @@ public class ChatService {
     this.userRepository = userRepository;
     }
 
+  public List<Chat> getChats() {
+    return this.chatRepository.findAll();
+  }
+
+  public Chat getChat(Long chatid) {
+    return this.chatRepository.findChatById(chatid);
+  }
+
   //@Transactional
   public void addMessage(Chat chat, Long userid, Long gameid) {
-    Game game = gameRepository.findByGameid(gameid);
+    Game game = gameRepository.findByGameId(gameid);
     Chat existingchat = game.getChat();
-    if (game.getChat() != chat) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "chat not found"); // smailalijagic: double check
-    }
+    //if (game.getChat() != chat) {
+    //  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "chat not found"); // smailalijagic: double check
+    //}
 
     // smailalijagic: final update
     String message = chat.getLastmessage();
-    User user = userRepository.findUserById(gameid);
-    assert checkIfUserExists(user);
+    //User user = userRepository.findUserById(gameid);
+    //assert checkIfUserExists(user);
     if (message.length() > Chat.MAX_MESSAGE_LENGTH) {
       message = message.substring(0, Chat.MAX_MESSAGE_LENGTH); // smailalijagic: only return first 250 characters
     }
-    String myMessage = user.getUsername() + ": " + message;
+    String myMessage = message; //user.getUsername() + ": " + message;
     existingchat.addMessage(myMessage, userid);
 
     chat = chatRepository.save(existingchat);
@@ -61,7 +69,7 @@ public class ChatService {
 
   public Game getGame(Long gameid) {
     try {
-      return this.gameRepository.findByGameid(gameid);
+      return this.gameRepository.findByGameId(gameid);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
     }

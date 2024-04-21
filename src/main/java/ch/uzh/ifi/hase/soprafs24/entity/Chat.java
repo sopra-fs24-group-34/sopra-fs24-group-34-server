@@ -36,7 +36,7 @@ public class Chat {
     finalMessage.setMessage(message);
     finalMessage.setUserid(writerid);
     this.messages.add(finalMessage); // smailalijagic: adding messages to DB/repository (=sending message)
-    // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
+    // smailalijagic: messages = {("1", "Is it male?"), ("2", "Yes"), ("2", "Does she have red hair?"), ("1", "Yes"), ("1", "...")}
   }
 
   //public List<ChatTuple<String, Long>> getMessages() {

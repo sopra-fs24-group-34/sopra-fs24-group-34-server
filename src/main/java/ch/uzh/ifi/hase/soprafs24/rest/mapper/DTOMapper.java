@@ -1,9 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 
-import ch.uzh.ifi.hase.soprafs24.entity.Chat;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -73,7 +71,11 @@ public interface DTOMapper {
 
   @Mapping(source = "id", target = "lobbyid")
   Lobby convertEntityToLobbyDeleteDTO(LobbyDeleteDTO lobbyDeleteDTO); // smailalijagic: added, issue #54
-  // source = LobbyDeleteDTO, target = Lobby
+    // source = LobbyDeleteDTO, target = Lobby
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "url", target = "url")
+    ImageDTO convertEntityToImageDTO(Image image); // dario added for Image
 
   @Mapping(source = "lobbyid", target = "id")
   @Mapping(source = "creator_userid", target = "creator_userid")
@@ -98,5 +100,18 @@ public interface DTOMapper {
 //  @Mapping(source = "lobbyToken", target = "lobbyToken")
 //  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
+  @Mapping(source = "gameid", target = "gameId")
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
+  Guess convertGuessPostDTOtoEntity(GuessPostDTO guessPostDTO);
+
+  @Mapping(source = "creatorid", target = "creatorId")
+  @Mapping(source = "invitedplayerid", target = "invitedPlayerId")
+  Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+  // source = GamePostDTO, target = Game
+
+  @Mapping(source = "playerid", target = "playerId")
+  @Mapping(source = "imageid", target = "imageId")
+  Guess convertGuessPutDTOtoEmtity(GuessPostDTO guessPostDTO);
 }
 
