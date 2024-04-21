@@ -9,6 +9,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import java.util.Random;
 import java.util.logging.Logger;
 import java.util.Collections;
@@ -18,10 +20,10 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 
 
 
+
 @Service
 public class UnsplashService {
     private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
-
 
     @Autowired
     private ImageRepository imageRepository;
@@ -30,23 +32,23 @@ public class UnsplashService {
     private String accessKey;
 
     public void saveRandomPortraitImagesToDatabase(int count) {
-    try {
-        String url = "https://api.unsplash.com/photos/random?client_id=" + accessKey +
-                "&orientation=portrait&count=" + count + "&query=people";
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, Object>[] responses = restTemplate.getForObject(url, Map[].class);
+        try {
+            String url = "https://api.unsplash.com/photos/random?client_id=" + accessKey +
+                    "&orientation=portrait&count=" + count + "&query=people";
+            RestTemplate restTemplate = new RestTemplate();
+            Map<String, Object>[] responses = restTemplate.getForObject(url, Map[].class);
 
-        if (responses != null) {
-            for (Map<String, Object> response : responses) {
-                Map<String, String> urls = (Map<String, String>) response.get("urls");
-                String imageUrl = urls.get("regular");
+            if (responses != null) {
+                for (Map<String, Object> response : responses) {
+                    Map<String, String> urls = (Map<String, String>) response.get("urls");
+                    String imageUrl = urls.get("regular");
 
-                Image image = new Image();
-                image.setUrl(imageUrl);
-                imageRepository.save(image);
+                    Image image = new Image();
+                    image.setUrl(imageUrl);
+                    imageRepository.save(image);
+                }
             }
-        }
-    } catch (Exception e) {
+        } catch (Exception e) {
             // Log any exceptions
             logger.severe("Error while saving images to database: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while saving images to database");}
@@ -88,6 +90,22 @@ public class UnsplashService {
             // Log any exceptions
             logger.severe("Error while retrieving image URLs from database: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while retrieving image URLs from database");
+        }
+    }
+
+    public static void deleteImage(Long imageId, ImageRepository imageRepository) {
+        try {
+            Image image = imageRepository.findImageById(imageId); //Check if image in db
+            if (image == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found");
+            }
+
+            imageRepository.delete(image);
+
+        } catch (Exception e) {
+            // Log any exceptions
+            logger.severe("Error while deleting image from database: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while deleting image from database");
         }
     }
 }
