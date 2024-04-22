@@ -53,10 +53,12 @@ public class GameController {
     // 4. remove lobby
     // 5. load game --> game logic (follows)
     Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+    //nedim-j: made new game to return in pusher, feel free to adjust
+    Game createdGame = gameService.creategame(lobbyid, game);
 
-    pusher.trigger("lobby-events", "game-started", game);
+    pusher.trigger("lobby-events", "game-started", createdGame);
 
-    return gameService.creategame(lobbyid, game);
+    return createdGame;
   }
 
   @PostMapping("/player/{playerid}")
