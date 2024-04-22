@@ -5,22 +5,13 @@ import java.io.Serializable;
 
 @Entity
 public class Guess {
-
     @Id
     @GeneratedValue
     private Long id;
 
     // Other attributes and methods
-
-
-
-
     private Long gameId;
-
-
     private Long playerId;
-
-
     private Long imageId;
 
     public Long getId() {
@@ -44,17 +35,14 @@ public class Guess {
     }
 
     public void setPlayerId(Long playerid) {
-            this.playerId = playerid;
-        }
+        this.playerId = playerid;
+    }
 
     public Long getImageId() {
         return imageId;
     }
 
     public void setImageId(Long imageid) {
-            this.imageId = imageid;
-        }
-
-
+        this.imageId = imageid;
+    }
 }
-

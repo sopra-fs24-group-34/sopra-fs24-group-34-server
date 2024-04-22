@@ -25,15 +25,8 @@
 ### Jukic Nedim
 
 ### Kontopulos Liam
--------------------------------------------------------------------------------------------------------------------
-|  02.04  |  #50  |  Implemented Landing Page; further implemented login & register; Styled the general Web Page  |
--------------------------------------------------------------------------------------------------------------------
-
 
 ### Sollberger Till
 --------------------------------------------
 | 28.03.2024 | #98 | Added the implementation to update the User profile, the second task went missing. So I'm gonna do more than two for the next week. |
 --------------------------------------------
-|10.04.2024 | #44 #46 | Creation of the lobby and handling of failures. |
---------------------------------------------
-

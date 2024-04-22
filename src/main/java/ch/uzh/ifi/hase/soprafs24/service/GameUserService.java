@@ -19,11 +19,8 @@ import java.util.List;
 @Service     //Service to handle User and PLayer methods that need USer and PLayer repository, done to reduce coupling
 @Transactional
 public class GameUserService {
-
     private final PlayerRepository playerRepository;
-
     private final UserRepository userrepository;
-
     private final LobbyRepository lobbyRepository;
 
     @Autowired
@@ -33,28 +30,24 @@ public class GameUserService {
         this.lobbyRepository = lobbyRepository;
     }
 
-
     public Player getUser(Long playerId){
         return playerRepository.findByPlayerId(playerId);
     }
 
-
-    public Player createplayer(){
+    public Player createplayer(Long userid){
         Player player = new Player();
+        player.setPlayerId(userid);
 
         //saving PLayer to repository
         player = playerRepository.save(player);
         playerRepository.flush();
 
         return player;
-
     }
-
 
     public Long getChosenCharacterofOpponent(Game game, Long playerid) {
         // till: get players from the game
         Long creatorid = game.getCreatorId();
-
 
         // create Long for opponentplayerid
         Long opponentid;
@@ -68,27 +61,18 @@ public class GameUserService {
         // get player to get chosencharacter
         Player opponent = playerRepository.findByPlayerId(opponentid);
 
-        try {
-            return opponent.getChosencharacter();
-        } catch (NullPointerException e){
-
-        }
         return opponent.getChosencharacter();
-
-
     }
-
 
     public Boolean increaseandcheckStrikes(Long playerid){
         Player player = getUser(playerid);
         if (player.getStrikes() == 2){
             return false;
-        } else {
-            player.setStrikes(player.getStrikes() + 1);
-            playerRepository.save(player);
-            playerRepository.flush();
-            return true;
         }
+        player.setStrikes(player.getStrikes() + 1);
+        playerRepository.save(player);
+        playerRepository.flush();
+        return true;
     }
 
 
@@ -98,31 +82,24 @@ public class GameUserService {
         playerRepository.flush();
     }
 
-
-
     //
     // check Functions
     //
-
-
     public Boolean checkIfUserExists(Long userid){
-            User user = userrepository.findUserById(userid);
-
-            return user != null; //user = null-> user does not exist
-
+        User user = userrepository.findUserById(userid);
+        return user != null; //user = null-> user does not exist
     }
 
     public Boolean checkIfUserOnline(Long userid){
         User user = userrepository.findUserById(userid);
         return user.getStatus() == UserStatus.ONLINE;
-
     }
 
     public Boolean checkForCorrectLobby(Long lobbyid, Long userid) {
         // gets the Lobby
         Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
         // checks if the userid is the same as the one saved in the lobby
-        if (lobby.getUser() == userid){
+        if (lobby.getCreator_userid().equals(userid)){
             return true;
         } else {
             return false;
@@ -132,18 +109,8 @@ public class GameUserService {
     public Boolean checkIfPlayerinGame(Game game, Long playerid){
         // till: get players from the game
         playerRepository.findByPlayerId(playerid);
-        if (game == null) {
-            throw new IllegalArgumentException("Game cannot be null");
-        }
+
         // check if the player is in the game players list, returns true when in game and false when not
         return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
-
-
-
-
-
-
     }
-
-
 }

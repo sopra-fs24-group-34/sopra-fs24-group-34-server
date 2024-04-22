@@ -29,7 +29,6 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserService {
-
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
@@ -41,6 +40,14 @@ public class UserService {
 
     public List<User> getUsers() {
         return this.userRepository.findAll();
+    }
+
+    public User getUser(Long userId) {
+        try {
+            return this.userRepository.findUserById(userId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
+        }
     }
 
     public AuthenticationResponseDTO createUser(User newUser) {
@@ -57,8 +64,37 @@ public class UserService {
         return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
     }
 
+    public AuthenticationResponseDTO createGuestUser(User newGuestUser) {
+        checkIfUserExists(newGuestUser);
+        newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
+        newGuestUser.setToken(UUID.randomUUID().toString());
+
+        // saves the given entity but data is only persisted in the database once
+        // flush() is called
+        newGuestUser = userRepository.save(newGuestUser);
+        userRepository.flush(); // smailalijagic: this sets the ID
+
+        newGuestUser.setUsername(newGuestUser.getUsername() + newGuestUser.getId()); // smailalijagic: username = Guest1
+
+        newGuestUser = userRepository.save(newGuestUser); // smailalijagic: update guestuser
+        userRepository.flush();
+
+        log.debug("Created Information for User: {}", newGuestUser);
+        return new AuthenticationResponseDTO(newGuestUser.getId(), newGuestUser.getToken());
+    }
+
+
+    /**
+     * This is a helper method that will check the uniqueness criteria of the
+     * username and the name
+     * defined in the User entity. The method will do nothing if the input is unique
+     * and throw an error otherwise.
+     *
+     * @param userToBeCreated
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see User
+     */
     private Boolean checkIfUserExists(User userToBeCreated) {
-        // smailalijagic: changed to boolean
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
         String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
@@ -75,13 +111,13 @@ public class UserService {
             // User is authenticated
             existingUser.setStatus(UserStatus.ONLINE);
             return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
-        }
-        else {
+        } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
     }
 
     public User updateUser(User updatedUser, Long userId) {
+        //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
         User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
         // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
@@ -98,9 +134,11 @@ public class UserService {
         updatedUser = userRepository.save(exsistingUser);
         userRepository.flush();
 
-
         return updatedUser;
     }
 
+    public void deleteGuestUser(Long id) {
+        this.userRepository.deleteById(id);
+    }
 
 }

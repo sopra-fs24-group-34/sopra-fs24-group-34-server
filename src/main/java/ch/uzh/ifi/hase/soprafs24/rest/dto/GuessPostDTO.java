@@ -1,13 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 public class GuessPostDTO {
-
     private Long gameid;
-
     private Long playerid;
-
     private Long imageid;
-
 
     public Long getGameid() {
         return gameid;
@@ -16,7 +12,6 @@ public class GuessPostDTO {
     public void setGameid(Long gameid) {
         this.gameid = gameid;
     }
-
 
     public Long getPlayerid() {
         return playerid;
@@ -33,5 +28,4 @@ public class GuessPostDTO {
     public void setImageid(Long imageid) {
         this.imageid = imageid;
     }
-
 }

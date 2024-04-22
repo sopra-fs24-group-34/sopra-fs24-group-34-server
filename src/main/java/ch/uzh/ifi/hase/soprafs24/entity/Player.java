@@ -8,20 +8,17 @@ import java.io.Serializable;
 
 @Entity
 public class Player implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
     private Long playerId;
 
-
     @Column(nullable = true)
     private Long chosencharacter;
 
     @Column(nullable = false)
     private int strikes;
-
 
     public Long getPlayerId() {
         return playerId;

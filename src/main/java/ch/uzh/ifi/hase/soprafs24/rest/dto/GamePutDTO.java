@@ -1,17 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 public class GamePutDTO {
-
     private Long gameid;
-
     private Long playerid;
-
     private Long imageid;
-
-
-
-
-
 
     public Long getPlayerid(){
         return playerid;
@@ -28,6 +20,4 @@ public class GamePutDTO {
     public void setImageid(Long imageid){
         this.imageid = imageid;
     }
-
-
 }

@@ -1,18 +1,16 @@
-package ch.uzh.ifi.hase.soprafs24.entity;
+package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
-@Entity
-public class Image {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ImageDTO {
     private Long id;
-
     private String url;
+    public ImageDTO() {
+    }
+
+    public ImageDTO(Long id, String url) {
+        this.id = id;
+        this.url = url;
+    }
 
     public Long getId() {
         return id;

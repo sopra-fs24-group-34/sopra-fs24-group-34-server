@@ -13,10 +13,17 @@ public class Chat {
   @GeneratedValue //(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ElementCollection
-  @CollectionTable(name = "MESSAGES", joinColumns = @JoinColumn(name = "chat_id"))
-  @Column(name = "MESSAGE")
-  private List<String> messages;
+  //@ElementCollection
+  //@CollectionTable(name = "MESSAGES", joinColumns = @JoinColumn(name = "chat_id"))
+  //@Column(name = "MESSAGES")
+  // private List<ChatTuple<String, Long>> messages;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  private List<ChatTuple> messages; // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
+
+  //private List<String> messages;
+
+  private String lastmessage;
 
   public static int MAX_MESSAGE_LENGTH = 250; // smailalijagic: allow max 250 char per message, issue #58
 
@@ -24,11 +31,19 @@ public class Chat {
   //  this.messages = new ArrayList<>(); // smailalijagic: initialization
   //}
 
-  public void addMessage(String messages) {
-    this.messages.add(messages); // smailalijagic: adding messages to DB/repository (=sending message)
+  public void addMessage(String message, Long writerid) {
+    ChatTuple finalMessage = new ChatTuple();
+    finalMessage.setMessage(message);
+    finalMessage.setUserid(writerid);
+    this.messages.add(finalMessage); // smailalijagic: adding messages to DB/repository (=sending message)
+    // smailalijagic: messages = {("1", "Is it male?"), ("2", "Yes"), ("2", "Does she have red hair?"), ("1", "Yes"), ("1", "...")}
   }
 
-  public List<String> getMessages() {
+  //public List<ChatTuple<String, Long>> getMessages() {
+  //  return messages; // smailalijagic: getting message from DB/repository (=reading message)
+  //}
+
+  public List<ChatTuple> getMessages() {
     return messages; // smailalijagic: getting message from DB/repository (=reading message)
   }
 
@@ -38,6 +53,14 @@ public class Chat {
 
   public Long getId() {
     return id;
+  }
+
+  public void setLastmessage(String lastmessage) {
+    this.lastmessage = lastmessage;
+  }
+
+  public String getLastmessage() {
+    return lastmessage;
   }
 
 }
