@@ -40,7 +40,7 @@ public class GameService {
   public Player selectimage(Guess guess) {
     checkIfImageExists(guess.getImageId());
 
-    Player player = gameUserService.getUser(guess.getPlayerId());
+    Player player = gameUserService.getPlayer(guess.getPlayerId());
 
     if (player.getChosencharacter() == null) {
       player.setChosencharacter(guess.getImageId());
@@ -51,29 +51,30 @@ public class GameService {
     return player;
   }
 
-  //
-  // Not done yet
-  //
   public Game creategame(Long lobbyid, Game game) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
     // till: check if both players exist
     gameUserService.checkIfUserExists(game.getCreatorId());
     gameUserService.checkIfUserExists(game.getInvitedPlayerId());
     // till: check if both players are online
-      //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
+    //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
     //gameUserService.checkIfUserOnline(game.getCreatorId());
     //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
     // till: checks if the user is actually the creator of the lobby
     gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
-    // till: create 2 players
+    // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();
+    User user = gameUserService.getUser(game.getCreatorId());
+    player1.setUser(user);
+
     Player player2 = new Player();
-    //save the changes
+    player2.setUser(gameUserService.getUser(game.getInvitedPlayerId()));
+
+    // till: Save the changes
     gameUserService.saveplayerchanges(player1);
     gameUserService.saveplayerchanges(player2);
 
-    // Set the game's players
     game.setCreatorId(player1.getPlayerId());
     game.setInvitedPlayerId(player2.getPlayerId());
 
@@ -85,26 +86,49 @@ public class GameService {
     return game;
   }
 
-  public Boolean guesssimage(Guess guess){
+  public Response guesssimage(Guess guess){
     //till: check if game exists
     checkIfGameExists(guess.getGameId());
     //till: check if Imageid exists
     checkIfImageExists(guess.getImageId());
     //till: check if player is in the game
-    Game game = gameRepository.findByGameId(guess.getGameId());
+    Game game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
     gameUserService.checkIfPlayerinGame(game, guess.getPlayerId());
 
     //get the chosencharacter of the Opponent
     Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, guess.getPlayerId());
 
+
     if (oppChosenCharacter.equals(guess.getImageId())){
-      return true;
-    } else if (gameUserService.increaseandcheckStrikes(guess.getPlayerId())){
-      return false;
+      Response response = gameUserService.createResponse(true, guess.getPlayerId());
+      gameUserService.increaseWinTotal(guess.getPlayerId());
+      return response;
+    } else if (gameUserService.checkStrikes(guess.getPlayerId())){
+        gameUserService.increaseStrikesbyOne(guess.getPlayerId());
+        return gameUserService.createResponse(false, guess.getPlayerId());
     } else {
-      throw new IllegalStateException();
+      Response response = new Response();
+      response.setGuess(false);
+      response.setStrikes(3L);
+      // deletegame(game);
+      return response;
     }
   }
+
+  private void deletegame(Game game) {
+      //Get the users
+      User user = gameUserService.getUser(game.getCreatorId());
+      User invitedUser = gameUserService.getUser(game.getInvitedPlayerId());
+      //set the game in the Usergamelobbylist to null
+      gameUserService.updategamelobbylist(user);
+      gameUserService.updategamelobbylist(invitedUser);
+
+      //delete the game
+      gameRepository.delete(game);
+  }
+
+
+
 
   public Boolean checkIfGameExists(Long gameId) {
     try {
@@ -133,6 +157,7 @@ public class GameService {
       super(message);
     }
   }
+
 }
 
 

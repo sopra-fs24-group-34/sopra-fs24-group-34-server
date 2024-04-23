@@ -34,4 +34,9 @@ public class ImageController {
     public void deleteImage(@PathVariable Long imageId) {
         UnsplashService.deleteImage(imageId, imageRepository);
     }
+
+    @PostMapping("/images/create")
+    public void createImage(){
+        unsplashService.createImage();
+    }
 }
