@@ -87,6 +87,9 @@ public class GameController {
     // 1. ImageID exists?
     // 2. chosencharacter still null?
     Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+    String channelName = "gameRound"+guess.getGameId();
+    String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
+    pusher.trigger(channelName, "round-update", message);
     return gameService.selectimage(guess);
   }
 
@@ -95,6 +98,9 @@ public class GameController {
   @ResponseBody
   public Boolean guessImage(@RequestBody GuessPostDTO guessPostDTO){
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    String channelName = "gameRound"+guess.getGameId();
+    String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId();
+    pusher.trigger(channelName, "round-update", message);
     return gameService.guesssimage(guess);
   }
 
