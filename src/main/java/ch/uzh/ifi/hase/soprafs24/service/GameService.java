@@ -87,6 +87,7 @@ public class GameService {
 
   public Boolean guesssimage(Guess guess){
     //till: check if game exists
+      //nedim-j: nothing is done with the "exists". maybe asserts/change functions to void?
     checkIfGameExists(guess.getGameId());
     //till: check if Imageid exists
     checkIfImageExists(guess.getImageId());
