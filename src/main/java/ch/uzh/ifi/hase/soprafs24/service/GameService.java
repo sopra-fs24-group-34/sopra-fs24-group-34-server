@@ -37,7 +37,7 @@ public class GameService {
     return this.gameRepository.findByGameId(gameid);
   }
 
-  public Player selectimage(Guess guess) {
+  public void selectimage(Guess guess) {
     checkIfImageExists(guess.getImageId());
 
     Player player = gameUserService.getUser(guess.getPlayerId());
@@ -48,7 +48,10 @@ public class GameService {
     } else {
       throw new IllegalStateException("The player has already chosen a character.");
     }
-    return player;
+  }
+
+  public Boolean playerHasSelected(Long playerId) {
+      return gameUserService.getUser(playerId).getChosencharacter() != null;
   }
 
   //

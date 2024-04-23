@@ -82,15 +82,25 @@ public class GameController {
   @PutMapping("/game/character/choose")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @ResponseBody
-  public Player chooseImage(@RequestBody GuessPostDTO guessPostDTO){
+  public void chooseImage(@RequestBody GuessPostDTO guessPostDTO){
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
     Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
-    String channelName = "gameRound"+guess.getGameId();
-    String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
-    pusher.trigger(channelName, "round-update", message);
-    return gameService.selectimage(guess);
+    Game game = gameService.getGame(guess.getGameId());
+    Long creatorId = game.getCreatorId();
+    Long invitedId = game.getInvitedPlayerId();
+    if(!gameService.playerHasSelected(guess.getPlayerId())) {
+        gameService.selectimage(guess);
+        if(gameService.playerHasSelected(creatorId) && gameService.playerHasSelected(invitedId)) {
+            String channelName = "gameRound"+guess.getGameId();
+            String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
+            pusher.trigger(channelName, "round-update", message);
+        }
+    }
+    else {
+        throw new RuntimeException("You have already chosen a character");
+    }
   }
 
   @PostMapping("/game/character/guess")
