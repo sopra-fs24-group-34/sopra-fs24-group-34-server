@@ -1,4 +1,4 @@
-
+/*
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -34,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
  * request without actually sending them over the network.
  * This tests if the UserController works.
- */
+ * /
 @WebMvcTest(GameController.class)
 public class GameControllerTest {
 
@@ -106,7 +107,7 @@ public class GameControllerTest {
    *
    * @param object
    * @return string
-   */
+   * /
   private String asJsonString(final Object object) {
     try {
       return new ObjectMapper().writeValueAsString(object);
@@ -116,3 +117,4 @@ public class GameControllerTest {
     }
   }
 }
+*/

@@ -9,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.ChatRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,8 @@ public class ChatService {
   private final UserRepository userRepository;
 
   @Autowired
-  public ChatService(ChatRepository chatRepository, GameRepository gameRepository, UserRepository userRepository) {
+  public ChatService(@Qualifier("chatRepository")ChatRepository chatRepository, @Qualifier("gameRepository") GameRepository gameRepository,
+                     @Qualifier("userRepository") UserRepository userRepository) {
     this.chatRepository = chatRepository;
     this.gameRepository = gameRepository;
     this.userRepository = userRepository;
