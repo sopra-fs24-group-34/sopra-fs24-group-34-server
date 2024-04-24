@@ -37,13 +37,13 @@
 
 ## <font style="color: #00d7ff">Week 3 *(17.04 – 23.04)*</font>
 
-| Date | Name | Links to Github Issues | Comments |
-|---|---|---|---|
-| 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat|
-| 01.04.2024 | Dario Giuliani | | |
-| 02.04.2024 | Liam Kontopulos | | |
-| 02.04.2024 | Nedim Jukic | | |
-| 02.04.2024 | Till Sollberger | | |
+| Date | Name | Links to Github Issues                                                                                                                                                                                                                                                                                                                         | Comments                                                                                                     |
+|---|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat                                                                                               |
+| 01.04.2024 | Dario Giuliani |                                                                                                                                                                                                                                                                                                                                                |                                                                                                              |
+| 02.04.2024 | Liam Kontopulos |                                                                                                                                                                                                                                                                                                                                                |                                                                                                              |
+| 02.04.2024 | Nedim Jukic |                                                                                                                                                                                                                                                                                                                                                |                                                                                                              |
+| 02.04.2024 | Till Sollberger | [#70](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/70), [#50](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/50)                                                                                                                                                                         | Strikes system implementedwith new entity response, a lot of time spent for matching mappings with Frontend. |
 
 
 ## <font style="color: #00d7ff">Week 4 *(24.04 – 26.04)*</font>
