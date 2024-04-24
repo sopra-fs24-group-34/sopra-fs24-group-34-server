@@ -75,7 +75,7 @@ public class GameController {
   @ResponseBody
   public Player getplayer(@PathVariable("playerid") Long playerid){
     // method to get a player to check with Postman
-    Player player = gameUserService.getUser(playerid);
+    Player player = gameUserService.getPlayer(playerid);
     return player;
   }
 
@@ -96,7 +96,7 @@ public class GameController {
   @PostMapping("/game/character/guess")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @ResponseBody
-  public Boolean guessImage(@RequestBody GuessPostDTO guessPostDTO){
+  public Response guessImage(@RequestBody GuessPostDTO guessPostDTO){
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     String channelName = "gameRound"+guess.getGameId();
     String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId();

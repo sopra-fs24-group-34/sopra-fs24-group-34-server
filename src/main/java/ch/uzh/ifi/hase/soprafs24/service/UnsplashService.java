@@ -108,4 +108,10 @@ public class UnsplashService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while deleting image from database");
         }
     }
+
+    public void createImage() {
+        Image image = new Image();
+        imageRepository.save(image);
+        imageRepository.flush();
+    }
 }
