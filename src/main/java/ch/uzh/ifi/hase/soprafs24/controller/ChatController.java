@@ -11,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import com.pusher.rest.Pusher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -23,6 +24,7 @@ public class ChatController {
   private final ChatService chatService;
   private final Pusher pusher;
 
+  @Autowired
   public ChatController(ChatService chatService, Pusher pusher) {
     this.chatService = chatService;
     this.pusher = pusher;

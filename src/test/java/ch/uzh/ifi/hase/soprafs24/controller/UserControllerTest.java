@@ -85,7 +85,7 @@
 //    given(userService.createUser(Mockito.any())).willReturn(user);
 //
 //    // when/then -> do the request + validate the result
-//    MockHttpServletRequestBuilder postRequest = post("/register")
+//    MockHttpServletRequestBuilder postRequest = post("/users")
 //        .contentType(MediaType.APPLICATION_JSON)
 //        .content(asJsonString(userPostDTO));
 //
