@@ -8,40 +8,40 @@ import java.io.Serializable;
 
 @Entity
 public class Player implements Serializable {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
-  private Long playerId;
+    @Id
+    @GeneratedValue
+    private Long playerId;
 
-  @Column(nullable = true)
-  private Long chosencharacter;
+    @Column(nullable = true)
+    private Long chosencharacter;
 
-  @Column(nullable = false)
-  private int strikes;
+    @Column(nullable = false)
+    private int strikes;
 
-  public Long getPlayerId() {
-    return playerId;
-  }
+    public Long getPlayerId() {
+        return playerId;
+    }
 
-  public void setPlayerId(Long playerId) {
-    this.playerId = playerId;
-  }
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
+    }
 
-  public Long getChosencharacter() {
-    return chosencharacter;
-  }
+    public Long getChosencharacter() {
+        return chosencharacter;
+    }
 
-  public void setChosencharacter(Long chosencharacter) {
-    this.chosencharacter = chosencharacter;
-  }
+    public void setChosencharacter(Long chosencharacter) {
+        this.chosencharacter = chosencharacter;
+    }
 
-  public int getStrikes() {
-    return strikes;
-  }
+    public int getStrikes() {
+        return strikes;
+    }
 
-  public void setStrikes(int strikes) {
-    this.strikes = strikes;
-  }
+    public void setStrikes(int strikes) {
+        this.strikes = strikes;
+    }
 
 }

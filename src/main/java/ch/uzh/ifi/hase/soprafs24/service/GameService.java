@@ -88,26 +88,34 @@ public class GameService {
     return game;
   }
 
-  public Boolean guesssimage(Guess guess){
-    //till: check if game exists
+  public Boolean guesssimage(Guess guess) {
+      //till: check if game exists
       //nedim-j: nothing is done with the "exists". maybe asserts/change functions to void?
-    checkIfGameExists(guess.getGameId());
-    //till: check if Imageid exists
-    checkIfImageExists(guess.getImageId());
-    //till: check if player is in the game
-    Game game = gameRepository.findByGameId(guess.getGameId());
-    gameUserService.checkIfPlayerinGame(game, guess.getPlayerId());
+      checkIfGameExists(guess.getGameId());
+      //till: check if Imageid exists
+      checkIfImageExists(guess.getImageId());
+      //till: check if player is in the game
+      Game game = gameRepository.findByGameId(guess.getGameId());
+      Long playerId = guess.getPlayerId();
+      gameUserService.checkIfPlayerinGame(game, playerId);
 
-    //get the chosencharacter of the Opponent
-    Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, guess.getPlayerId());
+      //get the chosencharacter of the Opponent
+      Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
 
-    if (oppChosenCharacter.equals(guess.getImageId())){
-      return true;
-    } else if (gameUserService.increaseandcheckStrikes(guess.getPlayerId())){
+      if (oppChosenCharacter.equals(guess.getImageId())) {
+          return handleWin();
+      }
+      else {
+          if (gameUserService.checkStrikes(playerId)) {
+              gameUserService.increaseStrikes(playerId);
+          }
+      }
       return false;
-    } else {
-      throw new IllegalStateException();
-    }
+  }
+
+  public Boolean handleWin() {
+      //nedim-j: handle stats increase etc.
+    return true;
   }
 
   public Boolean checkIfGameExists(Long gameId) {
