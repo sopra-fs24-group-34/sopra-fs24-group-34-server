@@ -105,4 +105,27 @@ public class GameController {
     // update stats
     // load new page
   }
+
+
+    // Endpoints regarding game-specific images
+    @GetMapping("/games/{gameId}/images")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<ImageDTO> getGameImages(@PathVariable Long gameId) {
+
+      return gameService.getGameImages(gameId);
+    }
+    @PostMapping("/games/{gameId}/images")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public void saveGameImages(@PathVariable Long gameId) {
+        gameService.saveGameImages(gameId, 20);
+    }
+    @DeleteMapping("/games/{gameId}/images/{imageId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<ImageDTO> deleteGameImage(@PathVariable Long gameId, @PathVariable Long imageId) {
+        return gameService.deleteGameImage(gameId, imageId);
+    }
+
 }

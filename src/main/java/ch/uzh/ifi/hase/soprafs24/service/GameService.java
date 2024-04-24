@@ -2,7 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,23 +12,37 @@ import org.springframework.stereotype.Service;
 
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.logging.Logger;
+
 
 @Service
 @Transactional
 public class GameService {
-  private final GameRepository gameRepository;
+
+    private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+
+    private final GameRepository gameRepository;
   private final ImageRepository imageRepository;
   private final GameUserService gameUserService;
   private final LobbyRepository lobbyRepository;
+  private final UnsplashService unsplashService; // Inject UnsplashService
 
   @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
+    this.unsplashService = unsplashService; // Initialize UnsplashService
+
   }
 
   public List<Game> getGames() {
@@ -82,6 +98,14 @@ public class GameService {
 
     lobby.setGame(game); // smailalijagic: add game to lobby
 
+      // Check if there are already 200 images in the database
+      int imageCount = imageRepository.countAllImages();
+      if (imageCount < 200) {
+          // If there are less than 200 images, fetch and save more
+          int count = 225 - imageCount;
+          unsplashService.saveRandomPortraitImagesToDatabase(count);
+      }
+
     return game;
   }
 
@@ -133,6 +157,167 @@ public class GameService {
       super(message);
     }
   }
+
+    private Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found with id: " + gameId));
+    }
+
+
+    private List<ImageDTO> fetchNewImages(int count) {
+
+      return unsplashService.getImageUrlsFromDatabase(count);
+    }
+
+    private List<ImageDTO> filterDuplicates(Game game,int count) {
+        List<Long> currentImageIds = game.getGameImages().stream()
+                .map(Image::getId)
+                .toList();
+
+        List<ImageDTO> nonDuplicateImages = new ArrayList<>();
+        int iterations = 0;
+        int maxIterations = 10;
+
+        // Continue fetching new images until we find non-duplicates or reach the maximum number of iterations
+        while (nonDuplicateImages.isEmpty() && iterations < maxIterations) {
+            List<ImageDTO> newImageDTOs = fetchNewImages(5); // Fetch another batch of 5 images
+            Collections.shuffle(newImageDTOs);
+            nonDuplicateImages = newImageDTOs.stream()
+                    .filter(imageDTO -> !currentImageIds.contains(imageDTO.getId()))
+                    .limit(count) // Limit to the desired count
+                    .collect(Collectors.toList());
+
+            iterations++;
+        }
+
+        // If nonDuplicateImages is still empty, throw an error
+        if (nonDuplicateImages.isEmpty()) {
+            throw new IllegalStateException("Unable to find non-duplicate images after " + maxIterations + " iterations.");
+        }
+
+        return nonDuplicateImages;
+    }
+
+    private List<Image> createImageEntities(List<ImageDTO> imageDTOs) {
+        return imageDTOs.stream()
+                .map(imageDTO -> {
+                    Image image = new Image();
+                    image.setId(imageDTO.getId());
+                    image.setUrl(imageDTO.getUrl());
+                    return image;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private void addImagesToGameAndUpdate(Game game, List<Image> images) {
+        game.getGameImages().addAll(images);
+        gameRepository.save(game);
+    }
+
+    public List<ImageDTO> getGameImages(Long gameId) {
+        try {
+            // Retrieve the game entity from the database
+            Game game = getGameById(gameId);
+
+            // Access the list of game-specific images from the game entity
+            List<Image> gameImages = game.getGameImages();
+
+            // Convert Image objects to ImageDTO objects
+            List<ImageDTO> gameImageDTOs = gameImages.stream()
+                    .map(image -> {
+                        ImageDTO imageDTO = new ImageDTO();
+                        imageDTO.setId(image.getId());
+                        imageDTO.setUrl(image.getUrl());
+                        // Set other properties as needed
+                        return imageDTO;
+                    })
+                    .collect(Collectors.toList());
+
+            return gameImageDTOs;
+        } catch (Exception e) {
+            // Handle the exception or rethrow it as needed
+            e.printStackTrace();
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error while fetching images for your game");
+        }
+    }
+
+    public void saveGameImages(Long gameId, int count) {
+        try {
+            // Retrieve the game entity from the database
+            Game game = getGameById(gameId);
+
+            // Fetch new images from the UnsplashService
+            List<ImageDTO> newImageDTOs = fetchNewImages(count);
+
+            // Filter out duplicates and ensure enough unique images are fetched
+            //List<ImageDTO> filteredNewImageDTOs = filterDuplicates(game, newImageDTOs, count);
+
+            // Create Image entities based on the filtered new ImageDTOs
+            List<Image> newImages = createImageEntities(newImageDTOs);
+
+            // Add the new images to the game's image list and save the game
+            addImagesToGameAndUpdate(game, newImages);
+        } catch (Exception e) {
+            // Log the exception or handle it as needed
+            logger.severe("Error while saving images for game: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while saving images for your game", e);
+        }
+    }
+
+    public List<ImageDTO> replaceGameImages(Long gameId) {
+        try {
+            // Retrieve the game entity from the database
+            Game game = getGameById(gameId);
+
+            // Filter out duplicates and ensure enough unique images are fetched
+            List<ImageDTO> filteredNewImageDTOs = filterDuplicates(game, 1);
+
+            // Create Image entities based on the filtered new ImageDTOs
+            List<Image> newImages = createImageEntities(filteredNewImageDTOs);
+
+            // Add the new images to the game's image list and save the game
+            addImagesToGameAndUpdate(game, newImages);
+            return filteredNewImageDTOs;
+
+        } catch (Exception e) {
+            // Log the exception or handle it as needed
+            logger.severe("Error while replacing image for game: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while replacing image from your game", e);
+        }
+    }
+
+    public List<ImageDTO> deleteGameImage(Long gameId, Long imageId) {
+        try {
+            // Retrieve the game entity from the database
+            Game game = getGameById(gameId);
+
+            //well check if image exists
+            checkIfImageExists(imageId);
+
+            // Delete the specific image chosen by the user from the database
+            imageRepository.deleteById(imageId);
+
+            // Update the list of images associated with the game
+            List<Image> currentImages = game.getGameImages();
+
+            currentImages.removeIf(image -> image.getId().equals(imageId));
+
+            // Set the updated list of images to the game
+
+            game.setGameImages(currentImages);
+
+            // Save the game entity to update the images association
+            gameRepository.save(game);
+            // Fetch and add a new image to ensure the game always has at least one image
+            return replaceGameImages(gameId);
+
+        } catch (Exception e) {
+            // Log the exception or handle it as needed
+            logger.severe("Error while deleting image from game: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while deleting image from your game", e);
+        }
+    }
 }
 
 

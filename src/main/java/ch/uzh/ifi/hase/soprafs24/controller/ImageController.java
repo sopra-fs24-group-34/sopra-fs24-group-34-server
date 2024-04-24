@@ -22,11 +22,11 @@ public class ImageController {
 
     @PostMapping("/images/saving")
     public String fetchAndSaveImages() { //fetches from database and saves to database
-        unsplashService.saveRandomPortraitImagesToDatabase(10); //should be 20, for now 5 because of the api limitation
+        unsplashService.saveRandomPortraitImagesToDatabase(100);
         return "Successfully fetched and saved images to the database.";
     }
     @GetMapping("/images")
-    public List<ImageDTO> getImageUrls(@RequestParam(defaultValue = "10") int count) {
+    public List<ImageDTO> getImageUrls(@RequestParam(defaultValue = "20") int count) {
         //gets images from database
         return unsplashService.getImageUrlsFromDatabase(count);
     }
