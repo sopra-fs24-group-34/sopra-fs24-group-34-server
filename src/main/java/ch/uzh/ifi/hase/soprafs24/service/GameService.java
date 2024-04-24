@@ -37,8 +37,8 @@ public class GameService {
     return this.gameRepository.findByGameId(gameid);
   }
 
-  public Player selectimage(Guess guess) {
-    checkIfImageExists(guess.getImageId());
+  public void selectimage(Guess guess) {
+    // checkIfImageExists(guess.getImageId());
 
     Player player = gameUserService.getPlayer(guess.getPlayerId());
 
@@ -48,20 +48,23 @@ public class GameService {
     } else {
       throw new IllegalStateException("The player has already chosen a character.");
     }
-    return player;
+  }
+
+  public Boolean playerHasSelected(Long playerId) {
+      return gameUserService.getPlayer(playerId).getChosencharacter() != null;
   }
 
   public Game creategame(Long lobbyid, Game game) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
     // till: check if both players exist
-    gameUserService.checkIfUserExists(game.getCreatorId());
-    gameUserService.checkIfUserExists(game.getInvitedPlayerId());
+    //gameUserService.checkIfUserExists(game.getCreatorId());
+    //gameUserService.checkIfUserExists(game.getInvitedPlayerId());
     // till: check if both players are online
     //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
     //gameUserService.checkIfUserOnline(game.getCreatorId());
     //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
     // till: checks if the user is actually the creator of the lobby
-    gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
+    // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
     // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();
@@ -88,15 +91,16 @@ public class GameService {
 
   public Response guesssimage(Guess guess){
     //till: check if game exists
-    checkIfGameExists(guess.getGameId());
+    // checkIfGameExists(guess.getGameId());
     //till: check if Imageid exists
-    checkIfImageExists(guess.getImageId());
+    // checkIfImageExists(guess.getImageId());
     //till: check if player is in the game
     Game game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
-    gameUserService.checkIfPlayerinGame(game, guess.getPlayerId());
+    Long playerId = guess.getPlayerId();
+    //gameUserService.checkIfPlayerinGame(game, playerId);
 
     //get the chosencharacter of the Opponent
-    Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, guess.getPlayerId());
+    Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
 
 
     if (oppChosenCharacter.equals(guess.getImageId())){
@@ -107,12 +111,17 @@ public class GameService {
         gameUserService.increaseStrikesbyOne(guess.getPlayerId());
         return gameUserService.createResponse(false, guess.getPlayerId());
     } else {
-      Response response = new Response();
-      response.setGuess(false);
-      response.setStrikes(3L);
-      // deletegame(game);
-      return response;
+        Response response = new Response();
+        response.setGuess(false);
+        response.setStrikes(3L);
+        // deletegame(game);
+        return response;
     }
+  }
+
+  public Boolean handleWin() {
+      //nedim-j: handle stats increase etc.
+    return true;
   }
 
   private void deletegame(Game game) {

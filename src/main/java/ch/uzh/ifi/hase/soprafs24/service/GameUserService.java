@@ -16,9 +16,9 @@ import java.util.List;
 @Service     //Service to handle User and PLayer methods that need USer and PLayer repository, done to reduce coupling
 @Transactional
 public class GameUserService {
-  private final PlayerRepository playerRepository;
-  private final UserRepository userrepository;
-  private final LobbyRepository lobbyRepository;
+    private final PlayerRepository playerRepository;
+    private final UserRepository userrepository;
+    private final LobbyRepository lobbyRepository;
 
   @Autowired
   public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
@@ -46,27 +46,22 @@ public class GameUserService {
   }
 
   public Long getChosenCharacterofOpponent(Game game, Long playerid) {
-    // till: get players from the game
-    Long creatorid = game.getCreatorId();
+      // till: get players from the game
+      Long creatorid = game.getCreatorId();
 
-    // create Long for opponentplayerid
-    Long opponentid;
-    // Find the opponent player (the player who is not the one making the guess)
-    if (playerid.equals(creatorid)){
-      opponentid = game.getInvitedPlayerId();
-    } else {
-      opponentid = game.getCreatorId();
-    }
+      // create Long for opponentplayerid
+      Long opponentid;
+      // Find the opponent player (the player who is not the one making the guess)
+      if (playerid.equals(creatorid)){
+          opponentid = game.getInvitedPlayerId();
+      } else {
+          opponentid = game.getCreatorId();
+      }
 
-    // get player to get chosencharacter
-    Player opponent = playerRepository.findByPlayerId(opponentid);
+      // get player to get chosencharacter
+      Player opponent = playerRepository.findByPlayerId(opponentid);
 
-    try {
-        return opponent.getChosencharacter();
-    } catch (NullPointerException e) {
-        System.out.println("Opponent's chosen character is null");
-        return null;
-    }
+      return opponent.getChosencharacter();
   }
 
   public void saveplayerchanges(Player player){
@@ -74,10 +69,14 @@ public class GameUserService {
       playerRepository.flush();
   }
 
-  public Boolean checkStrikes(Long playerid){
-    Player player = getPlayer(playerid);
-      return player.getStrikes() < 2;
-  }
+    public Boolean checkStrikes(Long playerid) {
+        Player player = getPlayer(playerid);
+        //nedim-j: for M4 need some variable maxGuesses instead of 2
+        if (player.getStrikes() == 2){
+            return false;
+        }
+        return true;
+    }
 
   public void increaseStrikesbyOne(Long playerId) {
       //increases the number of strikes a player has by one
@@ -133,19 +132,19 @@ public class GameUserService {
       }
   }
 
+
+  public void increaseStrikes(Long playerid){
+      Player player = getPlayer(playerid);
+      player.setStrikes(player.getStrikes() + 1);
+      playerRepository.save(player);
+      playerRepository.flush();
+  }
+
+
+
     //
     // check Functions
     //
-  public Boolean checkIfUserExists(Long userid) {
-      User user = userrepository.findUserById(userid);
-      if (user == null) {
-        throw new IllegalStateException("checkifuserexists failed");
-      }
-      else {
-          return user != null; //user = null-> user does not exist
-      }
-  }
-
   public Boolean checkIfUserOnline(Long userid){
     User user = userrepository.findUserById(userid);
     return user.getStatus() == UserStatus.ONLINE;
@@ -159,17 +158,19 @@ public class GameUserService {
       return true;
     } else {
       return false;
+        }
     }
-  }
+
+  public Boolean checkIfUserExists(Long userid){
+        User user = userrepository.findUserById(userid);
+        return user != null; //user = null-> user does not exist
+    }
 
   public Boolean checkIfPlayerinGame(Game game, Long playerid){
-    // till: get players from the game
-    playerRepository.findByPlayerId(playerid);
+        // till: get players from the game
+        playerRepository.findByPlayerId(playerid);
 
-    // check if the player is in the game players list, returns true when in game and false when not
-    return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
-  }
-
-
-
+        // check if the player is in the game players list, returns true when in game and false when not
+        return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
+    }
 }
