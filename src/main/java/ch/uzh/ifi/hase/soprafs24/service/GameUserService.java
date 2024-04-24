@@ -106,13 +106,19 @@ public class GameUserService {
       }
       userrepository.save(user);
       userrepository.flush();
+      userrepository.save(user);
+      userrepository.flush();
   }
 
   public void increaseGamesPlayed(Long playerId){
       //till: get the Player where the user is saved and there access the totalgames attribute
       Player player = getPlayer(playerId);
       User user = player.getUser();
-      user.setTotalplayed(user.getTotalplayed() + 1);
+      try {
+          user.setTotalplayed(user.getTotalplayed() + 1);
+      } catch (NullPointerException e){
+          user.setTotalplayed(1L);
+      }
       userrepository.save(user);
       userrepository.flush();
   }

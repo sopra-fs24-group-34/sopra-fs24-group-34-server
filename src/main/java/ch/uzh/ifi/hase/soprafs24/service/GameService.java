@@ -131,11 +131,17 @@ public class GameService {
 
   private void deleteGame(Game game) {
       //Get the users
-      User user = gameUserService.getUser(game.getCreatorId());
-      User invitedUser = gameUserService.getUser(game.getInvitedPlayerId());
+      Player creator = gameUserService.getPlayer(game.getCreatorId());
+      User user = creator.getUser();
+      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
+      User invitedUser = invitedPlayer.getUser();
+
       //set the game in the Usergamelobbylist to null
       gameUserService.updategamelobbylist(user);
       gameUserService.updategamelobbylist(invitedUser);
+      // increase the games played
+      gameUserService.increaseGamesPlayed(game.getCreatorId());
+      gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
 
       //delete the game
       gameRepository.delete(game);
