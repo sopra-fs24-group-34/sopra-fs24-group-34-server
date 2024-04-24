@@ -1,9 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -20,8 +17,13 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private int strikes;
 
+    @OneToOne
+    @JoinColumn(name = "id")
+    private User user;
+
+
     public Long getPlayerId() {
-        return playerId;
+      return playerId;
     }
 
     public void setPlayerId(Long playerId) {
@@ -42,6 +44,14 @@ public class Player implements Serializable {
 
     public void setStrikes(int strikes) {
         this.strikes = strikes;
+    }
+
+  public User getUser() {
+        return user;
+    }
+
+  public void setUser(User user) {
+        this.user = user;
     }
 
 }

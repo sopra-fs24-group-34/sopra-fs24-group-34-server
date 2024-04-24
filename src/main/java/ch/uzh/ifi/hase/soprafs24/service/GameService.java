@@ -38,9 +38,9 @@ public class GameService {
   }
 
   public void selectimage(Guess guess) {
-    checkIfImageExists(guess.getImageId());
+    // checkIfImageExists(guess.getImageId());
 
-    Player player = gameUserService.getUser(guess.getPlayerId());
+    Player player = gameUserService.getPlayer(guess.getPlayerId());
 
     if (player.getChosencharacter() == null) {
       player.setChosencharacter(guess.getImageId());
@@ -51,32 +51,33 @@ public class GameService {
   }
 
   public Boolean playerHasSelected(Long playerId) {
-      return gameUserService.getUser(playerId).getChosencharacter() != null;
+      return gameUserService.getPlayer(playerId).getChosencharacter() != null;
   }
 
-  //
-  // Not done yet
-  //
   public Game creategame(Long lobbyid, Game game) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
     // till: check if both players exist
-    gameUserService.checkIfUserExists(game.getCreatorId());
-    gameUserService.checkIfUserExists(game.getInvitedPlayerId());
+    //gameUserService.checkIfUserExists(game.getCreatorId());
+    //gameUserService.checkIfUserExists(game.getInvitedPlayerId());
     // till: check if both players are online
-      //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
+    //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
     //gameUserService.checkIfUserOnline(game.getCreatorId());
     //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
     // till: checks if the user is actually the creator of the lobby
-    gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
+    // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
-    // till: create 2 players
+    // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();
+    User user = gameUserService.getUser(game.getCreatorId());
+    player1.setUser(user);
+
     Player player2 = new Player();
-    //save the changes
+    player2.setUser(gameUserService.getUser(game.getInvitedPlayerId()));
+
+    // till: Save the changes
     gameUserService.saveplayerchanges(player1);
     gameUserService.saveplayerchanges(player2);
 
-    // Set the game's players
     game.setCreatorId(player1.getPlayerId());
     game.setInvitedPlayerId(player2.getPlayerId());
 
@@ -88,35 +89,55 @@ public class GameService {
     return game;
   }
 
-  public Boolean guesssimage(Guess guess) {
-      //till: check if game exists
-      //nedim-j: nothing is done with the "exists". maybe asserts/change functions to void?
-      checkIfGameExists(guess.getGameId());
-      //till: check if Imageid exists
-      checkIfImageExists(guess.getImageId());
-      //till: check if player is in the game
-      Game game = gameRepository.findByGameId(guess.getGameId());
-      Long playerId = guess.getPlayerId();
-      gameUserService.checkIfPlayerinGame(game, playerId);
+  public Response guesssimage(Guess guess){
+    //till: check if game exists
+    // checkIfGameExists(guess.getGameId());
+    //till: check if Imageid exists
+    // checkIfImageExists(guess.getImageId());
+    //till: check if player is in the game
+    Game game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
+    Long playerId = guess.getPlayerId();
+    //gameUserService.checkIfPlayerinGame(game, playerId);
 
-      //get the chosencharacter of the Opponent
-      Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
+    //get the chosencharacter of the Opponent
+    Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
 
-      if (oppChosenCharacter.equals(guess.getImageId())) {
-          return handleWin();
-      }
-      else {
-          if (gameUserService.checkStrikes(playerId)) {
-              gameUserService.increaseStrikes(playerId);
-          }
-      }
-      return false;
+
+    if (oppChosenCharacter.equals(guess.getImageId())){
+      Response response = gameUserService.createResponse(true, guess.getPlayerId());
+      gameUserService.increaseWinTotal(guess.getPlayerId());
+      return response;
+    } else if (gameUserService.checkStrikes(guess.getPlayerId())){
+        gameUserService.increaseStrikesbyOne(guess.getPlayerId());
+        return gameUserService.createResponse(false, guess.getPlayerId());
+    } else {
+        Response response = new Response();
+        response.setGuess(false);
+        response.setStrikes(3L);
+        // deletegame(game);
+        return response;
+    }
   }
 
   public Boolean handleWin() {
       //nedim-j: handle stats increase etc.
     return true;
   }
+
+  private void deletegame(Game game) {
+      //Get the users
+      User user = gameUserService.getUser(game.getCreatorId());
+      User invitedUser = gameUserService.getUser(game.getInvitedPlayerId());
+      //set the game in the Usergamelobbylist to null
+      gameUserService.updategamelobbylist(user);
+      gameUserService.updategamelobbylist(invitedUser);
+
+      //delete the game
+      gameRepository.delete(game);
+  }
+
+
+
 
   public Boolean checkIfGameExists(Long gameId) {
     try {
@@ -145,6 +166,7 @@ public class GameService {
       super(message);
     }
   }
+
 }
 
 

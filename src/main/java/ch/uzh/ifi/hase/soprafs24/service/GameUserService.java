@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
-import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
-import ch.uzh.ifi.hase.soprafs24.entity.Player;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,56 +20,57 @@ public class GameUserService {
     private final UserRepository userrepository;
     private final LobbyRepository lobbyRepository;
 
-    @Autowired
-    public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
-        this.userrepository = userrepository;
-        this.playerRepository = playerRepository;
-        this.lobbyRepository = lobbyRepository;
-    }
+  @Autowired
+  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+    this.userrepository = userrepository;
+    this.playerRepository = playerRepository;
+    this.lobbyRepository = lobbyRepository;
+  }
 
-    public Player getUser(Long playerId){
-        return playerRepository.findByPlayerId(playerId);
-    }
+  public Player getPlayer(Long playerId){
+    return playerRepository.findByPlayerId(playerId);
+  }
 
-    public Player createplayer(Long userid){
-        Player player = new Player();
-        player.setPlayerId(userid);
+  public User getUser(Long userId){
+      return userrepository.findUserById(userId);
+  }
 
-        //saving PLayer to repository
-        player = playerRepository.save(player);
-        playerRepository.flush();
+  public Player createplayer(Long userid){
+    Player player = new Player();
 
-        return player;
-    }
+    //saving PLayer to repository
+    player = playerRepository.save(player);
+    playerRepository.flush();
 
-    public Long getChosenCharacterofOpponent(Game game, Long playerid) {
-        // till: get players from the game
-        Long creatorid = game.getCreatorId();
+    return player;
+  }
 
-        // create Long for opponentplayerid
-        Long opponentid;
-        // Find the opponent player (the player who is not the one making the guess)
-        if (playerid.equals(creatorid)){
-            opponentid = game.getInvitedPlayerId();
-        } else {
-            opponentid = game.getCreatorId();
-        }
+  public Long getChosenCharacterofOpponent(Game game, Long playerid) {
+      // till: get players from the game
+      Long creatorid = game.getCreatorId();
 
-        // get player to get chosencharacter
-        Player opponent = playerRepository.findByPlayerId(opponentid);
+      // create Long for opponentplayerid
+      Long opponentid;
+      // Find the opponent player (the player who is not the one making the guess)
+      if (playerid.equals(creatorid)){
+          opponentid = game.getInvitedPlayerId();
+      } else {
+          opponentid = game.getCreatorId();
+      }
 
-        return opponent.getChosencharacter();
-    }
+      // get player to get chosencharacter
+      Player opponent = playerRepository.findByPlayerId(opponentid);
 
-    public void increaseStrikes(Long playerid){
-        Player player = getUser(playerid);
-        player.setStrikes(player.getStrikes() + 1);
-        playerRepository.save(player);
-        playerRepository.flush();
-    }
+      return opponent.getChosencharacter();
+  }
+
+  public void saveplayerchanges(Player player){
+      playerRepository.save(player);
+      playerRepository.flush();
+  }
 
     public Boolean checkStrikes(Long playerid) {
-        Player player = getUser(playerid);
+        Player player = getPlayer(playerid);
         //nedim-j: for M4 need some variable maxGuesses instead of 2
         if (player.getStrikes() == 2){
             return false;
@@ -80,36 +78,95 @@ public class GameUserService {
         return true;
     }
 
-    public void saveplayerchanges(Player player){
-        playerRepository.save(player);
-        playerRepository.flush();
+  public void increaseStrikesbyOne(Long playerId) {
+      //increases the number of strikes a player has by one
+      Player player = playerRepository.findByPlayerId(playerId);
+      player.setStrikes(player.getStrikes() + 1);
+      playerRepository.save(player);
+      playerRepository.flush();
     }
+  public Response createResponse(Boolean guess, Long playerId) {
+      // creates a response that is send back to the frontend
+      Player player = playerRepository.findByPlayerId(playerId);
+      Response response = new Response();
+      response.setGuess(guess);
+      response.setStrikes((long) player.getStrikes());
+
+      return response;
+  }
+
+
+
+  public void increaseWinTotal(Long playerId) {
+      //till: get the Player where the user is saved and there access the totalwins attribute
+      Player player = getPlayer(playerId);
+      User user = player.getUser();
+      try {
+          user.setTotalwins(user.getTotalwins() + 1);
+      } catch (NullPointerException e){
+          user.setTotalwins(1L);
+      }
+  }
+
+  public void increaseGamesPlayed(Long playerId){
+      //till: get the Player where the user is saved and there access the totalgames attribute
+      Player player = getPlayer(playerId);
+      User user = player.getUser();
+      user.setTotalplayed(user.getTotalplayed() + 1);
+  }
+
+  public void updategamelobbylist(User user) {
+      // deleting the game from game lobby list and setting it to null
+      List<Lobby> newUserGamelobbylist = user.getUsergamelobbylist();
+
+      if (user.getUsergamelobbylist() != null) {
+          for (Lobby lobby : newUserGamelobbylist) {
+              lobby.setGame(null);
+          }
+
+      //Update the user
+      user.setUsergamelobbylist(newUserGamelobbylist);
+
+      userrepository.save(user);
+      userrepository.flush();
+      }
+  }
+
+
+  public void increaseStrikes(Long playerid){
+      Player player = getPlayer(playerid);
+      player.setStrikes(player.getStrikes() + 1);
+      playerRepository.save(player);
+      playerRepository.flush();
+  }
+
+
 
     //
     // check Functions
     //
-    public Boolean checkIfUserExists(Long userid){
+  public Boolean checkIfUserOnline(Long userid){
+    User user = userrepository.findUserById(userid);
+    return user.getStatus() == UserStatus.ONLINE;
+  }
+
+  public Boolean checkForCorrectLobby(Long lobbyid, Long userid) {
+    // gets the Lobby
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
+    // checks if the userid is the same as the one saved in the lobby
+    if (lobby.getCreator_userid().equals(userid)){
+      return true;
+    } else {
+      return false;
+        }
+    }
+
+  public Boolean checkIfUserExists(Long userid){
         User user = userrepository.findUserById(userid);
         return user != null; //user = null-> user does not exist
     }
 
-    public Boolean checkIfUserOnline(Long userid){
-        User user = userrepository.findUserById(userid);
-        return user.getStatus() == UserStatus.ONLINE;
-    }
-
-    public Boolean checkForCorrectLobby(Long lobbyid, Long userid) {
-        // gets the Lobby
-        Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
-        // checks if the userid is the same as the one saved in the lobby
-        if (lobby.getCreator_userid().equals(userid)){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public Boolean checkIfPlayerinGame(Game game, Long playerid){
+  public Boolean checkIfPlayerinGame(Game game, Long playerid){
         // till: get players from the game
         playerRepository.findByPlayerId(playerid);
 
