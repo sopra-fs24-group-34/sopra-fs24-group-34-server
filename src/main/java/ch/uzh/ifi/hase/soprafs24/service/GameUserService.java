@@ -64,18 +64,21 @@ public class GameUserService {
         return opponent.getChosencharacter();
     }
 
-    public Boolean increaseandcheckStrikes(Long playerid){
+    public void increaseStrikes(Long playerid){
         Player player = getUser(playerid);
-        if (player.getStrikes() == 2){
-            return false;
-        }
         player.setStrikes(player.getStrikes() + 1);
         playerRepository.save(player);
         playerRepository.flush();
-        return true;
     }
 
-
+    public Boolean checkStrikes(Long playerid) {
+        Player player = getUser(playerid);
+        //nedim-j: for M4 need some variable maxGuesses instead of 2
+        if (player.getStrikes() == 2){
+            return false;
+        }
+        return true;
+    }
 
     public void saveplayerchanges(Player player){
         playerRepository.save(player);
