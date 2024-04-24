@@ -40,14 +40,14 @@
 
 | Date | Name | Links to Github Issues                                                                                                                                                                                                                                                                                                                       | Comments                                                                                                     |
 |---|---|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat                                                                                               |
-| 01.04.2024 | Dario Giuliani |                                                                                                                                                                                                                                                                                                                                              |                                                                                                              |
+| 31.03.2024 | Smail Alijagic | [#57](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/57), [#61](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/61), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#66](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/66) | finalized chat  |
+| 01.04.2024 | Dario Giuliani |  |  |
 | 23.04.2024 | Liam Kontopulos | [#14](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/14) [#19](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/19) [#22](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/22) | Finalized chat; the issues were manually closed, but a reference to the commit is given 
-| 02.04.2024 | Nedim Jukic |                                                                                                                                                                                                                                                                                                                                              |                                                                                                              |
-| 02.04.2024 | Till Sollberger | [#70](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/70), [#50](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/50)                                                                                                                                                                       | Strikes system implementedwith new entity response, a lot of time spent for matching mappings with Frontend. |
+| 23.04.2024 | Nedim Jukic | [#32](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/32), [#33](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/33), [#37](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/37), [#39](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/39) | Efforts in Pusher integration & bugfixes. #33 & #39: See comments in issues. |
+| 02.04.2024 | Till Sollberger | [#70](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/70), [#50](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/50) | Strikes system implemented with new entity response, a lot of time spent for matching mappings with Frontend. |
 
 
-## <font style="color: #00d7ff">Week 3 *(24.04 – 01.05)*</font>
+## <font style="color: #00d7ff">Week 4 *(24.04 – 01.05)*</font>
 
 
 | Date | Name | Links to Github Issues | Comments |
@@ -60,7 +60,7 @@
 
 
 
-## <font style="color: #00d7ff">Week 4 *(24.04 – 26.04)*</font>
+## <font style="color: #00d7ff">Week 5 *(24.04 – 26.04)*</font>
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
