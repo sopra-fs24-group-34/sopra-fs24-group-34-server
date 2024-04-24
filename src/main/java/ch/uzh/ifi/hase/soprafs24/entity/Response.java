@@ -3,7 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 public class Response {
 
     private Boolean guess;
-    private Long strikes;
+    private Long playerId;
+    private int strikes;
 
     public Boolean getGuess() {
         return guess;
@@ -13,11 +14,19 @@ public class Response {
         this.guess = guess;
     }
 
-    public Long getStrikes() {
+    public Long getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(Long playerId) {
+        this.playerId = playerId;
+    }
+
+    public int getStrikes() {
         return strikes;
     }
 
-    public void setStrikes(Long strikes) {
+    public void setStrikes(int strikes) {
         this.strikes = strikes;
     }
 }

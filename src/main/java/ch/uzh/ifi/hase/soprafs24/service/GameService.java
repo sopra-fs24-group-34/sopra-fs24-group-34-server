@@ -95,7 +95,12 @@ public class GameService {
     //till: check if Imageid exists
     // checkIfImageExists(guess.getImageId());
     //till: check if player is in the game
-    Game game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
+    Game game = new Game();
+    try {
+        game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
+    } catch(Exception e) {
+        System.out.println("Game is null in GameService.guessImage");
+    }
     Long playerId = guess.getPlayerId();
     //gameUserService.checkIfPlayerinGame(game, playerId);
 
@@ -109,13 +114,15 @@ public class GameService {
     } else {
         if (gameUserService.checkStrikes(playerId)) {
             gameUserService.increaseStrikesByOne(playerId);
-            return gameUserService.createResponse(false, playerId);
+            int strikes = gameUserService.getStrikesss(playerId);
+            return gameUserService.createResponse(false, playerId, strikes);
         }
         else {
             Response response = new Response();
             response.setGuess(false);
-            //nedim-j: change from 3L to maxguesses
-            response.setStrikes(3L);
+            response.setPlayerId(playerId);
+            //nedim-j: change from 3 to maxguesses
+            response.setStrikes(3);
             deleteGame(game);
             return response;
         }
@@ -126,7 +133,8 @@ public class GameService {
       //nedim-j: handle stats increase etc.
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
-    return gameUserService.createResponse(true, playerId);
+    int strikes = gameUserService.getStrikesss(playerId);
+    return gameUserService.createResponse(true, playerId, strikes);
   }
 
   private void deleteGame(Game game) {

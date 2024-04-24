@@ -78,6 +78,10 @@ public class GameUserService {
         return true;
     }
 
+    public int getStrikesss(Long playerId) {
+      return getPlayer(playerId).getStrikes();
+    }
+
   public void increaseStrikesByOne(Long playerId) {
       //increases the number of strikes a player has by one
       Player player = playerRepository.findByPlayerId(playerId);
@@ -86,12 +90,13 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-  public Response createResponse(Boolean guess, Long playerId) {
+  public Response createResponse(Boolean guess, Long playerId, int strikes) {
       // creates a response that is send back to the frontend
-      Player player = playerRepository.findByPlayerId(playerId);
+      //Player player = playerRepository.findByPlayerId(playerId);
       Response response = new Response();
       response.setGuess(guess);
-      response.setStrikes((long) player.getStrikes());
+      response.setPlayerId(playerId);
+      response.setStrikes(strikes);
       return response;
   }
 
@@ -117,7 +122,11 @@ public class GameUserService {
       try {
           user.setTotalplayed(user.getTotalplayed() + 1);
       } catch (NullPointerException e){
-          user.setTotalplayed(1L);
+          try {
+              user.setTotalplayed(1L);
+          } catch(Exception f) {
+              System.out.println("User is null in GameUserService.increaseGamesPlayed");
+          }
       }
       userrepository.save(user);
       userrepository.flush();
@@ -125,19 +134,24 @@ public class GameUserService {
 
   public void updategamelobbylist(User user) {
       // deleting the game from game lobby list and setting it to null
-      List<Lobby> newUserGamelobbylist = user.getUsergamelobbylist();
+      try {
+          List<Lobby> newUserGamelobbylist = user.getUsergamelobbylist();
 
-      if (user.getUsergamelobbylist() != null) {
-          for (Lobby lobby : newUserGamelobbylist) {
-              lobby.setGame(null);
+          if (user.getUsergamelobbylist() != null) {
+              for (Lobby lobby : newUserGamelobbylist) {
+                  lobby.setGame(null);
+              }
+
+              //Update the user
+              user.setUsergamelobbylist(newUserGamelobbylist);
+
+              userrepository.save(user);
+              userrepository.flush();
           }
-
-      //Update the user
-      user.setUsergamelobbylist(newUserGamelobbylist);
-
-      userrepository.save(user);
-      userrepository.flush();
+      } catch (Exception e) {
+          System.out.println("User is null in GameUserService.updategamelobbylist");
       }
+
   }
 
     //
