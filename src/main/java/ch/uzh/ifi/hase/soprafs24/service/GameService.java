@@ -101,11 +101,13 @@ public class GameService {
 
     //get the chosencharacter of the Opponent
     Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
+    Player player = gameUserService.getPlayer(playerId);
 
 
     if (oppChosenCharacter.equals(guess.getImageId())){
-      Response response = gameUserService.createResponse(true, guess.getPlayerId());
-      gameUserService.increaseWinTotal(guess.getPlayerId());
+      Response response = gameUserService.createResponse(true, playerId);
+      gameUserService.increaseWinTotal(playerId);
+      deletegame(game);
       return response;
     } else if (gameUserService.checkStrikes(guess.getPlayerId())){
         gameUserService.increaseStrikesbyOne(guess.getPlayerId());
@@ -114,7 +116,7 @@ public class GameService {
         Response response = new Response();
         response.setGuess(false);
         response.setStrikes(3L);
-        // deletegame(game);
+        deletegame(game);
         return response;
     }
   }
@@ -126,11 +128,17 @@ public class GameService {
 
   private void deletegame(Game game) {
       //Get the users
-      User user = gameUserService.getUser(game.getCreatorId());
-      User invitedUser = gameUserService.getUser(game.getInvitedPlayerId());
+      Player creator = gameUserService.getPlayer(game.getCreatorId());
+      User user = creator.getUser();
+      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
+      User invitedUser = invitedPlayer.getUser();
+
       //set the game in the Usergamelobbylist to null
       gameUserService.updategamelobbylist(user);
       gameUserService.updategamelobbylist(invitedUser);
+      // increase the games played
+      gameUserService.increaseGamesPlayed(game.getCreatorId());
+      gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
 
       //delete the game
       gameRepository.delete(game);
