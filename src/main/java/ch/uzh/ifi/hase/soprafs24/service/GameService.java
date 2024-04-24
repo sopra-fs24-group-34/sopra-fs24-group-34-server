@@ -102,29 +102,34 @@ public class GameService {
     //get the chosencharacter of the Opponent
     Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
 
-
     if (oppChosenCharacter.equals(guess.getImageId())){
-      Response response = gameUserService.createResponse(true, guess.getPlayerId());
-      gameUserService.increaseWinTotal(guess.getPlayerId());
-      return response;
-    } else if (gameUserService.checkStrikes(guess.getPlayerId())){
-        gameUserService.increaseStrikesbyOne(guess.getPlayerId());
-        return gameUserService.createResponse(false, guess.getPlayerId());
+      Response r = handleWin(playerId);
+      deleteGame(game);
+      return r;
     } else {
-        Response response = new Response();
-        response.setGuess(false);
-        response.setStrikes(3L);
-        // deletegame(game);
-        return response;
+        if (gameUserService.checkStrikes(playerId)) {
+            gameUserService.increaseStrikesByOne(playerId);
+            return gameUserService.createResponse(false, playerId);
+        }
+        else {
+            Response response = new Response();
+            response.setGuess(false);
+            //nedim-j: change from 3L to maxguesses
+            response.setStrikes(3L);
+            deleteGame(game);
+            return response;
+        }
     }
   }
 
-  public Boolean handleWin() {
+  public Response handleWin(Long playerId) {
       //nedim-j: handle stats increase etc.
-    return true;
+    gameUserService.increaseGamesPlayed(playerId);
+    gameUserService.increaseWinTotal(playerId);
+    return gameUserService.createResponse(true, playerId);
   }
 
-  private void deletegame(Game game) {
+  private void deleteGame(Game game) {
       //Get the users
       User user = gameUserService.getUser(game.getCreatorId());
       User invitedUser = gameUserService.getUser(game.getInvitedPlayerId());

@@ -78,24 +78,22 @@ public class GameUserService {
         return true;
     }
 
-  public void increaseStrikesbyOne(Long playerId) {
+  public void increaseStrikesByOne(Long playerId) {
       //increases the number of strikes a player has by one
       Player player = playerRepository.findByPlayerId(playerId);
       player.setStrikes(player.getStrikes() + 1);
       playerRepository.save(player);
       playerRepository.flush();
     }
+
   public Response createResponse(Boolean guess, Long playerId) {
       // creates a response that is send back to the frontend
       Player player = playerRepository.findByPlayerId(playerId);
       Response response = new Response();
       response.setGuess(guess);
       response.setStrikes((long) player.getStrikes());
-
       return response;
   }
-
-
 
   public void increaseWinTotal(Long playerId) {
       //till: get the Player where the user is saved and there access the totalwins attribute
@@ -106,6 +104,8 @@ public class GameUserService {
       } catch (NullPointerException e){
           user.setTotalwins(1L);
       }
+      userrepository.save(user);
+      userrepository.flush();
   }
 
   public void increaseGamesPlayed(Long playerId){
@@ -113,6 +113,8 @@ public class GameUserService {
       Player player = getPlayer(playerId);
       User user = player.getUser();
       user.setTotalplayed(user.getTotalplayed() + 1);
+      userrepository.save(user);
+      userrepository.flush();
   }
 
   public void updategamelobbylist(User user) {
@@ -131,16 +133,6 @@ public class GameUserService {
       userrepository.flush();
       }
   }
-
-
-  public void increaseStrikes(Long playerid){
-      Player player = getPlayer(playerid);
-      player.setStrikes(player.getStrikes() + 1);
-      playerRepository.save(player);
-      playerRepository.flush();
-  }
-
-
 
     //
     // check Functions

@@ -108,12 +108,12 @@ public class GameController {
   @ResponseBody
   public Response guessImage(@RequestBody GuessPostDTO guessPostDTO){
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Response response = (gameService.guesssimage(guess));
+    Response response = gameService.guesssimage(guess);
     String m = String.valueOf(response.getGuess());
 
     String channelName = "gameRound"+guess.getGameId();
-    String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId() + " and it was " + m;
-    pusher.trigger(channelName, "round-update", message);
+    //String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId() + " and it was " + m;
+    pusher.trigger(channelName, "round-update", response);
     return response;
   }
 
