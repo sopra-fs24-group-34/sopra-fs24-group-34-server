@@ -110,6 +110,7 @@ public interface DTOMapper {
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 
+    @Mapping(source = "gameid", target = "gameId")
     @Mapping(source = "playerid", target = "playerId")
     @Mapping(source = "imageid", target = "imageId")
     Guess convertGuessPutDTOtoEmtity(GuessPostDTO guessPostDTO);

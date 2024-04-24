@@ -53,10 +53,12 @@ public class GameController {
         // 4. remove lobby
         // 5. load game --> game logic (follows)
         Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        //nedim-j: made new game to return in pusher, feel free to adjust
+        Game createdGame = gameService.creategame(lobbyid, game);
 
-        pusher.trigger("lobby-events", "game-started", game);
+        pusher.trigger("lobby-events", "game-started", createdGame);
 
-        return gameService.creategame(lobbyid, game);
+        return createdGame;
     }
 
     @PostMapping("/player/{playerid}")
@@ -85,6 +87,9 @@ public class GameController {
         // 1. ImageID exists?
         // 2. chosencharacter still null?
         Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+        String channelName = "gameRound"+guess.getGameId();
+        String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
+        pusher.trigger(channelName, "round-update", message);
         return gameService.selectimage(guess);
     }
 
@@ -93,6 +98,9 @@ public class GameController {
     @ResponseBody
     public Boolean guessImage(@RequestBody GuessPostDTO guessPostDTO){
         Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+        String channelName = "gameRound"+guess.getGameId();
+        String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId();
+        pusher.trigger(channelName, "round-update", message);
         return gameService.guesssimage(guess);
     }
 
