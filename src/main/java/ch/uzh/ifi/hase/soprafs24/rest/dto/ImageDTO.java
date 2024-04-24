@@ -4,6 +4,8 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 public class ImageDTO {
     private Long id;
     private String url;
+    public ImageDTO() {
+    }
 
     public ImageDTO(Long id, String url) {
         this.id = id;

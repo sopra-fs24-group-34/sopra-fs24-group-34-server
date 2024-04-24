@@ -8,17 +8,13 @@ public class Game {
 
   @Id
   @GeneratedValue
-  private Long gameid;
+  private Long gameId;
 
   private Long maxguesses; // smailalijagic: handle guesses for each player in frontend
 
-  private Long user1_guess;
+  private Long creatorId; // smailalijagic: creator
 
-  private Long user2_guess;
-
-  private String user1_pick; // smailalijagic: URL of char
-
-  private String user2_pick;
+  private Long invitedplayerId; // smailalijagic: invited user
 
   private Long guessingtime; // smailalijagic:
 
@@ -29,12 +25,12 @@ public class Game {
     return chat;
   }
 
-  public String getGameid() {
-    return "game_" + gameid;
+  public Long getGameId() {
+    return gameId;
   }
 
-  public void setGameid(Long gameid) {
-    this.gameid = gameid;
+  public void setGameId(Long gameId) {
+    this.gameId = gameId;
   }
 
   public Long getMaxGuesses() {
@@ -45,22 +41,6 @@ public class Game {
     this.maxguesses = maxguesses;
   }
 
-  public String getUser1_pick() {
-    return user1_pick;
-  }
-
-  public void setUser1_pick(String user1_pick) {
-    this.user1_pick = user1_pick;
-  }
-
-  public String getUser2_pick() {
-    return user2_pick;
-  }
-
-  public void setUser2_pick(String user2_pick) {
-    this.user2_pick = user2_pick;
-  }
-
   public Long getGuessingtime() {
     return guessingtime;
   }
@@ -69,19 +49,21 @@ public class Game {
     this.guessingtime = guessingtime;
   }
 
-  public Long getUser1_guess() {
-    return user1_guess;
+  public Long getCreatorId() {
+    return creatorId;
   }
 
-  public void setUser1_guess(Long user1_guess) {
-    this.user1_guess = user1_guess;
+  public void setCreatorId(Long creatorId) {
+    this.creatorId = creatorId;
   }
 
-  public Long getUser2_guess() {
-    return user2_guess;
+  public Long getInvitedPlayerId() {
+    return invitedplayerId;
   }
 
-  public void setUser2_guess(Long user2_guess) {
-    this.user2_guess = user2_guess;
+  public void setInvitedPlayerId(Long invitedplayerId) {
+    this.invitedplayerId = invitedplayerId;
   }
+
+
 }

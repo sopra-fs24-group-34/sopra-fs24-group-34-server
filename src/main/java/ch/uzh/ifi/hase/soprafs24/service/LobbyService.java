@@ -39,6 +39,14 @@ public class LobbyService {
     return this.userRepository.findAll();
   }
 
+  public User getUser(Long id) {
+    try {
+      return this.userRepository.findUserById(id);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found, could not add user to lobby");
+    }
+  }
+
   public Boolean checkIfUserExists(User userToBeCreated) {
     // smailalijagic: changed to boolean
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
@@ -46,44 +54,18 @@ public class LobbyService {
     return userByUsername != null;// smailalijagic: user = null --> does not exist yet
   }
 
-//  private User createUser() {
-//    User user = new User();
-//    user.setUsername("Guest");
-//    user.setPassword("12345"); // smailalijagic: default password
-//    user.setStatus(UserStatus.ONLINE);
-//    user.setToken(UUID.randomUUID().toString());
-//    // saves the given entity but data is only persisted in the database once
-//    // flush() is called
-//    user = userRepository.save(user);
-//    userRepository.flush();
-//    // getUserId() --> 1
-//    log.debug("Created Information for User: {}", user);
-//    return user;
-//  }
-//
-//  public AuthenticationResponseDTO createGuestUser() {
-//    User newUser = createUser();
-//    newUser.setUsername("Guest" + newUser.getId());
-//    newUser.setStatus(UserStatus.INLOBBY);
-//    newUser.setToken(UUID.randomUUID().toString());
-//
-//    // saves the given entity but data is only persisted in the database once
-//    // flush() is called
-//    newUser = userRepository.save(newUser);
-//    userRepository.flush();
-//
-//    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
-//    // Guest1
-//    // Id: 1
-//    // password: 12345
-//  }
+
 
   public List<Lobby> getLobbies() {
     return this.lobbyRepository.findAll();
   }
 
   public Lobby getLobby(Long lobbyId) {
-    return this.lobbyRepository.findByLobbyid(lobbyId);
+    try {
+      return this.lobbyRepository.findByLobbyid(lobbyId);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby with lobby id " + lobbyId + " could not be found!");
+    }
   }
 
   public Boolean checkIfLobbyExists(Long lobbyid) {
@@ -114,7 +96,7 @@ public class LobbyService {
     }
   }
 
-  public Lobby createlobby(Long userId){
+  public Long createlobby(Long userId){
     Lobby newlobby = new Lobby();
     newlobby.setToken(UUID.randomUUID().toString());
     newlobby.setCreator_userid(userId);
@@ -122,8 +104,14 @@ public class LobbyService {
     newlobby = lobbyRepository.save(newlobby);
     lobbyRepository.flush();
 
+    User user = userRepository.findUserById(userId);
+
+    List<Lobby> lobbyList = user.getUsergamelobbylist();
+    lobbyList.add(newlobby);
+    user.setUsergamelobbylist(lobbyList);
+
     log.debug("Created Information for Lobby: {}", newlobby);
-    return newlobby;
+    return newlobby.getLobbyid();
   }
 
   public Boolean updateLobby(Lobby lobby) {

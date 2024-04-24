@@ -21,7 +21,7 @@ public class Lobby implements Serializable {
   private String lobbyToken;
 
   @OneToOne(cascade = CascadeType.ALL)
-  private Game game = new Game();
+  private Game game;// = new Game();
 
   public Long getLobbyid() {
     return lobbyid;

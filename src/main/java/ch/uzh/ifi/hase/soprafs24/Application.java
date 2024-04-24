@@ -8,21 +8,19 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.context.annotation.ComponentScan;
+
 
 @RestController
 @SpringBootApplication
+@ComponentScan(basePackages = {"ch.uzh.ifi.hase.soprafs24"})
 public class Application {
-
-  public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
-  }
+  public static void main(String[] args) {SpringApplication.run(Application.class, args);}
 
   @GetMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public String helloWorld() {
-    return "The application is running.";
-  }
+  public String helloWorld() {return "The application is running.";}
 
   @Bean
   public WebMvcConfigurer corsConfigurer() {
