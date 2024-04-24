@@ -103,9 +103,11 @@ public class GameService {
     Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
 
     if (oppChosenCharacter.equals(guess.getImageId())){
-      Response r = handleWin(playerId);
-      deleteGame(game);
-      return r;
+      //Response r = handleWin(playerId);
+      //deleteGame(game);
+      //return r;
+        int strikes = gameUserService.getStrikesss(playerId);
+        return gameUserService.createResponse(true, playerId, strikes);
     } else {
         if (gameUserService.checkStrikes(playerId)) {
             gameUserService.increaseStrikesByOne(playerId);
@@ -114,9 +116,10 @@ public class GameService {
         else {
             Response response = new Response();
             response.setGuess(false);
-            //nedim-j: change from 3L to maxguesses
-            response.setStrikes(3L);
-            deleteGame(game);
+            response.setPlayerId(playerId);
+            //nedim-j: change from 3 to maxguesses
+            response.setStrikes(3);
+            //deleteGame(game);
             return response;
         }
     }
