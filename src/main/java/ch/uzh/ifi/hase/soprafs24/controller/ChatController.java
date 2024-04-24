@@ -24,7 +24,7 @@ public class ChatController {
   private final ChatService chatService;
   private final Pusher pusher;
 
-  @Autowired
+  //@Autowired
   public ChatController(ChatService chatService, Pusher pusher) {
     this.chatService = chatService;
     this.pusher = pusher;
