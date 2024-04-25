@@ -31,13 +31,9 @@ public class ChatController {
   @PostMapping("/game/{gameId}/chat/{userId}") // smailalijagic: use gameId to check if a game exists
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public MessageGetDTO addMessage(@RequestBody String message, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
+  public MessageGetDTO addMessage(@RequestBody MessagePostDTO messagePostDTO, @PathVariable("gameId") String game_id, @PathVariable("userId") String user_id) {
     Long gameid = Long.valueOf(game_id); // smailalijagic: get gameId
-    //nedim-j: changed this and Requestbody to string, feel free to adjust
-    MessagePostDTO m = new MessagePostDTO();
-    m.setMessage(message);
-
-    Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(m); // smailalijagic: convert api representation to entity
+    Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO); // smailalijagic: convert api representation to entity
     Long userid = Long.valueOf(user_id); // smailalijagic: get userId
     chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
 

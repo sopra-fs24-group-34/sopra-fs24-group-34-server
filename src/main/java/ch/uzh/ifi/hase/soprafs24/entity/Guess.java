@@ -5,44 +5,44 @@ import java.io.Serializable;
 
 @Entity
 public class Guess {
-    @Id
-    @GeneratedValue
-    private Long id;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-    // Other attributes and methods
-    private Long gameId;
-    private Long playerId;
-    private Long imageId;
+  // Other attributes and methods
+  private Long gameId;
+  private Long playerId;
+  private Long imageId;
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public Long getGameId() {
-        return gameId;
-    }
+  public Long getGameId() {
+    return gameId;
+  }
 
-    public void setGameId(Long gameid) {
-        this.gameId = gameid;
-    }
+  public void setGameId(Long gameid) {
+    this.gameId = gameid;
+  }
 
-    public Long getPlayerId(){
-        return playerId;
-    }
+  public Long getPlayerId(){
+    return playerId;
+  }
 
-    public void setPlayerId(Long playerid) {
-        this.playerId = playerid;
-    }
+  public void setPlayerId(Long playerid) {
+    this.playerId = playerid;
+  }
 
-    public Long getImageId() {
-        return imageId;
-    }
+  public Long getImageId() {
+    return imageId;
+  }
 
-    public void setImageId(Long imageid) {
-        this.imageId = imageid;
-    }
+  public void setImageId(Long imageid) {
+    this.imageId = imageid;
+  }
 }
