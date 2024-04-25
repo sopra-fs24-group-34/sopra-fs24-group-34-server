@@ -55,7 +55,7 @@
 | 31.03.2024 | Smail Alijagic | [#105](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/105), [#107](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/107) | |
 | 01.04.2024 | Dario Giuliani | | |
 | 02.04.2024 | Liam Kontopulos | | |
-| 02.04.2024 | Nedim Jukic | | |
+| 02.04.2024 | Nedim Jukic | [#48](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/48), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#65](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/65), [#84](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/84) | |
 | 02.04.2024 | Till Sollberger | | |
 
 
