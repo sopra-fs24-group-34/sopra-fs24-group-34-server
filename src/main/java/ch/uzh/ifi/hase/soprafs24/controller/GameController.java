@@ -75,33 +75,53 @@ public class GameController {
   @ResponseBody
   public Player getplayer(@PathVariable("playerid") Long playerid){
     // method to get a player to check with Postman
-    Player player = gameUserService.getUser(playerid);
+    Player player = gameUserService.getPlayer(playerid);
     return player;
   }
 
   @PutMapping("/game/character/choose")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @ResponseBody
-  public Player chooseImage(@RequestBody GuessPostDTO guessPostDTO){
+  public void chooseImage(@RequestBody GuessPostDTO guessPostDTO){
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
-    Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    Response response = gameService.chooseImage(guess);
+
     String channelName = "gameRound"+guess.getGameId();
-    String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
-    pusher.trigger(channelName, "round-update", message);
-    return gameService.selectimage(guess);
+    pusher.trigger(channelName, "round-update", response);
+
+    /*
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    Game game = gameService.getGame(guess.getGameId());
+    Long creatorId = game.getCreatorId();
+    Long invitedId = game.getInvitedPlayerId();
+    if(!gameService.playerHasSelected(guess.getPlayerId())) {
+        gameService.selectimage(guess);
+        //if(gameService.playerHasSelected(creatorId) && gameService.playerHasSelected(invitedId)) {
+
+            String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
+            pusher.trigger(channelName, "round-update", message);
+        //}
+    }
+    else {
+        throw new RuntimeException("You have already chosen a character");
+    }
+     */
   }
 
   @PostMapping("/game/character/guess")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @ResponseBody
-  public Boolean guessImage(@RequestBody GuessPostDTO guessPostDTO){
+  public Response guessImage(@RequestBody GuessPostDTO guessPostDTO){
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    Response response = gameService.guesssimage(guess);
+
     String channelName = "gameRound"+guess.getGameId();
-    String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId();
-    pusher.trigger(channelName, "round-update", message);
-    return gameService.guesssimage(guess);
+    //String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId() + " and it was " + m;
+    pusher.trigger(channelName, "round-update", response);
+    return response;
   }
 
   @DeleteMapping("/game/{gameId}/delete")
