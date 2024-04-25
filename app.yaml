@@ -4,7 +4,9 @@
 runtime: java17
 instance_class: F2
 env_variables:
-  PUSHER_APP_ID: "1791066"
-  PUSHER_KEY: "e499792fd10f53102f20"
-  PUSHER_SECRET: "427dee30ab9b67c8a3d9"
+  PUSHER_APP_ID: "1790013"
+  PUSHER_KEY: "19cbfeaeb11cb7adbda4"
+  PUSHER_SECRET: "25d9fa7228b4648f110a"
   PUSHER_CLUSTER: "eu"
+  UNSPLASH.API.accessKey: "PWHJuYQL8bteX-4JFPeu_Io6DfznbwLiA9ze5tWRTlI"
+  UNSPLASH.API.secretKey: "zZ602hyHh-uc_4uKq4CS7IoYWfZz7itzl14In2ttD9Y"
