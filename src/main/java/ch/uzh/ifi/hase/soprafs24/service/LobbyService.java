@@ -34,10 +34,10 @@ public class LobbyService {
         this.lobbyRepository = lobbyRepository;
         this.userRepository = userRepository;
     }
-
+    /*
     public List<User> getUsers() {
         return this.userRepository.findAll();
-    }
+    }*/
 
     public User getUser(Long id) {
         try {
@@ -113,11 +113,11 @@ public class LobbyService {
         log.debug("Created Information for Lobby: {}", newlobby);
         return newlobby.getLobbyid();
     }
-
+    /*
     public Boolean updateLobby(Lobby lobby) {
         // smailalijagic: change settings
         return true;
-    }
+    }*/
 
     public void addUserToLobby(Lobby lobby, User user) {
         Long userId = user.getId();
