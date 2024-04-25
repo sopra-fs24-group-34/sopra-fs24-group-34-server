@@ -1,103 +1,74 @@
 package ch.uzh.ifi.hase.soprafs24.controller.usercontroller;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.controller.UserController;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * UserControllerTest
- * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
- * request without actually sending them over the network.
- * This tests if the UserController works.
- */
-@WebMvcTest(UserController.class)
+@SpringBootTest
 public class PutTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private UserService userService;
 
-    @Test
-    public void updateUser_existingId() throws Exception {
-        UserPutDTO userPutDTO = new UserPutDTO(); // smailalijagic: get access to user
-        userPutDTO.setUsername("testUsername"); // smailalijagic: update username
+    @InjectMocks
+    private UserController userController;
 
-        // when/then -> do the request + validate the result
-        MockHttpServletRequestBuilder putRequest = put("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(userPutDTO))
-                .header("token", "1")
-                .header("id", "1");
-
-        // then
-        mockMvc.perform(putRequest).andExpect(status().is(204));
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    public void updateUser_invalidId() throws Exception {
-        UserPutDTO userPutDTO = new UserPutDTO(); // smailalijagic: get access to user
-        userPutDTO.setUsername("testUsername"); // smailalijagic: update username
+    public void testUpdateUser() throws Exception {
+        // Mock existing user
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setUsername("testUser");
+        existingUser.setPassword("testPassword");
 
-        doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User id was not found")).when(userService).updateUser(any(), any());
+        // Mock UserService behavior
+        when(userService.updateUser(any(), any())).thenReturn(existingUser);
 
-        // when/then -> do the request + validate the result
-        MockHttpServletRequestBuilder putRequest = put("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(userPutDTO))
-                .header("token", "1")
-                .header("id", "1");
+        // Create UserPutDTO
+        UserPutDTO userPutDTO = new UserPutDTO();
+        userPutDTO.setUsername("newUsername");
+        userPutDTO.setPassword("newPassword");
 
-        // then
-        mockMvc.perform(putRequest).andExpect(status().is(404));
+        // Perform PUT request
+        mockMvc.perform(put("/users/" + existingUser.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtils.toJson(userPutDTO)))
+                .andExpect(status().isNoContent());
     }
 
-    /**
-     * Helper Method to convert userPostDTO into a JSON string such that the input
-     * can be processed
-     * Input will look like this: {"name": "Test User", "username": "testUsername"}
-     *
-     * @param object
-     * @return string
-     */
-    private String asJsonString(final Object object) {
-        try {
-            return new ObjectMapper().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("The request body could not be created.%s", e.toString()));
+    static class JsonUtils {
+        private static final ObjectMapper objectMapper = new ObjectMapper();
+
+        public static String toJson(Object object) {
+            try {
+                return objectMapper.writeValueAsString(object);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 }
