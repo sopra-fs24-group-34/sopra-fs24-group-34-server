@@ -77,7 +77,8 @@ public class GameUserService {
       //nedim-j: returns true, if player has less than max strikes and can play on
         Player player = getPlayer(playerid);
         //nedim-j: for M4 need some variable maxGuesses instead of 2
-        if (player.getStrikes() == 2){
+        int maxGuesses = 3;
+        if (player.getStrikes() >= maxGuesses){
             return false;
         }
         return true;
