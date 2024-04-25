@@ -29,18 +29,18 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserService {
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+  private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+  @Autowired
+  public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
-    public List<User> getUsers() {
-        return this.userRepository.findAll();
-    }
+  public List<User> getUsers() {
+    return this.userRepository.findAll();
+  }
 
   public User getUser(Long userId) {
     try {
@@ -139,7 +139,7 @@ public class UserService {
 
     updatedUser = userRepository.save(exsistingUser);
     userRepository.flush();
-
+    
     return updatedUser;
   }
 
