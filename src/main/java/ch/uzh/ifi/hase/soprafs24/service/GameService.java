@@ -270,10 +270,10 @@ public class GameService {
             // Retrieve the game entity from the database
             Game game = getGameById(gameId);
 
-            // Filter out duplicates and ensure enough unique images are fetched
+            // Filter out duplicates
             List<ImageDTO> filteredNewImageDTOs = filterDuplicates(game, 1);
 
-            // Create Image entities based on the filtered new ImageDTOs
+            // Create Image entities
             List<Image> newImages = createImageEntities(filteredNewImageDTOs);
 
             // Add the new images to the game's image list and save the game
@@ -292,22 +292,21 @@ public class GameService {
             // Retrieve the game entity from the database
             Game game = getGameById(gameId);
 
-            //well check if image exists
+            // Check if image exists
             checkIfImageExists(imageId);
 
             // Delete the specific image chosen by the user from the database
             imageRepository.deleteById(imageId);
 
-            // Update the list of images associated with the game
+            // Update the list of images of the game
             List<Image> currentImages = game.getGameImages();
 
             currentImages.removeIf(image -> image.getId().equals(imageId));
 
             // Set the updated list of images to the game
-
             game.setGameImages(currentImages);
 
-            // Save the game entity to update the images association
+            // Save the game entity to update the images
             gameRepository.save(game);
             // Fetch and add a new image to ensure the game always has at least one image
             return replaceGameImages(gameId);
