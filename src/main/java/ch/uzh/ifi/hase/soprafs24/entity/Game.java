@@ -71,5 +71,11 @@ public class Game {
         this.invitedplayerId = invitedplayerId;
     }
 
+    public List<Image> getGameImages() {
+        return gameImages;
+    }
+
+    public void setGameImages(List<Image> gameImages) { this.gameImages = gameImages;}
+
 
 }
