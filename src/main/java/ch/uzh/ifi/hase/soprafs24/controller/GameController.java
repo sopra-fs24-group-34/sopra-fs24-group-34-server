@@ -86,13 +86,14 @@ public class GameController {
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
-    Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
     String channelName = "gameRound"+guess.getGameId();
     pusher.trigger(channelName, "round-update", response);
 
     /*
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Game game = gameService.getGame(guess.getGameId());
     Long creatorId = game.getCreatorId();
     Long invitedId = game.getInvitedPlayerId();

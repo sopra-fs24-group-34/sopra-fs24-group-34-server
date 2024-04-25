@@ -44,6 +44,9 @@ public class UserService {
 
   public User getUser(Long userId) {
     try {
+      if (this.userRepository.findUserById(userId) == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
+      }
         return this.userRepository.findUserById(userId);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
@@ -52,6 +55,9 @@ public class UserService {
 
   public AuthenticationResponseDTO createUser(User newUser) {
     checkIfUserExists(newUser);
+    if (newUser.getUsername() == null || newUser.getPassword() == null) {
+      throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
+    }
     newUser.setStatus(UserStatus.ONLINE);
     newUser.setToken(UUID.randomUUID().toString());
 
@@ -133,7 +139,7 @@ public class UserService {
 
     updatedUser = userRepository.save(exsistingUser);
     userRepository.flush();
-
+    
     return updatedUser;
   }
 

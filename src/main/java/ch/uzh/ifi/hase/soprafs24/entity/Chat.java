@@ -1,12 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "CHAT")
-public class Chat {
+public class Chat implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -19,7 +20,7 @@ public class Chat {
   // private List<ChatTuple<String, Long>> messages;
 
   @OneToMany(cascade = CascadeType.ALL)
-  private List<ChatTuple> messages; // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
+  private List<ChatTuple> messages = new ArrayList<ChatTuple>(); // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
 
   //private List<String> messages;
 
@@ -36,6 +37,7 @@ public class Chat {
     finalMessage.setMessage(message);
     finalMessage.setUserid(writerid);
     this.messages.add(finalMessage); // smailalijagic: adding messages to DB/repository (=sending message)
+    this.setLastmessage(message);
     // smailalijagic: messages = {("1", "Is it male?"), ("2", "Yes"), ("2", "Does she have red hair?"), ("1", "Yes"), ("1", "...")}
   }
 
@@ -61,6 +63,13 @@ public class Chat {
 
   public String getLastmessage() {
     return lastmessage;
+  }
+
+  public static void main(String[] args) {
+    Chat chat = new Chat();
+    chat.addMessage("hello", 1L);
+    List<ChatTuple> messages = chat.getMessages();
+
   }
 
 }

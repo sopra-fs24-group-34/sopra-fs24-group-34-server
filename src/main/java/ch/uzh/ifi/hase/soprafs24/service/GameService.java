@@ -86,7 +86,8 @@ public class GameService {
     player1.setUser(user);
 
     Player player2 = new Player();
-    player2.setUser(gameUserService.getUser(game.getInvitedPlayerId()));
+    User inviteduser = gameUserService.getUser(game.getInvitedPlayerId());
+    player2.setUser(inviteduser);
 
     // till: Save the changes
     gameUserService.saveplayerchanges(player1);
@@ -97,7 +98,7 @@ public class GameService {
 
     // save changes to game
     gameRepository.save(game);
-
+    gameRepository.flush();
     lobby.setGame(game); // smailalijagic: add game to lobby
 
       // Check if there are already 200 images in the database
