@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 
 @Repository("playerRepository")
 public interface PlayerRepository extends JpaRepository <Player, Long>{
-    //@Query("SELECT p FROM Player p WHERE p.playerid = :playerId")
-    Player findByPlayerId(Long playerId);
+  //@Query("SELECT p FROM Player p WHERE p.playerid = :playerId")
+  Player findByPlayerId(Long playerId);
 }
