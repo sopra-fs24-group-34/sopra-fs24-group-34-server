@@ -153,8 +153,8 @@ public class GameController {
     @DeleteMapping("/games/{gameId}/images/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<ImageDTO> deleteGameImage(@PathVariable Long gameId, @PathVariable Long imageId) {
-        return gameService.deleteGameImage(gameId, imageId);
+    public void deleteGameImage(@PathVariable Long gameId, @PathVariable Long imageId) {
+      gameService.deleteGameImage(gameId, imageId);
     }
 
 }

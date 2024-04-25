@@ -238,7 +238,7 @@ public class GameService {
 
         // Continue fetching new images until we find non-duplicates or reach the maximum number of iterations
         while (nonDuplicateImages.isEmpty() && iterations < maxIterations) {
-            List<ImageDTO> newImageDTOs = fetchNewImages(5); // Fetch another batch of 5 images
+            List<ImageDTO> newImageDTOs = fetchNewImages(10); // Fetch another batch of 5 images
             Collections.shuffle(newImageDTOs);
             nonDuplicateImages = newImageDTOs.stream()
                     .filter(imageDTO -> !currentImageIds.contains(imageDTO.getId()))
@@ -265,11 +265,6 @@ public class GameService {
                     return image;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private void addImagesToGameAndUpdate(Game game, List<Image> images) {
-        game.getGameImages().addAll(images);
-        gameRepository.save(game);
     }
 
     public List<ImageDTO> getGameImages(Long gameId) {
@@ -315,7 +310,9 @@ public class GameService {
             List<Image> newImages = createImageEntities(newImageDTOs);
 
             // Add the new images to the game's image list and save the game
-            addImagesToGameAndUpdate(game, newImages);
+            game.getGameImages().addAll(newImages);
+            gameRepository.save(game);;
+
         } catch (Exception e) {
             // Log the exception or handle it as needed
             logger.severe("Error while saving images for game: " + e.getMessage());
@@ -323,7 +320,7 @@ public class GameService {
         }
     }
 
-    public List<ImageDTO> replaceGameImages(Long gameId) {
+    public void replaceGameImages(Long gameId) {
         try {
             // Retrieve the game entity from the database
             Game game = getGameById(gameId);
@@ -335,8 +332,9 @@ public class GameService {
             List<Image> newImages = createImageEntities(filteredNewImageDTOs);
 
             // Add the new images to the game's image list and save the game
-            addImagesToGameAndUpdate(game, newImages);
-            return filteredNewImageDTOs;
+            game.getGameImages().addAll(newImages);
+            gameRepository.save(game);
+            // return filteredNewImageDTOs;
 
         } catch (Exception e) {
             // Log the exception or handle it as needed
@@ -345,7 +343,7 @@ public class GameService {
         }
     }
 
-    public List<ImageDTO> deleteGameImage(Long gameId, Long imageId) {
+    public void deleteGameImage(Long gameId, Long imageId) {
         try {
             // Retrieve the game entity from the database
             Game game = getGameById(gameId);
@@ -354,7 +352,7 @@ public class GameService {
             checkIfImageExists(imageId);
 
             // Delete the specific image chosen by the user from the database
-            imageRepository.deleteById(imageId);
+            // imageRepository.deleteById(imageId);
 
             // Update the list of images of the game
             List<Image> currentImages = game.getGameImages();
@@ -366,8 +364,9 @@ public class GameService {
 
             // Save the game entity to update the images
             gameRepository.save(game);
+            replaceGameImages(gameId);
             // Fetch and add a new image to ensure the game always has at least one image
-            return replaceGameImages(gameId);
+            //return replaceGameImages(gameId);
 
         } catch (Exception e) {
             // Log the exception or handle it as needed

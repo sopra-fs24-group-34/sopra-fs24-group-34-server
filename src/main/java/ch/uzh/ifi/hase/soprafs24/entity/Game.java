@@ -19,9 +19,13 @@ public class Game {
 
     private Long guessingtime; // smailalijagic:
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //orphanremoval -> instant deletion from db if delted from game
-    @JoinColumn(name = "game_id")
-    private List<Image> gameImages; // dario: images associated to a game
+    @ManyToMany
+    @JoinTable(
+            name = "game_image",
+            joinColumns = @JoinColumn(name = "game_id"), // column referencing Game
+            inverseJoinColumns = @JoinColumn(name = "image_id") // column referencing Image
+    )
+    private List<Image> gameImages; // images associated to a game
 
     @OneToOne(cascade = CascadeType.ALL)
     private Chat chat = new Chat();
