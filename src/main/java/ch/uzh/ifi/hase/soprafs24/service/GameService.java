@@ -1,16 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -37,9 +35,8 @@ public class GameService {
     return this.gameRepository.findByGameId(gameid);
   }
 
-  public void selectimage(Guess guess) {
+  public Response chooseImage(Guess guess) {
     // checkIfImageExists(guess.getImageId());
-
     Player player = gameUserService.getPlayer(guess.getPlayerId());
 
     if (player.getChosencharacter() == null) {
@@ -48,6 +45,7 @@ public class GameService {
     } else {
       throw new IllegalStateException("The player has already chosen a character.");
     }
+    return gameUserService.createResponse(false, player.getPlayerId(), player.getStrikes(), gameUserService.determineStatus(guess.getGameId()));
   }
 
   public Boolean playerHasSelected(Long playerId) {
@@ -112,12 +110,15 @@ public class GameService {
       //deleteGame(game);
       //return r;
         int strikes = gameUserService.getStrikesss(playerId);
-        return gameUserService.createResponse(true, playerId, strikes);
+        //RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
+        RoundStatus roundStatus = RoundStatus.END;
+        return gameUserService.createResponse(true, playerId, strikes, roundStatus);
     } else {
         if (gameUserService.checkStrikes(playerId)) {
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikesss(playerId);
-            return gameUserService.createResponse(false, playerId, strikes);
+            RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
+            return gameUserService.createResponse(false, playerId, strikes, roundStatus);
         }
         else {
             Response response = new Response();
@@ -125,6 +126,7 @@ public class GameService {
             response.setPlayerId(playerId);
             //nedim-j: change from 3 to maxguesses
             response.setStrikes(3);
+            response.setRoundStatus(RoundStatus.END);
             //deleteGame(game);
             return response;
         }
@@ -136,7 +138,7 @@ public class GameService {
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikesss(playerId);
-    return gameUserService.createResponse(true, playerId, strikes);
+    return gameUserService.createResponse(true, playerId, strikes, RoundStatus.END);
   }
 
   private void deleteGame(Game game) {
@@ -182,7 +184,7 @@ public class GameService {
     }
   }
 
-  public class ImageNotFoundException extends Exception {
+    public class ImageNotFoundException extends Exception {
     public ImageNotFoundException(String message) {
       super(message);
     }

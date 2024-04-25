@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -19,12 +21,14 @@ public class GameUserService {
     private final PlayerRepository playerRepository;
     private final UserRepository userrepository;
     private final LobbyRepository lobbyRepository;
+    private final GameRepository gameRepository;
 
   @Autowired
-  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository) {
+  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("gameRepository") GameRepository gameRepository) {
     this.userrepository = userrepository;
     this.playerRepository = playerRepository;
     this.lobbyRepository = lobbyRepository;
+    this.gameRepository = gameRepository;
   }
 
   public Player getPlayer(Long playerId){
@@ -70,6 +74,7 @@ public class GameUserService {
   }
 
     public Boolean checkStrikes(Long playerid) {
+      //nedim-j: returns true, if player has less than max strikes and can play on
         Player player = getPlayer(playerid);
         //nedim-j: for M4 need some variable maxGuesses instead of 2
         if (player.getStrikes() == 2){
@@ -90,13 +95,33 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-  public Response createResponse(Boolean guess, Long playerId, int strikes) {
+    public RoundStatus determineStatus(Long gameId) {
+        Game game = new Game();
+        try {
+            game = gameRepository.findByGameId(gameId);
+        } catch (Exception e) {
+            System.out.println("Game is null");
+            return RoundStatus.CHOOSING;
+        }
+
+        Player creator = playerRepository.findByPlayerId(game.getCreatorId());
+        Player invited = playerRepository.findByPlayerId(game.getInvitedPlayerId());
+        if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
+            return RoundStatus.CHOOSING;
+        } else if(!checkStrikes(creator.getPlayerId()) || !checkStrikes(invited.getPlayerId())) {
+            return RoundStatus.END;
+        }
+        return RoundStatus.GUESSING;
+    }
+
+  public Response createResponse(Boolean guess, Long playerId, int strikes, RoundStatus roundStatus) {
       // creates a response that is send back to the frontend
       //Player player = playerRepository.findByPlayerId(playerId);
       Response response = new Response();
       response.setGuess(guess);
       response.setPlayerId(playerId);
       response.setStrikes(strikes);
+      response.setRoundStatus(roundStatus);
       return response;
   }
 
