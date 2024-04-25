@@ -60,6 +60,8 @@ public class ChatService {
     String myMessage = message; //user.getUsername() + ": " + message;
     existingchat.addMessage(myMessage, userid);
 
+    //chat.setLastmessage(message);
+
     chat = chatRepository.save(existingchat);
     chatRepository.flush();
 
@@ -73,10 +75,19 @@ public class ChatService {
 
   public Game getGame(Long gameid) {
     try {
-      return this.gameRepository.findByGameId(gameid);
+        if (this.gameRepository.findByGameId(gameid) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
+        }
+        return this.gameRepository.findByGameId(gameid);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
     }
+
+//    try {
+//      return this.gameRepository.findByGameId(gameid);
+//    } catch (Exception e) {
+//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
+//    }
   }
 
 //  private Chat getOrCreateChat() {
@@ -88,13 +99,12 @@ public class ChatService {
 //    }
 //  }
 
-  private Boolean checkIfUserExists(User userToBeCreated) {
+  public Boolean checkIfUserExists(User userToBeCreated) {
     // smailalijagic: changed to boolean
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+      return true;
     }
     return false; // smailalijagic: user = null --> does not exist yet
   }
