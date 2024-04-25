@@ -42,103 +42,109 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User getUser(Long userId) {
-        try {
-            return this.userRepository.findUserById(userId);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
-        }
+  public User getUser(Long userId) {
+    try {
+      if (this.userRepository.findUserById(userId) == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
+      }
+        return this.userRepository.findUserById(userId);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
     }
+  }
 
-    public AuthenticationResponseDTO createUser(User newUser) {
-        checkIfUserExists(newUser);
-        newUser.setStatus(UserStatus.ONLINE);
-        newUser.setToken(UUID.randomUUID().toString());
-
-        // saves the given entity but data is only persisted in the database once
-        // flush() is called
-        newUser = userRepository.save(newUser);
-        userRepository.flush();
-
-        log.debug("Created Information for User: {}", newUser);
-        return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
+  public AuthenticationResponseDTO createUser(User newUser) {
+    checkIfUserExists(newUser);
+    if (newUser.getUsername() == null || newUser.getPassword() == null) {
+      throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
     }
+    newUser.setStatus(UserStatus.ONLINE);
+    newUser.setToken(UUID.randomUUID().toString());
 
-    public AuthenticationResponseDTO createGuestUser(User newGuestUser) {
-        checkIfUserExists(newGuestUser);
-        newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
-        newGuestUser.setToken(UUID.randomUUID().toString());
+    // saves the given entity but data is only persisted in the database once
+    // flush() is called
+    newUser = userRepository.save(newUser);
+    userRepository.flush();
 
-        // saves the given entity but data is only persisted in the database once
-        // flush() is called
-        newGuestUser = userRepository.save(newGuestUser);
-        userRepository.flush(); // smailalijagic: this sets the ID
+    log.debug("Created Information for User: {}", newUser);
+    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
+  }
 
-        newGuestUser.setUsername(newGuestUser.getUsername() + newGuestUser.getId()); // smailalijagic: username = Guest1
+  public AuthenticationResponseDTO createGuestUser(User newGuestUser) {
+    checkIfUserExists(newGuestUser);
+    newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
+    newGuestUser.setToken(UUID.randomUUID().toString());
 
-        newGuestUser = userRepository.save(newGuestUser); // smailalijagic: update guestuser
-        userRepository.flush();
+    // saves the given entity but data is only persisted in the database once
+    // flush() is called
+    newGuestUser = userRepository.save(newGuestUser);
+    userRepository.flush(); // smailalijagic: this sets the ID
 
-        log.debug("Created Information for User: {}", newGuestUser);
-        return new AuthenticationResponseDTO(newGuestUser.getId(), newGuestUser.getToken());
+    newGuestUser.setUsername(newGuestUser.getUsername() + newGuestUser.getId()); // smailalijagic: username = Guest1
+
+    newGuestUser = userRepository.save(newGuestUser); // smailalijagic: update guestuser
+    userRepository.flush();
+
+    log.debug("Created Information for User: {}", newGuestUser);
+    return new AuthenticationResponseDTO(newGuestUser.getId(), newGuestUser.getToken());
+  }
+
+
+  /**
+   * This is a helper method that will check the uniqueness criteria of the
+   * username and the name
+   * defined in the User entity. The method will do nothing if the input is unique
+   * and throw an error otherwise.
+   *
+   * @param userToBeCreated
+   * @throws org.springframework.web.server.ResponseStatusException
+   * @see User
+   */
+  private Boolean checkIfUserExists(User userToBeCreated) {
+    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
+
+    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+    if (userByUsername != null) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
     }
+    return false; // smailalijagic: user = null --> does not exist yet
+  }
 
+  public AuthenticationResponseDTO loginUser(User loginUser) {
+    User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
-    private Boolean checkIfUserExists(User userToBeCreated) {
-        User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-
-        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-        if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
-        }
-        return false; // smailalijagic: user = null --> does not exist yet
+    if (existingUser != null) {
+      // User is authenticated
+      existingUser.setStatus(UserStatus.ONLINE);
+      return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
+  }
 
-    public AuthenticationResponseDTO loginUser(User loginUser) {
-        User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
+  public User updateUser(User updatedUser, Long userId) {
+    //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
+    User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
-        if (existingUser != null) {
-            // User is authenticated
-            existingUser.setStatus(UserStatus.ONLINE);
-            return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-        }
+    // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
+    if (!Objects.equals(updatedUser.getUsername(), "") && !checkIfUserExists(updatedUser)) {
+      exsistingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
     }
-
-    public User updateUser(User updatedUser, Long userId) {
-        //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
-        User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
-
-        // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
-        if (!Objects.equals(updatedUser.getUsername(), "") && !checkIfUserExists(updatedUser)) {
-            exsistingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
-        }
-        if (!Objects.equals(updatedUser.getPassword(), "")) {
-            exsistingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
-        }
-        exsistingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
-        exsistingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
-        exsistingUser.setUsericon(updatedUser.getUsericon()); // smailalijagic: update usericon
-
-        updatedUser = userRepository.save(exsistingUser);
-        userRepository.flush();
-
-        return updatedUser;
+    if (!Objects.equals(updatedUser.getPassword(), "")) {
+      exsistingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
     }
+    exsistingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
+    exsistingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
+    exsistingUser.setUsericon(updatedUser.getUsericon()); // smailalijagic: update usericon
 
-    public void deleteGuestUser(Long id) {
-        this.userRepository.deleteById(id);
-    }
+    updatedUser = userRepository.save(exsistingUser);
+    userRepository.flush();
+
+    return updatedUser;
+  }
+
+  public void deleteGuestUser(Long id) {
+    this.userRepository.deleteById(id);
+  }
 
 }

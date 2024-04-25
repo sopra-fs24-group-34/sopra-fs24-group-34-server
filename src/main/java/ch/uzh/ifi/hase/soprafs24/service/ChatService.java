@@ -8,7 +8,10 @@ import ch.uzh.ifi.hase.soprafs24.exceptions.GlobalExceptionAdvice;
 import ch.uzh.ifi.hase.soprafs24.repository.ChatRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +22,13 @@ import java.util.List;
 @Service
 @Transactional
 public class ChatService {
+  private final Logger log = LoggerFactory.getLogger(ChatService.class);
   private final ChatRepository chatRepository;
   private final GameRepository gameRepository;
   private final UserRepository userRepository;
 
   @Autowired
-  public ChatService(ChatRepository chatRepository, GameRepository gameRepository, UserRepository userRepository) {
+  public ChatService(@Qualifier("chatRepository") ChatRepository chatRepository, @Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("userRepository") UserRepository userRepository) {
     this.chatRepository = chatRepository;
     this.gameRepository = gameRepository;
     this.userRepository = userRepository;
@@ -56,6 +60,8 @@ public class ChatService {
     String myMessage = message; //user.getUsername() + ": " + message;
     existingchat.addMessage(myMessage, userid);
 
+    //chat.setLastmessage(message);
+
     chat = chatRepository.save(existingchat);
     chatRepository.flush();
 
@@ -69,10 +75,19 @@ public class ChatService {
 
   public Game getGame(Long gameid) {
     try {
-      return this.gameRepository.findByGameId(gameid);
+        if (this.gameRepository.findByGameId(gameid) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
+        }
+        return this.gameRepository.findByGameId(gameid);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
     }
+
+//    try {
+//      return this.gameRepository.findByGameId(gameid);
+//    } catch (Exception e) {
+//      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found error");
+//    }
   }
 
 //  private Chat getOrCreateChat() {
@@ -84,13 +99,12 @@ public class ChatService {
 //    }
 //  }
 
-  private Boolean checkIfUserExists(User userToBeCreated) {
+  public Boolean checkIfUserExists(User userToBeCreated) {
     // smailalijagic: changed to boolean
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
     if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+      return true;
     }
     return false; // smailalijagic: user = null --> does not exist yet
   }
