@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,8 +32,8 @@ public class LobbyServiceIntegrationTest {
     private LobbyService lobbyService;
 
 
-    @AfterEach
-    public void tearDown() {
+    @BeforeEach
+    public void setup() {
         userRepository.deleteAll();
         lobbyRepository.deleteAll();
     }
@@ -45,11 +46,12 @@ public class LobbyServiceIntegrationTest {
         user.setPassword("test");
         user.setToken("1");
         user.setStatus(UserStatus.ONLINE);
-        userRepository.save(user);
+        user = userRepository.save(user);
         userRepository.flush();
 
         User resUser = lobbyService.getUser(user.getId());
 
+        System.out.print(resUser.getId());
         assertEquals(resUser.getId(), user.getId());
         assertEquals(resUser.getToken(), user.getToken());
         assertEquals(resUser.getUsername(), user.getUsername());
@@ -76,9 +78,9 @@ public class LobbyServiceIntegrationTest {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(1L);
         lobby.setToken("1");
-        lobbyRepository.save(lobby);
+        lobby = lobbyRepository.save(lobby);
         lobbyRepository.flush();
-
+        System.out.print(lobbyService.checkIfLobbyExists(lobby.getLobbyid()));
         assertTrue(lobbyService.checkIfLobbyExists(lobby.getLobbyid()));
     }
 
@@ -100,7 +102,7 @@ public class LobbyServiceIntegrationTest {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(1L);
         lobby.setToken("1");
-        lobbyRepository.save(lobby);
+        lobby = lobbyRepository.save(lobby);
         lobbyRepository.flush();
 
         User user = new User();
@@ -110,7 +112,7 @@ public class LobbyServiceIntegrationTest {
 
         lobbyService.addUserToLobby(lobby, user);
         lobby = lobbyRepository.findByLobbyid(lobby.getLobbyid());
-
+        System.out.print(lobby.getInvited_userid());
         assertEquals(lobby.getInvited_userid(), user.getId());
     }
 }
