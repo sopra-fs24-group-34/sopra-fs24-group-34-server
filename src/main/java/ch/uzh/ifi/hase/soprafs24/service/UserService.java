@@ -29,21 +29,24 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserService {
-  private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  @Autowired
-  public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+    @Autowired
+    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-  public List<User> getUsers() {
-    return this.userRepository.findAll();
-  }
+    public List<User> getUsers() {
+        return this.userRepository.findAll();
+    }
 
   public User getUser(Long userId) {
     try {
+      if (this.userRepository.findUserById(userId) == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
+      }
         return this.userRepository.findUserById(userId);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with userId " + userId + " does not exist");
@@ -52,6 +55,9 @@ public class UserService {
 
   public AuthenticationResponseDTO createUser(User newUser) {
     checkIfUserExists(newUser);
+    if (newUser.getUsername() == null || newUser.getPassword() == null) {
+      throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
+    }
     newUser.setStatus(UserStatus.ONLINE);
     newUser.setToken(UUID.randomUUID().toString());
 
