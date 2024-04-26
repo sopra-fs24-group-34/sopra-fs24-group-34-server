@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -9,28 +8,24 @@ import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
-import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class GameServiceTest {
+public class GameServiceIntegrationTest {
 
 
 
@@ -64,26 +59,36 @@ public class GameServiceTest {
     public void setup() {
         creator = new User();
         creator.setId(1L);
-        userRepository.save(creator);
-        userRepository.flush();
         invited = new User();
         invited.setId(2L);
+
+        userRepository.save(creator);
         userRepository.save(invited);
         userRepository.flush();
+
         lobby = new Lobby();
-        lobby.setCreator_userid(1L);
-        lobby.setInvited_userid(2L);
+        lobby.setCreator_userid(creator.getId());
+        lobby.setInvited_userid(invited.getId());
         lobby.setLobbyid(3L);
+
         lobbyRepository.save(lobby);
         lobbyRepository.flush();
+
         createdgame = new Game();
         createdgame.setGameId(4L);
         createdgame.setCreatorId(1L);
         createdgame.setInvitedPlayerId(2L);
+
         gamerepository.save(createdgame);
         gamerepository.flush();
     }
 
+    @AfterEach
+    void teardown() {
+        userRepository.deleteAll();
+        lobbyRepository.deleteAll();
+        gamerepository.deleteAll();
+    }
 
     @Test
     void getGames_validInput(){
