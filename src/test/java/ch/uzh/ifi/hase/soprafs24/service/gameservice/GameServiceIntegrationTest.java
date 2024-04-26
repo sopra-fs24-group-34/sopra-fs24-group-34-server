@@ -2,10 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.service.gameservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
@@ -39,6 +36,9 @@ public class GameServiceIntegrationTest {
     private LobbyRepository lobbyRepository;
     @Mock
     private GameUserService gameUserService;
+
+    @Mock
+    private ImageRepository imagerepository;
 
     @InjectMocks
     private GameService gameservice;
@@ -202,23 +202,18 @@ public class GameServiceIntegrationTest {
         assertEquals(result.getGuess(), true);
     }
 
-    /**
-    @Test
-    void checkIfGameExists_validInputs(){
-        Game game = new Game();
-        game.setGameId(1L);
-        gamerepository.save(game);
-        gamerepository.flush();
 
-        Boolean result = gameservice.checkIfGameExists(1L);
+    @Test
+    void checkIfImageExists_validInputs(){
+        Image image = new Image();
+        image.setId(1L);
+
+        when(imagerepository.findImageById(1L)).thenReturn(image);
+
+        Boolean result = gameservice.checkIfImageExists(1L);
 
         assertTrue(result);
     }
-    */
-
-    
-
-
 
     }
 
