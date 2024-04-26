@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Game {
@@ -17,6 +18,14 @@ public class Game {
     private Long invitedplayerId; // smailalijagic: invited user
 
     private Long guessingtime; // smailalijagic:
+
+    @ManyToMany
+    @JoinTable(
+            name = "game_image",
+            joinColumns = @JoinColumn(name = "game_id"), // column referencing Game
+            inverseJoinColumns = @JoinColumn(name = "image_id") // column referencing Image
+    )
+    private List<Image> gameImages; // images associated to a game
 
     @OneToOne(cascade = CascadeType.ALL)
     private Chat chat = new Chat();
@@ -65,5 +74,9 @@ public class Game {
         this.invitedplayerId = invitedplayerId;
     }
 
+    public List<Image> getGameImages() {
+        return gameImages;
+    }
 
+    public void setGameImages(List<Image> gameImages) { this.gameImages = gameImages;}
 }

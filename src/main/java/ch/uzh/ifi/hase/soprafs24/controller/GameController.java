@@ -86,13 +86,14 @@ public class GameController {
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
-    Guess guess = DTOMapper.INSTANCE.convertGuessPutDTOtoEmtity(guessPostDTO);
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
     String channelName = "gameRound"+guess.getGameId();
     pusher.trigger(channelName, "round-update", response);
 
     /*
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Game game = gameService.getGame(guess.getGameId());
     Long creatorId = game.getCreatorId();
     Long invitedId = game.getInvitedPlayerId();
@@ -132,4 +133,28 @@ public class GameController {
     // update stats
     // load new page
   }
+
+
+
+    // Endpoints regarding game-specific images
+    @GetMapping("/games/{gameId}/images")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<ImageDTO> getGameImages(@PathVariable Long gameId) {
+
+        return gameService.getGameImages(gameId);
+    }
+    @PostMapping("/games/{gameId}/images")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public void saveGameImages(@PathVariable Long gameId) {
+        gameService.saveGameImages(gameId, 20);
+    }
+    @DeleteMapping("/games/{gameId}/images/{imageId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public void deleteGameImage(@PathVariable Long gameId, @PathVariable Long imageId) {
+      gameService.deleteGameImage(gameId, imageId);
+    }
+
 }

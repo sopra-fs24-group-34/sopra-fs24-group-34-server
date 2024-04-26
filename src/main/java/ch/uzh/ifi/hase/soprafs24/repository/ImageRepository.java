@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface ImageRepository extends JpaRepository<Image, Long> {
     Image findImageById(Long userId);
 
+    @Query("SELECT COUNT(i) FROM Image i")
+    int countAllImages();
 }

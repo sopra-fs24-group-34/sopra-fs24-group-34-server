@@ -3,7 +3,6 @@
 ## <font style="color: #00d7ff">Week 1 *(25.03 – 02.04)*</font>
 
 
-
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
 | 27.03.2024  | Smail Alijagic | [#100](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/100), [#101](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/101) | Added all necessary functions --> not sure yet how to handle pictures and how to identify user (token, id, username?), added some files for REST (Put, Delete)  |
@@ -69,6 +68,4 @@
 | 02.04.2024 | Liam Kontopulos | | |
 | 02.04.2024 | Nedim Jukic | | |
 | 02.04.2024 | Till Sollberger | | |
-
-
 

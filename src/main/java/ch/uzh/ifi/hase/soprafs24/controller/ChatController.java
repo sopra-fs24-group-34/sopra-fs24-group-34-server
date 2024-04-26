@@ -11,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import com.pusher.rest.Pusher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
@@ -23,6 +24,7 @@ public class ChatController {
   private final ChatService chatService;
   private final Pusher pusher;
 
+  //@Autowired
   public ChatController(ChatService chatService, Pusher pusher) {
     this.chatService = chatService;
     this.pusher = pusher;
@@ -42,7 +44,9 @@ public class ChatController {
     chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
 
     // smailalijagic: trigger a Pusher event to notify clients about the new chat message
-    pusher.trigger("chat_channel", "new_message", chat.getLastmessage());
+    //pusher.trigger("chat_channel", "new_message", chat.getLastmessage());
+      String channel = "gameRound"+gameid;
+      pusher.trigger(channel, "new_message", chat.getLastmessage());
 
     return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat); // smailalijagic: return api representation of chat
 
