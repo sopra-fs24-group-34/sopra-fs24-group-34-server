@@ -59,18 +59,17 @@ public class GameControllerTest {
 
         @Test
         public void createGame_validInput_gameCreated() throws Exception {
-            // Given
+
             Long lobbyId = 1L;
             GamePostDTO gamePostDTO = new GamePostDTO();
             gamePostDTO.setCreator_userid(1L);
             gamePostDTO.setInvited_userid(2L);
 
-            // Mock the response from the game service
+            // Mock the response from game service
             Game createdGame = new Game();
             createdGame.setGameId(1L);
             given(gameService.creategame(eq(lobbyId), any(Game.class))).willReturn(createdGame);
 
-            // When/Then
             MockHttpServletRequestBuilder postRequest = post("/game/{lobbyid}/start", lobbyId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(gamePostDTO));
@@ -79,7 +78,8 @@ public class GameControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.gameId", is(createdGame.getGameId().intValue())));
-            // Verify that the creategame method was called with the expected arguments
+
+            // verify that creategame was called with the expected arguments
             verify(gameService).creategame(eq(lobbyId), any(Game.class));
         }
 
