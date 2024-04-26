@@ -1,7 +1,8 @@
-/*
+
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -24,18 +25,66 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+/* *
  * UserControllerTest
  * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
  * request without actually sending them over the network.
  * This tests if the UserController works.
- * /
+ */
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class GameControllerTest {
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockBean
+        private GameService gameService;
+
+        @Test
+        public void createGame_validInput_gameCreated() throws Exception {
+            // Given
+            Long lobbyId = 1L;
+            GamePostDTO gamePostDTO = new GamePostDTO();
+            gamePostDTO.setCreator_userid(1L);
+            gamePostDTO.setInvited_userid(2L);
+
+            // Mock the response from the game service
+            Game createdGame = new Game();
+            createdGame.setGameId(1L);
+            given(gameService.creategame(eq(lobbyId), any(Game.class))).willReturn(createdGame);
+
+            // When/Then
+            MockHttpServletRequestBuilder postRequest = post("/game/{lobbyid}/start", lobbyId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(gamePostDTO));
+
+            mockMvc.perform(postRequest)
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.gameId", is(createdGame.getGameId().intValue())));
+            // Verify that the creategame method was called with the expected arguments
+            verify(gameService).creategame(eq(lobbyId), any(Game.class));
+        }
+
+
+/*
 @WebMvcTest(GameController.class)
 public class GameControllerTest {
 
@@ -99,7 +148,7 @@ public class GameControllerTest {
         .andExpect(jsonPath("$.username", is(user.getUsername())))
         .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
-
+*/
   /**
    * Helper Method to convert userPostDTO into a JSON string such that the input
    * can be processed
@@ -107,7 +156,7 @@ public class GameControllerTest {
    *
    * @param object
    * @return string
-   * /
+   */
   private String asJsonString(final Object object) {
     try {
       return new ObjectMapper().writeValueAsString(object);
@@ -117,4 +166,3 @@ public class GameControllerTest {
     }
   }
 }
-*/
