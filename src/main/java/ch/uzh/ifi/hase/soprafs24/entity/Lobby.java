@@ -39,15 +39,6 @@ public class Lobby implements Serializable {
         this.creator_userid = creator_userid;
     }
 
-
-    //public User getUser() {
-    //  return user;
-    //}
-
-    //public void setUser(User user) {
-    //  this.user = user;
-    //}
-
     public String getlobbyToken(){
         return lobbyToken;
     }
