@@ -236,19 +236,19 @@ public class GameService {
         int iterations = 0;
         int maxIterations = 10;
 
-        // Continue fetching new images until we find non-duplicates or reach the maximum number of iterations
+        // continue fetching new images until we find non-duplicates (or reach the maximum number of iterations)
         while (nonDuplicateImages.isEmpty() && iterations < maxIterations) {
-            List<ImageDTO> newImageDTOs = fetchNewImages(10); // Fetch another batch of 5 images
+            List<ImageDTO> newImageDTOs = fetchNewImages(10); // fetch another 5 images
             Collections.shuffle(newImageDTOs);
             nonDuplicateImages = newImageDTOs.stream()
                     .filter(imageDTO -> !currentImageIds.contains(imageDTO.getId()))
-                    .limit(count) // Limit to the desired count
+                    .limit(count) // limit additional images
                     .collect(Collectors.toList());
 
             iterations++;
         }
 
-        // If nonDuplicateImages is still empty, throw an error
+        // if nonDuplicateImages is still empty, throw an error
         if (nonDuplicateImages.isEmpty()) {
             throw new IllegalStateException("Unable to find non-duplicate images after " + maxIterations + " iterations.");
         }
@@ -269,52 +269,47 @@ public class GameService {
 
     public List<ImageDTO> getGameImages(Long gameId) {
         try {
-            // Retrieve the game entity from the database
+            // retrieve the game entity (db)
             Game game = getGameById(gameId);
 
-            // Access the list of game-specific images from the game entity
+            // access the list of game-specific images from the game entity
             List<Image> gameImages = game.getGameImages();
 
-            // Convert Image objects to ImageDTO objects
+            // convert Image objects to ImageDTO objects
             List<ImageDTO> gameImageDTOs = gameImages.stream()
                     .map(image -> {
                         ImageDTO imageDTO = new ImageDTO();
                         imageDTO.setId(image.getId());
                         imageDTO.setUrl(image.getUrl());
-                        // Set other properties as needed
                         return imageDTO;
                     })
                     .collect(Collectors.toList());
 
             return gameImageDTOs;
         } catch (Exception e) {
-            // Handle the exception or rethrow it as needed
-            e.printStackTrace();
-
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error while fetching images for your game");
         }
     }
 
     public void saveGameImages(Long gameId, int count) {
         try {
-            // Retrieve the game entity from the database
+            // retrieve the game entity from (db)
             Game game = getGameById(gameId);
 
-            // Fetch new images from the UnsplashService
+            // fetch new images
             List<ImageDTO> newImageDTOs = fetchNewImages(count);
 
-            // Filter out duplicates and ensure enough unique images are fetched
+            // filter out duplicates and ensure enough unique images are fetched
             //List<ImageDTO> filteredNewImageDTOs = filterDuplicates(game, newImageDTOs, count);
 
-            // Create Image entities based on the filtered new ImageDTOs
+            // create Image entities based on the filtered new ImageDTOs
             List<Image> newImages = createImageEntities(newImageDTOs);
 
-            // Add the new images to the game's image list and save the game
+            // add the new images to the game's image list and save the game
             game.getGameImages().addAll(newImages);
             gameRepository.save(game);;
 
         } catch (Exception e) {
-            // Log the exception or handle it as needed
             logger.severe("Error while saving images for game: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while saving images for your game", e);
         }
@@ -322,22 +317,21 @@ public class GameService {
 
     public void replaceGameImages(Long gameId) {
         try {
-            // Retrieve the game entity from the database
+            // retrieve the game entity from (db)
             Game game = getGameById(gameId);
 
-            // Filter out duplicates
+            // filter out duplicates
             List<ImageDTO> filteredNewImageDTOs = filterDuplicates(game, 1);
 
-            // Create Image entities
+            // create Image entities
             List<Image> newImages = createImageEntities(filteredNewImageDTOs);
 
-            // Add the new images to the game's image list and save the game
+            // add the new images to the game's image list and save the game
             game.getGameImages().addAll(newImages);
             gameRepository.save(game);
             // return filteredNewImageDTOs;
 
         } catch (Exception e) {
-            // Log the exception or handle it as needed
             logger.severe("Error while replacing image for game: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while replacing image from your game", e);
         }
@@ -345,31 +339,31 @@ public class GameService {
 
     public void deleteGameImage(Long gameId, Long imageId) {
         try {
-            // Retrieve the game entity from the database
+            // retrieve the game entity from (db)
             Game game = getGameById(gameId);
 
-            // Check if image exists
+            // check if image exists
             checkIfImageExists(imageId);
 
-            // Delete the specific image chosen by the user from the database
+            // delete the specific image chosen by the user from the database
             // imageRepository.deleteById(imageId);
 
-            // Update the list of images of the game
+            // update the list of images of the game
             List<Image> currentImages = game.getGameImages();
 
             currentImages.removeIf(image -> image.getId().equals(imageId));
 
-            // Set the updated list of images to the game
+            // set the updated list of images to the game
             game.setGameImages(currentImages);
 
-            // Save the game entity to update the images
+            // save the game entity to update the images
             gameRepository.save(game);
             replaceGameImages(gameId);
-            // Fetch and add a new image to ensure the game always has at least one image
+
+            // fetch and add a new image to ensure the game always has at least one image
             //return replaceGameImages(gameId);
 
         } catch (Exception e) {
-            // Log the exception or handle it as needed
             logger.severe("Error while deleting image from game: " + e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while deleting image from your game", e);
         }
