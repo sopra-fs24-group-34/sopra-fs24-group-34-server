@@ -1,5 +1,5 @@
-package ch.uzh.ifi.hase.soprafs24.repository;
-
-public class PlayerRepositoryTest {
-    // smailalijagic: to be implemented
-}
+//package ch.uzh.ifi.hase.soprafs24.repository;
+//
+//public class PlayerRepositoryTest {
+//    // smailalijagic: to be implemented
+//}

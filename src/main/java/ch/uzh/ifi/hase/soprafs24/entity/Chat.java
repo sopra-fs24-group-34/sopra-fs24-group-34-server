@@ -65,11 +65,12 @@ public class Chat implements Serializable {
     return lastmessage;
   }
 
-  public static void main(String[] args) {
-    Chat chat = new Chat();
-    chat.addMessage("hello", 1L);
-    List<ChatTuple> messages = chat.getMessages();
-
-  }
+  // smailalijagic: just for testing, once chat works fine delete this
+//  public static void main(String[] args) {
+//    Chat chat = new Chat();
+//    chat.addMessage("hello", 1L);
+//    List<ChatTuple> messages = chat.getMessages();
+//
+//  }
 
 }
