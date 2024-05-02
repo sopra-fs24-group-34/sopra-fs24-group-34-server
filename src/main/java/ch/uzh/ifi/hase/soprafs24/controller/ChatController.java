@@ -44,7 +44,9 @@ public class ChatController {
     chatService.addMessage(chat, userid, gameid); // smailalijagic: add message and userid to chat that belongs to game with gameid XYZ
 
     // smailalijagic: trigger a Pusher event to notify clients about the new chat message
-    pusher.trigger("chat_channel", "new_message", chat.getLastmessage());
+    //pusher.trigger("chat_channel", "new_message", chat.getLastmessage());
+      String channel = "gameRound"+gameid;
+      pusher.trigger(channel, "new_message", chat.getLastmessage());
 
     return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat); // smailalijagic: return api representation of chat
 
