@@ -13,21 +13,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.pusher.rest.Pusher;
+//import com.pusher.rest.Pusher;
 
 @RestController
 public class LobbyController {
 
     private final LobbyService lobbyService;
-    private final Pusher pusher;
+    //private final Pusher pusher;
+    private final WebSocketHandler webSocketHandler;
 
-    LobbyController(LobbyService lobbyService, Pusher pusher) {
+    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler/*, Pusher pusher*/) {
         this.lobbyService = lobbyService;
-        this.pusher = pusher;
+        this.webSocketHandler = webSocketHandler;
+        //this.pusher = pusher;
     }
 
     @ExceptionHandler(Exception.class)
@@ -108,7 +111,9 @@ public class LobbyController {
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
 
             //nedim-j: adjust if needed
-            pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+            //pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+
+            webSocketHandler.handleLobbyJoin(lobby, user);
 
             //return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
             return lobby; // smailalijagic: return api representation
