@@ -23,7 +23,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // smailalijagic: Configuring message broker to enable broadcasting to "/topic"
-        registry.enableSimpleBroker("/topic", "/game", "/lobby", "/chat");
+        registry.enableSimpleBroker("/topic", "/game/10", "/lobby", "/chat");
         registry.setApplicationDestinationPrefixes("/app");
     }
 
