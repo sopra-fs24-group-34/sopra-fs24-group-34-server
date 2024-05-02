@@ -2,7 +2,9 @@ package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
+import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -20,10 +22,13 @@ public class ChatServiceWebSockets {
 
     private final GameRepository gameRepository;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public ChatServiceWebSockets(ChatRepository chatRepository, GameRepository gameRepository) {
+    public ChatServiceWebSockets(ChatRepository chatRepository, GameRepository gameRepository, UserRepository userRepository) {
         this.chatRepository = chatRepository;
         this.gameRepository = gameRepository;
+        this.userRepository = userRepository;
     }
 
     public MessageGetDTO addMessage(Chat chat, Long userId, Long gameId) {
@@ -35,12 +40,13 @@ public class ChatServiceWebSockets {
 
         // smailalijagic: final update
         String message = chat.getLastmessage();
-        //User user = userRepository.findUserById(gameid);
+
+        User user = userRepository.findUserById(gameId);
         //assert checkIfUserExists(user);
         if (message.length() > Chat.MAX_MESSAGE_LENGTH) {
             message = message.substring(0, Chat.MAX_MESSAGE_LENGTH); // smailalijagic: only return first 250 characters
         }
-        String myMessage = message; //user.getUsername() + ": " + message;
+        String myMessage = user.getUsername() + ": " + message;
         existingchat.addMessage(myMessage, userId);
 
         //chat.setLastmessage(message);
