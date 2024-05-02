@@ -36,7 +36,7 @@ public class ChatControllerWebSockets {
         Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
         MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userIdLong, gameIdLong);
-        String destination = "/topic/gameRound/" + gameIdLong; // smailalijagic: search chat in here
+        String destination = "/topic/game/" + gameIdLong + "/chat/" + chat.getId(); // smailalijagic: search chat in here
         messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: message is sent
     }
 
