@@ -23,12 +23,21 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // smailalijagic: Configuring message broker to enable broadcasting to "/topic"
-        registry.enableSimpleBroker("/topic", "/game/10", "/lobby", "/chat");
+        registry.enableSimpleBroker("/topic", "/games", "/lobbies", "/chat");
         registry.setApplicationDestinationPrefixes("/app");
     }
 
     public void addCorsMappings(CorsRegistry registry) {
-        //registry.addMapping("/websocket-demo").allowedOrigins("http://localhost:3000");
         registry.addMapping("/websocket-demo").allowedOrigins("http://localhost:3000").allowedMethods("*").allowCredentials(true);
     }
+
+    /*
+    //nedim-j: don't know if we can do this dynamically. "/lobbies" (above) seems to be enough though, pls verify
+    public void createLobbyRegistry (Long lobbyId) {
+        String lobbyEndpoint = "/lobbies/" + lobbyId;
+        MessageBrokerRegistry registry = new MessageBrokerRegistry();
+        registry.enableSimpleBroker(lobbyEndpoint);
+    }
+     */
+
 }

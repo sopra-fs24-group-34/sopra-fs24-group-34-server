@@ -8,29 +8,34 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketsConfig;
 import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-//import com.pusher.rest.Pusher;
 
 @RestController
 public class LobbyController {
 
     private final LobbyService lobbyService;
-    //private final Pusher pusher;
-    private final WebSocketHandler webSocketHandler;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketsConfig webSocketsConfig;
 
-    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler/*, Pusher pusher*/) {
+    LobbyController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate, WebSocketsConfig webSocketsConfig/*WebSocketHandler webSocketHandler*//*, Pusher pusher*/) {
         this.lobbyService = lobbyService;
-        this.webSocketHandler = webSocketHandler;
-        //this.pusher = pusher;
+        //this.webSocketHandler = webSocketHandler;
+        this.messagingTemplate = messagingTemplate;
+        this.webSocketsConfig = webSocketsConfig;
     }
 
     @ExceptionHandler(Exception.class)
@@ -73,7 +78,9 @@ public class LobbyController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public Long createlobby(@PathVariable("userId") Long userId) {
-        return lobbyService.createlobby(userId);
+        Long lobbyId = lobbyService.createlobby(userId);
+        //webSocketsConfig.configureMessageBrokerForLobby(lobbyId);
+        return lobbyId;
     }
 
     @PutMapping("/lobbies/settings/{lobbyId}")
@@ -102,6 +109,7 @@ public class LobbyController {
         // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
         Long lobbyId = Long.valueOf(id1);
         Long userId = Long.valueOf(id2);
+
         if (lobbyService.checkIfLobbyExists(lobbyId)) {
             Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
             if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
@@ -113,7 +121,13 @@ public class LobbyController {
             //nedim-j: adjust if needed
             //pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
 
-            webSocketHandler.handleLobbyJoin(lobby, user);
+            //nedim-j: websocket stuff. doesn't seem to add header properly though
+            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create();
+            headerAccessor.setHeader("event-type", "user-joined");
+            UserGetDTO payload = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+            String destination = "/lobbies/"+lobbyId;
+            System.out.println("DESTINATION: " + destination);
+            messagingTemplate.convertAndSend(destination, payload, headerAccessor.getMessageHeaders());
 
             //return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
             return lobby; // smailalijagic: return api representation
