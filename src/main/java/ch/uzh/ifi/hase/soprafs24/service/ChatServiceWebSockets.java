@@ -26,7 +26,7 @@ public class ChatServiceWebSockets {
         this.userRepository = userRepository;
     }
 
-    public MessageGetDTO addMessage(Chat chat, Long userId, Long gameId) {
+    public MessageGetDTO addMessage(String message, Long userId, Long gameId) {
         Game game = gameRepository.findByGameId(gameId);
         Chat existingchat = game.getChat();
         //if (game.getChat() != chat) {
@@ -34,7 +34,7 @@ public class ChatServiceWebSockets {
         //}
 
         // smailalijagic: final update
-        String message = chat.getLastmessage();
+        //String message = chat.getLastmessage();
 
         User user = userRepository.findUserById(gameId);
         //assert checkIfUserExists(user);
@@ -49,7 +49,7 @@ public class ChatServiceWebSockets {
         //chat = chatRepository.save(existingchat);
         //chatRepository.flush();
 
-        return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
+        return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(existingchat);
 
     }
 

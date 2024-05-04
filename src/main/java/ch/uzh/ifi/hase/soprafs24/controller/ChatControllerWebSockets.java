@@ -45,12 +45,12 @@ public class ChatControllerWebSockets {
 
     @MessageMapping("/sendMessage")
     public void addMessage(String message, Long gameId, Long userId) {
-        MessagePostDTO messagePostDTO = new MessagePostDTO();
-        messagePostDTO.setMessage(message);
+        //MessagePostDTO messagePostDTO = new MessagePostDTO();
+        //messagePostDTO.setMessage(message);
 
-        Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
+        //Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
-        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userId, gameId);
+        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
         String destination = "/game/" + gameId + "/chat"; // smailalijagic: search chat in here
         messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
     }
