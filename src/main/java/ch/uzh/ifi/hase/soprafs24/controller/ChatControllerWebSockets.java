@@ -7,11 +7,13 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatServiceWebSockets;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import com.google.gson.*;
 
 import java.util.List;
 
@@ -19,11 +21,14 @@ import java.util.List;
 public class ChatControllerWebSockets {
     private final ChatServiceWebSockets chatServiceWebSockets;
     private final SimpMessagingTemplate messagingTemplate;
+    private final Gson gson = new Gson();
+    private WebSocketHandler webSocketHandler;
 
     @Autowired
-    public ChatControllerWebSockets(ChatServiceWebSockets chatServiceWebSockets, SimpMessagingTemplate messagingTemplate) {
+    public ChatControllerWebSockets(ChatServiceWebSockets chatServiceWebSockets, SimpMessagingTemplate messagingTemplate, WebSocketHandler webSocketHandler) {
         this.chatServiceWebSockets = chatServiceWebSockets;
         this.messagingTemplate = messagingTemplate;
+        this.webSocketHandler = webSocketHandler;
     }
 
 //    @PostMapping("/game/{gameId}/chat/{userId}")
@@ -44,15 +49,29 @@ public class ChatControllerWebSockets {
 
 
     @MessageMapping("/sendMessage")
-    public void addMessage(String message, Long gameId, Long userId) {
-        //MessagePostDTO messagePostDTO = new MessagePostDTO();
-        //messagePostDTO.setMessage(message);
+    public void addMessage(String stringJsonRequest) {
+        try {
+            //nedim-j: search/create an own decorator for string parsing maybe
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(stringJsonRequest).getAsJsonObject();
+            System.out.println(stringJsonRequest);
+            String message = jsonObject.get("message").getAsString();
+            Long gameId = Long.parseLong(jsonObject.get("gameId").getAsString());
+            Long userId = Long.parseLong(jsonObject.get("userId").getAsString());
+
+            //MessagePostDTO messagePostDTO = new MessagePostDTO();
+            //messagePostDTO.setMessage(message);
 
         //Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
-        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
-        String destination = "/game/" + gameId + "/chat"; // smailalijagic: search chat in here
-        messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
+            MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
+
+            String destination = "/games/" + gameId + "/chat"; // smailalijagic: search chat in here
+            //messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
+            webSocketHandler.sendMessage(destination, "chat-message", messageGetDTO);
+        } catch(Exception e) {
+            System.out.println("Something went wrong with chat: "+e);
+        }
     }
 
     @GetMapping("/game/{gameId}/chat")

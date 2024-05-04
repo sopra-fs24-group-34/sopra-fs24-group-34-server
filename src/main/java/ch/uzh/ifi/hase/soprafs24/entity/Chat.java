@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+//@Entity
+//@Table(name = "CHAT")
 public class Chat implements Serializable {
 
   //@ElementCollection
@@ -12,7 +14,16 @@ public class Chat implements Serializable {
   //@Column(name = "MESSAGES")
   // private List<ChatTuple<String, Long>> messages;
 
+    //@Id
+    //@GeneratedValue
+    //private Long chatId;
+
+    //@OneToOne
+    //@JoinColumn(name = "game_id")
+    //private Game game;
+
   //@OneToMany(cascade = CascadeType.ALL)
+  //@JoinColumn(name = "chat_id")
   private List<ChatTuple> messages = new ArrayList<ChatTuple>(); // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
 
   //private List<String> messages;

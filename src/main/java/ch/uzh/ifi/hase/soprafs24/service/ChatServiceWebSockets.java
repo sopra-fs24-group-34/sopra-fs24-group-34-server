@@ -36,7 +36,7 @@ public class ChatServiceWebSockets {
         // smailalijagic: final update
         //String message = chat.getLastmessage();
 
-        User user = userRepository.findUserById(gameId);
+        User user = userRepository.findUserById(userId);
         //assert checkIfUserExists(user);
         if (message.length() > Chat.MAX_MESSAGE_LENGTH) {
             message = message.substring(0, Chat.MAX_MESSAGE_LENGTH); // smailalijagic: only return first 250 characters
@@ -46,8 +46,9 @@ public class ChatServiceWebSockets {
 
         //chat.setLastmessage(message);
 
-        //chat = chatRepository.save(existingchat);
-        //chatRepository.flush();
+        //game.setChat(existingchat);
+        //gameRepository.save(game);
+        //gameRepository.flush();
 
         return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(existingchat);
 

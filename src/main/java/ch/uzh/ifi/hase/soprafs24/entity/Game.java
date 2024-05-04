@@ -1,23 +1,32 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
+import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 
 @Entity
-public class Game {
+public class Game implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
     private Long gameId;
 
+    @Column(nullable = true)
     private Long maxguesses; // smailalijagic: handle guesses for each player in frontend
 
+    @Column(nullable = true)
     private Long creatorId; // smailalijagic: creator
 
+    @Column(nullable = true)
     private Long invitedplayerId; // smailalijagic: invited user
 
+    @Column(nullable = true)
     private Long guessingtime; // smailalijagic:
+
+    //@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+    private Chat chat = new Chat();
 
     @ManyToMany
     @JoinTable(
@@ -28,11 +37,11 @@ public class Game {
     private List<Image> gameImages; // images associated to a game
 
     //@OneToOne(cascade = CascadeType.ALL)
-    private Chat chat = new Chat();
-
     public Chat getChat() {
         return chat;
     }
+
+    public void setChat(Chat chat) { this.chat = chat; }
 
     public Long getGameId() {
         return gameId;
@@ -79,4 +88,5 @@ public class Game {
     }
 
     public void setGameImages(List<Image> gameImages) { this.gameImages = gameImages;}
+
 }
