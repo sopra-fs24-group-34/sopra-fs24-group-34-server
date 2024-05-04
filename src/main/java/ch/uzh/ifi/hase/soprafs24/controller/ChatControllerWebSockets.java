@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatServiceWebSockets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,19 +25,32 @@ public class ChatControllerWebSockets {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @PostMapping("/game/{gameId}/chat/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void addMessage(@RequestBody String message, @PathVariable("gameId") String gameId, @PathVariable("userId") String userId) {
-        Long gameIdLong = Long.valueOf(gameId);
-        Long userIdLong = Long.valueOf(userId);
+//    @PostMapping("/game/{gameId}/chat/{userId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public void addMessage(@RequestBody String message, @PathVariable("gameId") String gameId, @PathVariable("userId") String userId) {
+//        Long gameIdLong = Long.valueOf(gameId);
+//        Long userIdLong = Long.valueOf(userId);
+//
+//        MessagePostDTO messagePostDTO = new MessagePostDTO();
+//        messagePostDTO.setMessage(message);
+//
+//        Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
+//
+//        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userIdLong, gameIdLong);
+//        String destination = "/topic/game/" + gameIdLong + "/chat/" + chat.getId(); // smailalijagic: search chat in here
+//        messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: message is sent
+//    }
 
+
+    @MessageMapping("/sendMessage")
+    public void addMessage(String message, Long gameId, Long userId) {
         MessagePostDTO messagePostDTO = new MessagePostDTO();
         messagePostDTO.setMessage(message);
 
         Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
-        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userIdLong, gameIdLong);
-        String destination = "/topic/game/" + gameIdLong + "/chat/" + chat.getId(); // smailalijagic: search chat in here
+        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userId, gameId);
+        String destination = "/topic/game/" + gameId + "/chat/" + chat.getId(); // smailalijagic: search chat in here
         messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: message is sent
     }
 
