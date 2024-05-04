@@ -19,16 +19,16 @@ public class WebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/sendMessage")
-    public String sendMessage(String message) {
-        //String m = message.getMessage();
-        System.out.println("Received message from client: " + message);
-
-        String destination = "/game/10/receiveMessage";
-        messagingTemplate.convertAndSend(destination, message); // smailalijagic: message is sent
-
-        return "Message received: " + message;
-        //return message;
-    }
+//    @MessageMapping("/sendMessage")
+//    public String sendMessage(String message) {
+//        //String m = message.getMessage();
+//        System.out.println("Received message from client: " + message);
+//
+//        String destination = "/game/10/receiveMessage";
+//        messagingTemplate.convertAndSend(destination, message); // smailalijagic: message is sent
+//
+//        return "Message received: " + message;
+//        //return message;
+//    }
 
 }

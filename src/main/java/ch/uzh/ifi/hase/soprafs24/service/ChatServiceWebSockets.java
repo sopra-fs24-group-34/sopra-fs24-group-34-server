@@ -6,9 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
-import ch.uzh.ifi.hase.soprafs24.repository.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,15 +16,12 @@ import java.util.List;
 
 @Service
 public class ChatServiceWebSockets {
-    private final ChatRepository chatRepository;
-
     private final GameRepository gameRepository;
 
     private final UserRepository userRepository;
 
     @Autowired
-    public ChatServiceWebSockets(ChatRepository chatRepository, GameRepository gameRepository, UserRepository userRepository) {
-        this.chatRepository = chatRepository;
+    public ChatServiceWebSockets(GameRepository gameRepository, UserRepository userRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
     }
@@ -51,8 +46,8 @@ public class ChatServiceWebSockets {
 
         //chat.setLastmessage(message);
 
-        chat = chatRepository.save(existingchat);
-        chatRepository.flush();
+        //chat = chatRepository.save(existingchat);
+        //chatRepository.flush();
 
         return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
 
@@ -70,11 +65,11 @@ public class ChatServiceWebSockets {
         }
     }
 
-    public List<Chat> getAllChats() {
-        return chatRepository.findAll();
-    }
-
-    public Chat getChat(Long chatid) {
-        return this.chatRepository.findChatById(chatid);
-    }
+//    public List<Chat> getAllChats() {
+//        return chatRepository.findAll();
+//    }
+//
+//    public Chat getChat(Long chatid) {
+//        return this.chatRepository.findChatById(chatid);
+//    }
 }

@@ -50,8 +50,8 @@ public class ChatControllerWebSockets {
         Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
         MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userId, gameId);
-        String destination = "/topic/game/" + gameId + "/chat/" + chat.getId(); // smailalijagic: search chat in here
-        messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: message is sent
+        String destination = "/game/" + gameId + "/chat"; // smailalijagic: search chat in here
+        messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
     }
 
     @GetMapping("/game/{gameId}/chat")
@@ -69,16 +69,16 @@ public class ChatControllerWebSockets {
     }
 
 
-    @GetMapping("/chats")
-    public List<Chat> getAllChats() {
-        return chatServiceWebSockets.getAllChats();
-    }
-
-    @GetMapping("chats/{chatId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public Chat getChat(@PathVariable("chatId") String id) {
-        Long chatid = Long.valueOf(id);
-        return chatServiceWebSockets.getChat(chatid);
-    }
+//    @GetMapping("/chats")
+//    public List<Chat> getAllChats() {
+//        return chatServiceWebSockets.getAllChats();
+//    }
+//
+//    @GetMapping("chats/{chatId}")
+//    @ResponseStatus(HttpStatus.OK)
+//    @ResponseBody
+//    public Chat getChat(@PathVariable("chatId") String id) {
+//        Long chatid = Long.valueOf(id);
+//        return chatServiceWebSockets.getChat(chatid);
+//    }
 }

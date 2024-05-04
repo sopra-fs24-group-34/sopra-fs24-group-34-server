@@ -65,7 +65,7 @@ public interface DTOMapper {
     // source = MessagePostDTO, target = Chat
 
     //@Mapping(source = "id", target = "id")
-    @Mapping(source = "messages", target = "message")
+    @Mapping(source = "lastmessage", target = "message")
     MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
     // source = Chat, target = MessageGetDTO
 

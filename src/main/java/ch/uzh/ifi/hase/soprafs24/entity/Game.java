@@ -27,7 +27,7 @@ public class Game {
     )
     private List<Image> gameImages; // images associated to a game
 
-    @OneToOne(cascade = CascadeType.ALL)
+    //@OneToOne(cascade = CascadeType.ALL)
     private Chat chat = new Chat();
 
     public Chat getChat() {
