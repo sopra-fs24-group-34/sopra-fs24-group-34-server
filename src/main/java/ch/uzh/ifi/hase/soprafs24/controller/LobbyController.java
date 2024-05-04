@@ -8,7 +8,6 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketsConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.bytebuddy.asm.Advice;
@@ -30,15 +29,12 @@ import java.util.UUID;
 public class LobbyController {
 
     private final LobbyService lobbyService;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final WebSocketsConfig webSocketsConfig;
-    private final Gson gson = new Gson();
+    private final WebSocketHandler webSocketHandler;
 
-    LobbyController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate, WebSocketsConfig webSocketsConfig/*WebSocketHandler webSocketHandler*//*, Pusher pusher*/) {
+    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler) {
         this.lobbyService = lobbyService;
-        //this.webSocketHandler = webSocketHandler;
-        this.messagingTemplate = messagingTemplate;
-        this.webSocketsConfig = webSocketsConfig;
+
+        this.webSocketHandler = webSocketHandler;
     }
 
     @ExceptionHandler(Exception.class)
@@ -121,38 +117,9 @@ public class LobbyController {
             User user = lobbyService.getUser(userId); // smailalijagic: get user
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
 
-            //nedim-j: websocket stuff
             UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
-            JsonObject messageJson = new JsonObject();
-            messageJson.addProperty("event-type", "user-joined");
-            messageJson.add("data", gson.toJsonTree(u));
-            String message = gson.toJson(messageJson);
-
-            String destination = "/lobbies/"+lobbyId;
-
-            messagingTemplate.convertAndSend(destination, message);
-
-            //nedim-j: can't get custom headers to work
-            /*
-            SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create();
-            headerAccessor.setHeader("event-type", "user-joined");
-            System.out.println("Header: " + headerAccessor.getMessageHeaders());
-
-            //messagingTemplate.convertAndSend(destination, payload, headerAccessor.getMessageHeaders());
-            try {
-                String payloadJson = objectMapper.writeValueAsString(payload);
-
-                Message<byte[]> message = MessageBuilder
-                        .withPayload(payloadJson.getBytes())
-                        .setHeaders(headerAccessor)
-                        .build();
-
-                messagingTemplate.send(destination, message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            */
+            webSocketHandler.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
 
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
