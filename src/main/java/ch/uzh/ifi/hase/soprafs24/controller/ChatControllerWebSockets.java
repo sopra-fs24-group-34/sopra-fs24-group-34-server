@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
+import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
@@ -57,15 +58,13 @@ public class ChatControllerWebSockets {
     @GetMapping("/game/{gameId}/chat")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public MessageGetDTO getAllMessages(@PathVariable("gameId") String id) {
-        // smailalijagic: get gameId
-        Long gameid = Long.valueOf(id); // smailalijagic: added
+    public List<ChatTuple> getAllMessages(@PathVariable("gameId") Long gameId) {
         // smailalijagic: get Game --> get chat
-        Game game = chatServiceWebSockets.getGameByGameId(gameid);
+        Game game = chatServiceWebSockets.getGameByGameId(gameId);
         // smailalijagic: get Chat
         Chat chat = game.getChat();
-        // smailalijagic: return api repr of chat
-        return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
+        // smailalijagic: return all messages
+        return chat.getMessages();
     }
 
 
