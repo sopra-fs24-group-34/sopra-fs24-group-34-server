@@ -6,10 +6,11 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
-import com.pusher.rest.Pusher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,13 @@ import java.util.List;
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
-  private final Pusher pusher;
+  private final WebSocketHandler webSocketHandler;
 
   @Autowired
-  GameController(GameService gameService, GameUserService gameUserService, Pusher pusher) {
+  GameController(GameService gameService, GameUserService gameUserService, WebSocketHandler webSocketHandler) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
-    this.pusher = pusher;
+    this.webSocketHandler = webSocketHandler;
   }
 
   @GetMapping("/games")
@@ -56,7 +57,7 @@ public class GameController {
     //nedim-j: made new game to return in pusher, feel free to adjust
     Game createdGame = gameService.creategame(lobbyid, game);
 
-    pusher.trigger("lobby-events", "game-started", createdGame);
+    webSocketHandler.sendMessage("/lobbies/"+lobbyid, "game-started", createdGame);
 
     return createdGame;
   }
@@ -89,8 +90,7 @@ public class GameController {
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
-    String channelName = "gameRound"+guess.getGameId();
-    pusher.trigger(channelName, "round-update", response);
+    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
 
     /*
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
@@ -118,9 +118,7 @@ public class GameController {
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.guesssimage(guess);
 
-    String channelName = "gameRound"+guess.getGameId();
-    //String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId() + " and it was " + m;
-    pusher.trigger(channelName, "round-update", response);
+    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
     return response;
   }
 
