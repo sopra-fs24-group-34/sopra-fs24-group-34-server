@@ -9,6 +9,8 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketsConfig;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import net.bytebuddy.asm.Advice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class LobbyController {
     private final LobbyService lobbyService;
     private final SimpMessagingTemplate messagingTemplate;
     private final WebSocketsConfig webSocketsConfig;
+    private final Gson gson = new Gson();
 
     LobbyController(LobbyService lobbyService, SimpMessagingTemplate messagingTemplate, WebSocketsConfig webSocketsConfig/*WebSocketHandler webSocketHandler*//*, Pusher pusher*/) {
         this.lobbyService = lobbyService;
@@ -104,7 +107,7 @@ public class LobbyController {
     @PutMapping("lobbies/join/{lobbyId}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Lobby joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+    public void joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
         // smailalijagic: update lobby for guest
         // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
         Long lobbyId = Long.valueOf(id1);
@@ -118,20 +121,38 @@ public class LobbyController {
             User user = lobbyService.getUser(userId); // smailalijagic: get user
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
 
-            //nedim-j: adjust if needed
-            //pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+            //nedim-j: websocket stuff
+            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
-            //nedim-j: websocket stuff. doesn't seem to add header properly though
+            JsonObject messageJson = new JsonObject();
+            messageJson.addProperty("event-type", "user-joined");
+            messageJson.add("data", gson.toJsonTree(u));
+            String message = gson.toJson(messageJson);
+
+            String destination = "/lobbies/"+lobbyId;
+
+            messagingTemplate.convertAndSend(destination, message);
+
+            //nedim-j: can't get custom headers to work
+            /*
             SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create();
             headerAccessor.setHeader("event-type", "user-joined");
-            UserGetDTO payload = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-            String destination = "/lobbies/"+lobbyId;
-            System.out.println("DESTINATION: " + destination);
-            messagingTemplate.convertAndSend(destination, payload, headerAccessor.getMessageHeaders());
+            System.out.println("Header: " + headerAccessor.getMessageHeaders());
 
-            //return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
-            return lobby; // smailalijagic: return api representation
-            // smailalijagic: load lobby screen
+            //messagingTemplate.convertAndSend(destination, payload, headerAccessor.getMessageHeaders());
+            try {
+                String payloadJson = objectMapper.writeValueAsString(payload);
+
+                Message<byte[]> message = MessageBuilder
+                        .withPayload(payloadJson.getBytes())
+                        .setHeaders(headerAccessor)
+                        .build();
+
+                messagingTemplate.send(destination, message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            */
 
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
