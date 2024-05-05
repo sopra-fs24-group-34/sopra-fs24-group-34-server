@@ -5,21 +5,25 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "CHAT")
+//@Entity
+//@Table(name = "CHAT")
 public class Chat implements Serializable {
-  private static final long serialVersionUID = 1L;
-
-  @Id
-  @GeneratedValue //(strategy = GenerationType.IDENTITY)
-  private Long id;
 
   //@ElementCollection
   //@CollectionTable(name = "MESSAGES", joinColumns = @JoinColumn(name = "chat_id"))
   //@Column(name = "MESSAGES")
   // private List<ChatTuple<String, Long>> messages;
 
-  @OneToMany(cascade = CascadeType.ALL)
+    //@Id
+    //@GeneratedValue
+    //private Long chatId;
+
+    //@OneToOne
+    //@JoinColumn(name = "game_id")
+    //private Game game;
+
+  //@OneToMany(cascade = CascadeType.ALL)
+  //@JoinColumn(name = "chat_id")
   private List<ChatTuple> messages = new ArrayList<ChatTuple>(); // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
 
   //private List<String> messages;
@@ -49,14 +53,6 @@ public class Chat implements Serializable {
     return messages; // smailalijagic: getting message from DB/repository (=reading message)
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
   public void setLastmessage(String lastmessage) {
     this.lastmessage = lastmessage;
   }
@@ -65,11 +61,12 @@ public class Chat implements Serializable {
     return lastmessage;
   }
 
-  public static void main(String[] args) {
-    Chat chat = new Chat();
-    chat.addMessage("hello", 1L);
-    List<ChatTuple> messages = chat.getMessages();
-
-  }
+  // smailalijagic: just for testing, once chat works fine delete this
+//  public static void main(String[] args) {
+//    Chat chat = new Chat();
+//    chat.addMessage("hello", 1L);
+//    List<ChatTuple> messages = chat.getMessages();
+//
+//  }
 
 }

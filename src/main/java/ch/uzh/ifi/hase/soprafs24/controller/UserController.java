@@ -108,9 +108,15 @@ public class UserController {
   @DeleteMapping("guestuser/{guestuserId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
-  public void deleteGuestUser(@PathVariable("guestuserId") String id) {
-    Long guestuserId = Long.valueOf(id);
-    userService.deleteGuestUser(guestuserId);
+  public void deleteGuestUser(@PathVariable("guestuserId") Long guestuserId) {
+    userService.deleteUser(guestuserId);
   }
+
+  @DeleteMapping("user/{userId}/delete")
+  @ResponseStatus(HttpStatus.OK)
+  public void deleteUser(@PathVariable("userId") Long userId) {
+    userService.deleteUser(userId);
+  }
+
 
 }
