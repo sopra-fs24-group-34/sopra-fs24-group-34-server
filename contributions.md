@@ -52,14 +52,14 @@
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
 | 03.05.2024 | Smail Alijagic | [#105](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/105), [#107](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/107) | added possibility to delete users and guestusers |
-| 29.04.2024 | Dario Giuliani | [#142](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/142), [] ()| Replacement of unsuited images works both in front- and backend now. Bug fixing in game-image relation and image handling backend. |
+| 01.05.2024 | Dario Giuliani | [#142](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/142), [#61] (https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/61)| Replacement of unsuited images works both in front- and backend now. Bug fixing in game-image relation and image handling backend. User can now choose a profile picture, when editing his profile.  |
 | 26.04.2024 | Liam Kontopulos | [#7](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/7), [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135), [#8](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/8) | Issues closed before M3 hand-in |
 | 02.04.2024 | Nedim Jukic | [#48](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/48), [#64](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/64), [#65](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/65), [#84](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/84) | |
 | 02.04.2024 | Till Sollberger | | |
 
 
 
-## <font style="color: #00d7ff">Week 5 *(24.04 – 26.04)*</font>
+## <font style="color: #00d7ff">Week 5 *(02.05 – 09.05)*</font>
 
 | Date | Name | Links to Github Issues | Comments |
 |---|---|---|---|
