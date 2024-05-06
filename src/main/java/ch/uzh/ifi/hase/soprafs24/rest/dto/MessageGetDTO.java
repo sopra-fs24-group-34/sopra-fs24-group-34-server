@@ -8,7 +8,7 @@ public class MessageGetDTO {
   // smailalijagic: receiving messages
   //private Long id;
 
-  private List<ChatTuple> messages; // smailalijagic: server --> client: sending List<String>
+  private String message; // smailalijagic: server --> client: sending List<String>
 
 //  public MessageGetDTO(List<String> messages) {
 //    this.messages = messages;
@@ -22,12 +22,12 @@ public class MessageGetDTO {
   //  this.id = id;
   //}
 
-  public List<ChatTuple> getMessage() {
-    return messages;
+  public String getMessage() {
+    return message;
   }
 
-  public void setMessage(List<ChatTuple> messages) {
-    this.messages = messages;
+  public void setMessage(String message) {
+    this.message = message;
   }
 
 }
