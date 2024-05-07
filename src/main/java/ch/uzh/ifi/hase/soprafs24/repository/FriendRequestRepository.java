@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
     FriendRequest findByFriendRequestId(Long friendRequestId);
+
+    FriendRequest findBySenderIdAndReceiverId(Long senderId, Long receiverId);
 }
