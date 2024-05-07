@@ -53,6 +53,17 @@ public class UserService {
     }
   }
 
+  public User getUserByUsername(String username) {
+    try {
+      if (this.userRepository.findByUsername(username) == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
+      }
+      return this.userRepository.findByUsername(username);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
+    }
+  }
+
   public AuthenticationResponseDTO createUser(User newUser) {
     checkIfUserExists(newUser);
     if (newUser.getUsername() == null || newUser.getPassword() == null) {
@@ -133,7 +144,7 @@ public class UserService {
     if (!Objects.equals(updatedUser.getPassword(), "")) {
       exsistingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
     }
-    exsistingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
+    exsistingUser.setFriendsList(updatedUser.getFriendsList()); // smailalijagic: update friendlist
     exsistingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
     exsistingUser.setUsericon(updatedUser.getUsericon()); // smailalijagic: update usericon
 
