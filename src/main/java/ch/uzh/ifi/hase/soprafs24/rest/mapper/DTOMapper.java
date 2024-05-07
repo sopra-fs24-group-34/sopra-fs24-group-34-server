@@ -122,10 +122,10 @@ public interface DTOMapper {
     FriendRequest convertFriendRequestPostDTOtoEntity(FriendRequestPostDTO friendRequestPostDTO);
 
     @Mapping(source = "senderId", target = "senderId")
-    @Mapping(source = "receiverd", target = "receiverId")
+    @Mapping(source = "receiverId", target = "receiverId")
     FriendRequest convertFriendRequestPutDTOtoEntity(FriendRequestPutDTO friendRequestPutDTO);
 
-    @Mapping(source = "userId", target = "friendId")
+    @Mapping(source = "id", target = "friendId")
     @Mapping(source = "username", target = "friendUsername")
     @Mapping(source = "usericon", target = "friendIcon")
     FriendGetDTO convertEntityToFriendGetDTO(User friend);
