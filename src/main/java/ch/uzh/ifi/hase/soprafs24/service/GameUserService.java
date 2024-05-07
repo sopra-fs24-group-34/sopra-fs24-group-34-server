@@ -72,6 +72,12 @@ public class GameUserService {
       playerRepository.save(player);
       playerRepository.flush();
   }
+  public void saveuserchanges(User user){
+      userrepository.save(user);
+      userrepository.flush();
+  }
+
+
 
     public Boolean checkStrikes(Long playerid) {
       //nedim-j: returns true, if player has less than max strikes and can play on

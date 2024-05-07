@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
@@ -88,6 +89,13 @@ public class GameService {
     Player player2 = new Player();
     User inviteduser = gameUserService.getUser(game.getInvitedPlayerId());
     player2.setUser(inviteduser);
+
+    // till: change userStatus
+    user.setStatus(UserStatus.PLAYING);
+    inviteduser.setStatus(UserStatus.PLAYING);
+    gameUserService.saveuserchanges(user);
+    gameUserService.saveuserchanges(inviteduser);
+
 
     // till: Save the changes
     gameUserService.saveplayerchanges(player1);
@@ -179,6 +187,11 @@ public class GameService {
       // increase the games played
       gameUserService.increaseGamesPlayed(game.getCreatorId());
       gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
+
+      user.setStatus(UserStatus.ONLINE);  // till: probably needs to be changed when players go back to the lobby
+      invitedUser.setStatus(UserStatus.ONLINE);
+      gameUserService.saveuserchanges(user); // saves Status change
+      gameUserService.saveuserchanges(invitedUser);
 
       //delete the game
       gameRepository.delete(game);
