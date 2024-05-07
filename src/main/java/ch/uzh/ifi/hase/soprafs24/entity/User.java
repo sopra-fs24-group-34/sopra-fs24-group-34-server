@@ -1,14 +1,12 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import org.hibernate.mapping.Array;
-import org.mapstruct.Mapping;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Internal User Representation
@@ -42,11 +40,27 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
-  @Column(nullable = true)
+  @Column()
   private String usericon; // smailalijagic: added --> String datatype correct?
 
-  @ManyToMany(cascade = CascadeType.ALL) // smailalijagic: user can have many friends and be friends with many
-  private List<User> userfriendlist; // smailalijagic: userfriendlist contains Users
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(
+          name = "friendRequests",
+          joinColumns = @JoinColumn(name = "userId"),
+          inverseJoinColumns = @JoinColumn(name = "friendId")
+    )
+    // smailalijagic: user can have many friends and be friends with manyp
+  private Set<FriendRequest> friendRequests = new HashSet<>(); // smailalijagic: userfriendlist contains Users
+
+
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(
+          name = "friends",
+          joinColumns = @JoinColumn(name = "userId"),
+          inverseJoinColumns = @JoinColumn(name = "friendId")
+  )
+  // smailalijagic: user can have many friends and be friends with many
+  private Set<User> friendsList = new HashSet<>(); // smailalijagic: userfriendlist contains Users
 
   @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
   private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
@@ -105,12 +119,20 @@ public class User implements Serializable {
     this.usericon = usericon;
   }
 
-  public List<User> getUserfriendlist() {
-    return userfriendlist;
+  public Set<User> getFriendsList() {
+    return friendsList;
   }
 
-  public void setUserfriendlist(List<User> userfriendlist) {
-    this.userfriendlist = userfriendlist;
+  public void setFriendsList(Set<User> FriendsList) {
+    this.friendsList = FriendsList;
+  }
+
+  public void addFriend(User friend) {
+    this.friendsList.add(friend);
+  }
+
+  public void removeFriend(User friend) {
+    this.friendsList.remove(friend);
   }
 
   public List<Lobby> getUsergamelobbylist() {
@@ -137,4 +159,15 @@ public class User implements Serializable {
     this.totalwins = totalwins;
   }
 
+  public void addFriendRequest(FriendRequest friendRequest) {
+      this.friendRequests.add(friendRequest);
+  }
+
+  public Set<FriendRequest> getFriendRequests() {
+      return friendRequests;
+  }
+
+  public void setFriendRequests(Set<FriendRequest> pendingFriendRequests) {
+      this.friendRequests = pendingFriendRequests;
+  }
 }
