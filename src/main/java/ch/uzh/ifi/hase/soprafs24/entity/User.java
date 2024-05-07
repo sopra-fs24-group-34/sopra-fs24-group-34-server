@@ -1,13 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import org.hibernate.mapping.Array;
-import org.mapstruct.Mapping;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +39,7 @@ public class User implements Serializable {
   private UserStatus status;
 
   @Column(nullable = true)
-  private String usericon; // smailalijagic: added --> String datatype correct?
+  private String profilePicture;
 
   @ManyToMany(cascade = CascadeType.ALL) // smailalijagic: user can have many friends and be friends with many
   private List<User> userfriendlist; // smailalijagic: userfriendlist contains Users
@@ -97,12 +93,12 @@ public class User implements Serializable {
     this.status = status;
   }
 
-  public String getUsericon() {
-    return usericon;
+  public String getProfilePicture() {
+    return profilePicture;
   }
 
-  public void setUsericon(String usericon) {
-    this.usericon = usericon;
+  public void setProfilePicture(String profilepicture) {
+    this.profilePicture = profilepicture;
   }
 
   public List<User> getUserfriendlist() {
