@@ -34,7 +34,7 @@ public interface DTOMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
     @Mapping(source = "usericon", target = "usericon")
-    @Mapping(source = "userfriendlist", target = "userfriendlist")
+    @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
@@ -46,7 +46,7 @@ public interface DTOMapper {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
     @Mapping(source = "usericon", target = "usericon")
-    @Mapping(source = "userfriendlist", target = "userfriendlist")
+    @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
@@ -117,4 +117,16 @@ public interface DTOMapper {
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 
+    @Mapping(source = "senderId", target = "senderId")
+    @Mapping(source = "receiverUserName", target = "receiverUserName")
+    FriendRequest convertFriendRequestPostDTOtoEntity(FriendRequestPostDTO friendRequestPostDTO);
+
+    @Mapping(source = "senderId", target = "senderId")
+    @Mapping(source = "receiverd", target = "receiverId")
+    FriendRequest convertFriendRequestPutDTOtoEntity(FriendRequestPutDTO friendRequestPutDTO);
+
+    @Mapping(source = "userId", target = "friendId")
+    @Mapping(source = "username", target = "friendUsername")
+    @Mapping(source = "usericon", target = "friendIcon")
+    FriendGetDTO convertEntityToFriendGetDTO(User friend);
 }
