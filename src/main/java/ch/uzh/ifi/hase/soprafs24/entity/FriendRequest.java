@@ -16,11 +16,14 @@ public class FriendRequest implements Serializable {
     @Column(nullable = false)
     private Long senderId;
 
+    @Column
+    private String senderUserName;
+
     @Column(nullable = false)
     private Long receiverId;
 
-    @Column(nullable = false)
-    private FriendShipStatus friendShipStatus;
+    @Column
+    private String receiverUserName;
 
     public Long getFriendRequestId() {
         return friendRequestId;
@@ -46,11 +49,19 @@ public class FriendRequest implements Serializable {
         this.receiverId = receiverId;
     }
 
-    public FriendShipStatus getFriendShipStatus() {
-        return friendShipStatus;
+    public String getSenderUserName() {
+        return senderUserName;
     }
 
-    public void setFriendShipStatus(FriendShipStatus friendShipStatus) {
-        this.friendShipStatus = friendShipStatus;
+    public void setSenderUserName(String senderUserName) {
+        this.senderUserName = senderUserName;
+    }
+
+    public String getReceiverUserName() {
+        return receiverUserName;
+    }
+
+    public void setReceiverUserName(String receiverUserName) {
+        this.receiverUserName = receiverUserName;
     }
 }
