@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 public class UserGetDTO {
   // smailalijagic: all updatable data
@@ -20,7 +21,7 @@ public class UserGetDTO {
 
   private Long id;
 
-  private List<User> userfriendlist; // smailalijagic: adding and removing friends from friendlist
+  private Set<User> friendsList; // smailalijagic: adding and removing friends from friendlist
 
   private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
 
@@ -76,12 +77,12 @@ public class UserGetDTO {
     this.status = status;
   }
 
-  public List<User> getUserfriendlist() {
-    return userfriendlist;
+  public Set<User> getFriendsList() {
+    return friendsList;
   }
 
-  public void setUserfriendlist(List<User> userfriendlist) {
-    this.userfriendlist = userfriendlist;
+  public void setFriendsList(Set<User> userfriendlist) {
+    this.friendsList = userfriendlist;
   }
 
   public List<Lobby> getUsergamelobbylist() {
