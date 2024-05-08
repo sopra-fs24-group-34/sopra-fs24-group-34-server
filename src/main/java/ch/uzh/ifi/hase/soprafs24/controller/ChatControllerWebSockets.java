@@ -54,7 +54,7 @@ public class ChatControllerWebSockets {
             //nedim-j: search/create an own decorator for string parsing maybe
             JsonParser parser = new JsonParser();
             JsonObject jsonObject = parser.parse(stringJsonRequest).getAsJsonObject();
-            System.out.println(stringJsonRequest);
+
             String message = jsonObject.get("message").getAsString();
             Long gameId = Long.parseLong(jsonObject.get("gameId").getAsString());
             Long userId = Long.parseLong(jsonObject.get("userId").getAsString());

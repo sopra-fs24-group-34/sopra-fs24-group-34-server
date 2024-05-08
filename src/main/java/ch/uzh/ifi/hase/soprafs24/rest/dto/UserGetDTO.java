@@ -14,7 +14,7 @@ public class UserGetDTO {
 
   private UserStatus status;
 
-  private String usericon; // smailalijagic: check this again --> String correct datatype?
+  private String profilePicture;
 
   private String token;
 
@@ -44,12 +44,12 @@ public class UserGetDTO {
     this.username = username;
   }
 
-  public String getUsericon() {
-    return usericon;
+  public String getProfilePicture() {
+    return profilePicture;
   }
 
-  public void setUsericon(String usericon) {
-    this.usericon = usericon;
+  public void setProfilePicture(String profilePicture) {
+    this.profilePicture = profilePicture;
   }
 
   public String getToken() {

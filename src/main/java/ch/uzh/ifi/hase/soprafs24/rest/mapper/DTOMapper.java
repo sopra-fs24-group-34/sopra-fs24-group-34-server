@@ -33,7 +33,7 @@ public interface DTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "userfriendlist", target = "userfriendlist")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
@@ -45,7 +45,7 @@ public interface DTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "userfriendlist", target = "userfriendlist")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
@@ -56,6 +56,7 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "token", target = "token")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
 
 
