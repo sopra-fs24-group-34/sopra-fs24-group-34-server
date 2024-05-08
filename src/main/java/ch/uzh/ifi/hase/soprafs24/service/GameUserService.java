@@ -186,6 +186,14 @@ public class GameUserService {
 
   }
 
+  public GameHistory createGameHistory(User user) {
+        GameHistory gameHistory = new GameHistory();
+        gameHistory.setTotalgamesplayed(user.getTotalplayed());
+        gameHistory.setTotalwins(user.getTotalwins());
+        gameHistory.setWinPercentage(user.getTotalwins()/user.getTotalplayed());
+        return gameHistory;
+  }
+
     //
     // check Functions
     //
@@ -217,4 +225,6 @@ public class GameUserService {
         // check if the player is in the game players list, returns true when in game and false when not
         return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
     }
+
+
 }

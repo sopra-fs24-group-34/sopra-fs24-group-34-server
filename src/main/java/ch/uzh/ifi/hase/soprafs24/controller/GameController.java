@@ -155,4 +155,13 @@ public class GameController {
       gameService.deleteGameImage(gameId, imageId);
     }
 
+    @GetMapping("/games/{gameId}/history/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameHistory getGameHistory(@PathVariable Long gameId, Long userId){
+      return gameService.getGameHistory(gameId, userId);
+
+    }
+
+
 }

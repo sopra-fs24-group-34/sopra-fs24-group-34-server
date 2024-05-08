@@ -197,7 +197,13 @@ public class GameService {
       gameRepository.delete(game);
   }
 
-
+    public GameHistory getGameHistory(Long gameId, Long userId) {
+        Game game = gameRepository.findByGameId(gameId);
+        assert(game.getCreatorId() == userId || game.getInvitedPlayerId() == userId);
+        User user = gameUserService.getUser(userId);
+        GameHistory userGameHistory = gameUserService.createGameHistory(user);
+        return userGameHistory;
+    }
 
 
   public Boolean checkIfGameExists(Long gameId) {
@@ -221,6 +227,8 @@ public class GameService {
       return false;
     }
   }
+
+
 
     public class ImageNotFoundException extends Exception {
     public ImageNotFoundException(String message) {
