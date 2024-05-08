@@ -118,4 +118,9 @@ public interface DTOMapper {
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "id", target = "id")
+    User covertUserDeleteDTOtoEntity(UserDeleteDTO userDeleteDTO);
+    // smailalijagic: source = UserDeleteDTO, target = User
+
 }

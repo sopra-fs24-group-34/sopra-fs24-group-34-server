@@ -147,7 +147,17 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        this.userRepository.deleteById(id);
+        User user = userRepository.findUserById(id);
+        String username = user.getUsername().toUpperCase();
+        // smailalijagic: guest user?
+        if (username.startsWith("GUEST") && user.getStatus().equals(UserStatus.OFFLINE)) {
+            this.userRepository.deleteById(id); // smailallijagic: guest can only be deleted if offline --> automatic deletion
+        } else {
+            // smailalijagic: user
+            if (user.getStatus().equals(UserStatus.ONLINE)) {
+                this.userRepository.deleteById(id); // smailalijagic: user can only be deleted if online
+            }
+        }
     }
 
 }

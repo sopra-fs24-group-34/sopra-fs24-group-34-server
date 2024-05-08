@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -113,8 +110,12 @@ public class UserController {
   }
 
   @DeleteMapping("user/{userId}/delete")
-  @ResponseStatus(HttpStatus.OK)
-  public void deleteUser(@PathVariable("userId") Long userId) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteUser(@PathVariable("userId") Long userId, @RequestBody UserDeleteDTO userDeleteDTO) {
+    User user = DTOMapper.INSTANCE.covertUserDeleteDTOtoEntity(userDeleteDTO);
+    if (!user.getId().equals(userId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not possible to delete different users");
+    }
     userService.deleteUser(userId);
   }
 
