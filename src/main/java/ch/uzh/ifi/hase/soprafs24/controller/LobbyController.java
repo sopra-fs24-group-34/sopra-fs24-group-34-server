@@ -1,14 +1,17 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import com.google.gson.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
@@ -21,10 +24,12 @@ public class LobbyController {
 
     private final LobbyService lobbyService;
     private final WebSocketHandler webSocketHandler;
+    private final GameUserService gameUserService;
 
-    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler) {
+    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler, GameUserService gameUserService) {
         this.lobbyService = lobbyService;
         this.webSocketHandler = webSocketHandler;
+        this.gameUserService = gameUserService;
     }
 
     @ExceptionHandler(Exception.class)
@@ -67,7 +72,7 @@ public class LobbyController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public Long createlobby(@PathVariable("userId") Long userId) {
-        Long lobbyId = lobbyService.createlobby(userId);
+        Long lobbyId = lobbyService.createLobby(userId);
         //webSocketsConfig.configureMessageBrokerForLobby(lobbyId);
         return lobbyId;
     }
@@ -106,6 +111,8 @@ public class LobbyController {
             }
             User user = lobbyService.getUser(userId); // smailalijagic: get user
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+            user.setStatus(UserStatus.INLOBBY_PREPARING);
+            gameUserService.saveUserChanges(user);
 
             UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
@@ -116,6 +123,28 @@ public class LobbyController {
         }
     }
 
+    @MessageMapping("/updateReadyStatus")
+    public void addMessage(String stringJsonRequest) {
+        try {
+            //nedim-j: search/create an own decorator for string parsing maybe
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(stringJsonRequest).getAsJsonObject();
+
+            String readyStatus = jsonObject.get("readyStatus").getAsString();
+            Long lobbyId = Long.parseLong(jsonObject.get("lobbyId").getAsString());
+            Long userId = Long.parseLong(jsonObject.get("userId").getAsString());
+
+            //System.out.println("Request translated: " + readyStatus + " " + lobbyId + " " + userId);
+
+            UserGetDTO userGetDTO = lobbyService.updateReadyStatus(userId, readyStatus);
+
+            String destination = "/lobbies/" + lobbyId;
+
+            webSocketHandler.sendMessage(destination, "user-statusUpdate", userGetDTO);
+        } catch(Exception e) {
+            System.out.println("Something went wrong with ready status: "+e);
+        }
+    }
 
     /*
     @DeleteMapping("/lobbies/{lobbyId}/start")

@@ -5,9 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -171,7 +168,7 @@ public class LobbyServiceTest {
         when(lobbyRepository.save(Mockito.any(Lobby.class))).thenReturn(lobby);
         when(userRepository.findUserById(Mockito.anyLong())).thenReturn(user);
 
-        Long lobby_id = lobbyService.createlobby(user.getId());
+        Long lobby_id = lobbyService.createLobby(user.getId());
 
         assertEquals(lobby.getLobbyid(), lobby_id);
         assertTrue(user.getUsergamelobbylist().contains(lobby));

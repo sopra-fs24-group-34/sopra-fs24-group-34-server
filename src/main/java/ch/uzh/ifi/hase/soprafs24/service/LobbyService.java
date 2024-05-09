@@ -1,9 +1,12 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +89,7 @@ public class LobbyService {
     }
   }
 
-  public Long createlobby(Long userId){
+  public Long createLobby(Long userId){
     Lobby newlobby = new Lobby();
     newlobby.setToken(UUID.randomUUID().toString());
     newlobby.setCreator_userid(userId);
@@ -96,12 +99,30 @@ public class LobbyService {
 
     User user = userRepository.findUserById(userId);
 
+    /*
     List<Lobby> lobbyList = user.getUsergamelobbylist();
     lobbyList.add(newlobby);
     user.setUsergamelobbylist(lobbyList);
+     */
+    user.setStatus(UserStatus.INLOBBY_PREPARING);
+    userRepository.save(user);
+    userRepository.flush();
 
     log.debug("Created Information for Lobby: {}", newlobby);
     return newlobby.getLobbyid();
+  }
+
+  public UserGetDTO updateReadyStatus(Long userId, String readyStatus) {
+      //d
+      try {
+          User user = userRepository.findUserById(userId);
+          user.setStatus(UserStatus.valueOf(readyStatus));
+          userRepository.save(user);
+          userRepository.flush();
+          return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+      } catch(Exception e) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Illegal UserStatus");
+      }
   }
 
   public Boolean updateLobby(Lobby lobby) {
