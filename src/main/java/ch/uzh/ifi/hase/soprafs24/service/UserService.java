@@ -3,7 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -53,7 +53,7 @@ public class UserService {
     }
   }
 
-  public AuthenticationResponseDTO createUser(User newUser) {
+  public AuthenticationDTO createUser(User newUser) {
     checkIfUserExists(newUser);
     if (newUser.getUsername() == null || newUser.getPassword() == null) {
       throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
@@ -70,10 +70,10 @@ public class UserService {
     userRepository.flush();
 
     log.debug("Created Information for User: {}", newUser);
-    return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken());
+    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newUser);
   }
 
-  public AuthenticationResponseDTO createGuestUser(User newGuestUser) {
+  public AuthenticationDTO createGuestUser(User newGuestUser) {
     checkIfUserExists(newGuestUser);
     newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
     newGuestUser.setToken(UUID.randomUUID().toString());
@@ -89,7 +89,7 @@ public class UserService {
     userRepository.flush();
 
     log.debug("Created Information for User: {}", newGuestUser);
-    return new AuthenticationResponseDTO(newGuestUser.getId(), newGuestUser.getToken());
+    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newGuestUser);
   }
 
 
@@ -113,13 +113,13 @@ public class UserService {
     return false; // smailalijagic: user = null --> does not exist yet
   }
 
-  public AuthenticationResponseDTO loginUser(User loginUser) {
+  public AuthenticationDTO loginUser(User loginUser) {
     User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
     if (existingUser != null) {
       // User is authenticated
       existingUser.setStatus(UserStatus.ONLINE);
-      return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken());
+      return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(existingUser);
     } else {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }

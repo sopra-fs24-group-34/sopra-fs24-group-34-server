@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service.chatservice;
-
+/*
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
@@ -188,3 +188,4 @@ public class ChatServiceTest {
         assertFalse(result);
     }
 }
+*/

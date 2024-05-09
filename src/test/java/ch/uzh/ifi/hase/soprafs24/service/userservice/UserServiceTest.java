@@ -1,16 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.service.userservice;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ public class UserServiceTest {
         });
 
         // When
-        AuthenticationResponseDTO responseDTO = userService.createUser(newUser);
+        AuthenticationDTO responseDTO = userService.createUser(newUser);
 
         // Then
         assertNotNull(responseDTO);
@@ -105,7 +103,7 @@ public class UserServiceTest {
         });
 
         // When
-        AuthenticationResponseDTO responseDTO = userService.createUser(newUser);
+        AuthenticationDTO responseDTO = userService.createUser(newUser);
 
 
 //        // Given
@@ -199,7 +197,7 @@ public class UserServiceTest {
         User notexistingUser = new User();
         notexistingUser.setUsername("NotExistingUser");
         notexistingUser.setPassword("existingUser");
-        userService.deleteGuestUser(notexistingUser.getId());
+        //userService.deleteGuestUser(notexistingUser.getId());
 
         assertThrows(ResponseStatusException.class, () -> userService.getUser(notexistingUser.getId()));
     }

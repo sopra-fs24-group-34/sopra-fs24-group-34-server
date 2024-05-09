@@ -4,6 +4,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,10 +66,15 @@ public class GameControllerTest {
             gamePostDTO.setCreator_userid(1L);
             gamePostDTO.setInvited_userid(2L);
 
+            //nedim-j: probably not correct, please adjust
+            AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+            authenticationDTO.setId(1L);
+            authenticationDTO.setToken("123");
+
             // Mock the response from game service
             Game createdGame = new Game();
             createdGame.setGameId(1L);
-            given(gameService.creategame(eq(lobbyId), any(Game.class))).willReturn(createdGame);
+            given(gameService.creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class))).willReturn(createdGame);
 
             MockHttpServletRequestBuilder postRequest = post("/game/{lobbyid}/start", lobbyId)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -80,7 +86,7 @@ public class GameControllerTest {
                     .andExpect(jsonPath("$.gameId", is(createdGame.getGameId().intValue())));
 
             // verify that creategame was called with the expected arguments
-            verify(gameService).creategame(eq(lobbyId), any(Game.class));
+            verify(gameService).creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class));
         }
 
 

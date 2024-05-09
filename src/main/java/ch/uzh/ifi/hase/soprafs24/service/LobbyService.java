@@ -1,11 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,16 +74,8 @@ public class LobbyService {
   }
 
   public Boolean isLobbyOwner(User user, Long lobbyid) {
-    List<Lobby> lobbyList = user.getUsergamelobbylist(); // smailalijagic: get all created lobbies
-    Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get searched lobby
-
-    for (Lobby lobby: lobbyList) { // smailalijagic: make sure searched lobby was created by user else return false
-      if (lobby.equals(lobbyById)) {
-        return true;
-      }
-    }
-
-    return false;
+    Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid);
+    return Objects.equals(lobbyById.getCreator_userid(), user.getId());
   }
 
   public void deleteLobby(Lobby lobby) {

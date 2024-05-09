@@ -1,29 +1,20 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import net.bytebuddy.asm.Advice;
+import com.google.gson.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 public class LobbyController {
@@ -33,7 +24,6 @@ public class LobbyController {
 
     LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler) {
         this.lobbyService = lobbyService;
-
         this.webSocketHandler = webSocketHandler;
     }
 
@@ -127,6 +117,7 @@ public class LobbyController {
     }
 
 
+    /*
     @DeleteMapping("/lobbies/{lobbyId}/start")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -148,4 +139,6 @@ public class LobbyController {
         // smailalijagic: some return statement...
         return true;
     }
+
+     */
 }

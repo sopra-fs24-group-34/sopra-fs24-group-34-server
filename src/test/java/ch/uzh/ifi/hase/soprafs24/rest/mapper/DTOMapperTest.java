@@ -119,7 +119,7 @@ public class DTOMapperTest {
         user.setToken("testToken");
 
         // When
-        AuthenticationResponseDTO responseDTO = mapper.convertEntityToAuthenticationResponseDTO(user);
+        AuthenticationDTO responseDTO = mapper.convertEntityToAuthenticationDTO(user);
 
         // Then
         assertNotNull(responseDTO);

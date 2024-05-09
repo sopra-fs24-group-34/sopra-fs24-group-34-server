@@ -4,9 +4,9 @@ import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,18 +29,20 @@ public class GameService {
   private final ImageRepository imageRepository;
   private final GameUserService gameUserService;
   private final LobbyRepository lobbyRepository;
-    private final UnsplashService unsplashService; // Inject UnsplashService
-    private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+  private final UnsplashService unsplashService; // Inject UnsplashService
+  private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+  private final LobbyService lobbyService;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
     this.unsplashService = unsplashService;
-  }
+    this.lobbyService = lobbyService;
+    }
 
   public List<Game> getGames() {
     return this.gameRepository.findAll();
@@ -68,7 +69,7 @@ public class GameService {
       return gameUserService.getPlayer(playerId).getChosencharacter() != null;
   }
 
-  public Game creategame(Long lobbyid, Game game) {
+  public Game creategame(Long lobbyid, Game game, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
     // till: check if both players exist
     //gameUserService.checkIfUserExists(game.getCreatorId());
@@ -79,6 +80,19 @@ public class GameService {
     //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
     // till: checks if the user is actually the creator of the lobby
     // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
+
+
+      //nedim-j: check if user making request is the host. maybe shift to a AuthenticationService.java?
+      User potHost = new User();
+      try {
+          potHost = DTOMapper.INSTANCE.convertAuthenticationDTOtoUser(authenticationDTO);
+      } catch (Exception e) {
+          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No Authentification header sent");
+      }
+
+      if(!lobbyService.isLobbyOwner(potHost, lobbyid)) {
+          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not the host");
+      }
 
     // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();

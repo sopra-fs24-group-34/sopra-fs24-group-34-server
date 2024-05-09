@@ -3,8 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.service.GameService;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -136,7 +135,12 @@ public class GameServiceIntegrationTest {
         gamerepository.save(newgame);
         gamerepository.flush();
 
-        Game result = gameservice.creategame(3L, createdgame);
+        //nedim-j: probably not correct, please adjust
+        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+        authenticationDTO.setId(5L);
+        authenticationDTO.setToken("123");
+
+        Game result = gameservice.creategame(3L, createdgame, authenticationDTO);
 
         assertEquals(result.getCreatorId(), newgame.getCreatorId());
         assertEquals(result.getInvitedPlayerId(), newgame.getInvitedPlayerId());
