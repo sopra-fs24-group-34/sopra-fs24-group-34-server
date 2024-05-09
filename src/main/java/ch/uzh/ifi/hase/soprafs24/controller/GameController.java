@@ -73,15 +73,6 @@ public class GameController {
     return createdGame;
   }
 
-  @PostMapping("/player/{playerid}")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public Player createplayer(@PathVariable ("playerid") Long playerid) {
-    // method to create a player to check with Postman
-    Player player = gameUserService.createplayer(playerid);
-    return player;
-  }
-
   @GetMapping("/player/{playerid}")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody

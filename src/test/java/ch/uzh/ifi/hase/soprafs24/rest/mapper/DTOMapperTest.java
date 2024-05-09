@@ -287,7 +287,7 @@ public class DTOMapperTest {
 
         // Then
         assertNotNull(game);
-        assertEquals(123L, game.getCreatorId());
+        assertEquals(123L, game.getCreatorPlayerId());
         assertEquals(456L, game.getInvitedPlayerId());
     }
 }

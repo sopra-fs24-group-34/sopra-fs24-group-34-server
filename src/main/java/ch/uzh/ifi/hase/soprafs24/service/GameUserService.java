@@ -19,13 +19,13 @@ import java.util.List;
 @Transactional
 public class GameUserService {
     private final PlayerRepository playerRepository;
-    private final UserRepository userrepository;
+    private final UserRepository userRepository;
     private final LobbyRepository lobbyRepository;
     private final GameRepository gameRepository;
 
   @Autowired
-  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userrepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("gameRepository") GameRepository gameRepository) {
-    this.userrepository = userrepository;
+  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("gameRepository") GameRepository gameRepository) {
+    this.userRepository = userRepository;
     this.playerRepository = playerRepository;
     this.lobbyRepository = lobbyRepository;
     this.gameRepository = gameRepository;
@@ -36,22 +36,13 @@ public class GameUserService {
   }
 
   public User getUser(Long userId){
-      return userrepository.findUserById(userId);
+      return userRepository.findUserById(userId);
   }
 
-  public Player createplayer(Long userid){
-    Player player = new Player();
-
-    //saving PLayer to repository
-    player = playerRepository.save(player);
-    playerRepository.flush();
-
-    return player;
-  }
 
   public Long getChosenCharacterofOpponent(Game game, Long playerid) {
       // till: get players from the game
-      Long creatorid = game.getCreatorId();
+      Long creatorid = game.getCreatorPlayerId();
 
       // create Long for opponentplayerid
       Long opponentid;
@@ -59,7 +50,7 @@ public class GameUserService {
       if (playerid.equals(creatorid)){
           opponentid = game.getInvitedPlayerId();
       } else {
-          opponentid = game.getCreatorId();
+          opponentid = game.getCreatorPlayerId();
       }
 
       // get player to get chosencharacter
@@ -68,10 +59,15 @@ public class GameUserService {
       return opponent.getChosencharacter();
   }
 
-  public void saveplayerchanges(Player player){
+  public void savePlayerChanges(Player player){
       playerRepository.save(player);
       playerRepository.flush();
   }
+
+  public void saveUserChanges(User user){
+      userRepository.save(user);
+      userRepository.flush();
+}
 
     public Boolean checkStrikes(Long playerid) {
       //nedim-j: returns true, if player has less than max strikes and can play on
@@ -105,7 +101,7 @@ public class GameUserService {
             return RoundStatus.CHOOSING;
         }
 
-        Player creator = playerRepository.findByPlayerId(game.getCreatorId());
+        Player creator = playerRepository.findByPlayerId(game.getCreatorPlayerId());
         Player invited = playerRepository.findByPlayerId(game.getInvitedPlayerId());
         if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
             return RoundStatus.CHOOSING;
@@ -129,22 +125,22 @@ public class GameUserService {
   public void increaseWinTotal(Long playerId) {
       //till: get the Player where the user is saved and there access the totalwins attribute
       Player player = getPlayer(playerId);
-      User user = player.getUser();
+      User user = getUser(player.getUserId());
       try {
           user.setTotalwins(user.getTotalwins() + 1);
       } catch (NullPointerException e){
           user.setTotalwins(1L);
       }
-      userrepository.save(user);
-      userrepository.flush();
-      userrepository.save(user);
-      userrepository.flush();
+      userRepository.save(user);
+      userRepository.flush();
+      userRepository.save(user);
+      userRepository.flush();
   }
 
   public void increaseGamesPlayed(Long playerId){
       //till: get the Player where the user is saved and there access the totalgames attribute
       Player player = getPlayer(playerId);
-      User user = player.getUser();
+      User user = getUser(player.getUserId());
       try {
           user.setTotalplayed(user.getTotalplayed() + 1);
       } catch (NullPointerException e){
@@ -154,8 +150,8 @@ public class GameUserService {
               System.out.println("User is null in GameUserService.increaseGamesPlayed");
           }
       }
-      userrepository.save(user);
-      userrepository.flush();
+      userRepository.save(user);
+      userRepository.flush();
   }
 
   public void updategamelobbylist(User user) {
@@ -171,8 +167,8 @@ public class GameUserService {
               //Update the user
               user.setUsergamelobbylist(newUserGamelobbylist);
 
-              userrepository.save(user);
-              userrepository.flush();
+              userRepository.save(user);
+              userRepository.flush();
           }
       } catch (Exception e) {
           System.out.println("User is null in GameUserService.updategamelobbylist");
@@ -184,7 +180,7 @@ public class GameUserService {
     // check Functions
     //
   public Boolean checkIfUserOnline(Long userid){
-    User user = userrepository.findUserById(userid);
+    User user = userRepository.findUserById(userid);
     return user.getStatus() == UserStatus.ONLINE;
   }
 
@@ -200,7 +196,7 @@ public class GameUserService {
     }
 
   public Boolean checkIfUserExists(Long userid){
-        User user = userrepository.findUserById(userid);
+        User user = userRepository.findUserById(userid);
         return user != null; //user = null-> user does not exist
     }
 
@@ -209,6 +205,6 @@ public class GameUserService {
         playerRepository.findByPlayerId(playerid);
 
         // check if the player is in the game players list, returns true when in game and false when not
-        return game.getCreatorId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
+        return game.getCreatorPlayerId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
     }
 }

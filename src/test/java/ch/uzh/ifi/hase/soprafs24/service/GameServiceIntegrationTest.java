@@ -75,7 +75,7 @@ public class GameServiceIntegrationTest {
 
         createdgame = new Game();
         createdgame.setGameId(4L);
-        createdgame.setCreatorId(1L);
+        createdgame.setCreatorPlayerId(1L);
         createdgame.setInvitedPlayerId(2L);
 
         gamerepository.save(createdgame);
@@ -122,7 +122,7 @@ public class GameServiceIntegrationTest {
             playerrepository.flush();
             player.setPlayerId(5L);
             return null; // Since the method is void, return null
-        }).when(gameUserService).saveplayerchanges(any(Player.class));
+        }).when(gameUserService).savePlayerChanges(any(Player.class));
         when(imagerepository.countAllImages()).thenReturn(200);
 
         Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
@@ -130,7 +130,7 @@ public class GameServiceIntegrationTest {
 
         Game newgame = new Game();
         newgame.setGameId(4L);
-        newgame.setCreatorId(5L);
+        newgame.setCreatorPlayerId(5L);
         newgame.setInvitedPlayerId(5L);
         gamerepository.save(newgame);
         gamerepository.flush();
@@ -142,9 +142,9 @@ public class GameServiceIntegrationTest {
 
         Game result = gameservice.creategame(3L, createdgame, authenticationDTO);
 
-        assertEquals(result.getCreatorId(), newgame.getCreatorId());
+        assertEquals(result.getCreatorPlayerId(), newgame.getCreatorPlayerId());
         assertEquals(result.getInvitedPlayerId(), newgame.getInvitedPlayerId());
-        System.out.println(result.getCreatorId());
+        System.out.println(result.getCreatorPlayerId());
         // assertEquals(playerrepository.findByPlayerId(result.getCreatorId()).getUser(), playerrepository.findByPlayerId(newgame.getCreatorId()).getUser());
 
     }
@@ -168,7 +168,7 @@ public class GameServiceIntegrationTest {
             playerrepository.flush();
             anyplayer.setPlayerId(5L);
             return null; // Since the method is void, return null
-        }).when(gameUserService).saveplayerchanges(any(Player.class));
+        }).when(gameUserService).savePlayerChanges(any(Player.class));
 
 
         gameservice.chooseImage(guess);

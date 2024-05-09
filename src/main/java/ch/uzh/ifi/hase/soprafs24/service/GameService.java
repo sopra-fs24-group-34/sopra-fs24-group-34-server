@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
@@ -58,7 +59,7 @@ public class GameService {
 
     if (player.getChosencharacter() == null) {
       player.setChosencharacter(guess.getImageId());
-      gameUserService.saveplayerchanges(player);
+      gameUserService.savePlayerChanges(player);
     } else {
       throw new IllegalStateException("The player has already chosen a character.");
     }
@@ -96,18 +97,22 @@ public class GameService {
 
     // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();
-    User user = gameUserService.getUser(game.getCreatorId());
-    player1.setUser(user);
+    User creator = gameUserService.getUser(game.getCreatorPlayerId());
+    player1.setUserId(creator.getId());
+    creator.setStatus(UserStatus.PLAYING);
 
     Player player2 = new Player();
     User inviteduser = gameUserService.getUser(game.getInvitedPlayerId());
-    player2.setUser(inviteduser);
+    player2.setUserId(inviteduser.getId());
+    inviteduser.setStatus(UserStatus.PLAYING);
 
     // till: Save the changes
-    gameUserService.saveplayerchanges(player1);
-    gameUserService.saveplayerchanges(player2);
+    gameUserService.savePlayerChanges(player1);
+    gameUserService.savePlayerChanges(player2);
+    gameUserService.saveUserChanges(creator);
+    gameUserService.saveUserChanges(inviteduser);
 
-    game.setCreatorId(player1.getPlayerId());
+    game.setCreatorPlayerId(player1.getPlayerId());
     game.setInvitedPlayerId(player2.getPlayerId());
 
     // save changes to game
@@ -146,7 +151,7 @@ public class GameService {
 
     if (oppChosenCharacter.equals(guess.getImageId())){
       //Response r = handleWin(playerId);
-      //deleteGame(game);
+      deleteGame(game);
       //return r;
         int strikes = gameUserService.getStrikesss(playerId);
         //RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
@@ -166,7 +171,7 @@ public class GameService {
             //nedim-j: change from 3 to maxguesses
             response.setStrikes(3);
             response.setRoundStatus(RoundStatus.END);
-            //deleteGame(game);
+            deleteGame(game);
             return response;
         }
     }
@@ -181,12 +186,19 @@ public class GameService {
   }
 
   private void deleteGame(Game game) {
-      //Get the users
-      Player creator = gameUserService.getPlayer(game.getCreatorId());
-      User user = creator.getUser();
-      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
-      User invitedUser = invitedPlayer.getUser();
 
+      //Get the users
+      Player creator = gameUserService.getPlayer(game.getCreatorPlayerId());
+      User host = gameUserService.getUser(creator.getUserId());
+      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
+      User invitedUser = gameUserService.getUser(invitedPlayer.getUserId());
+
+      host.setStatus(UserStatus.ONLINE);
+      invitedUser.setStatus(UserStatus.ONLINE);
+      gameUserService.saveUserChanges(host);
+      gameUserService.saveUserChanges(invitedUser);
+
+      /*
       //set the game in the Usergamelobbylist to null
       gameUserService.updategamelobbylist(user);
       gameUserService.updategamelobbylist(invitedUser);
@@ -196,6 +208,8 @@ public class GameService {
 
       //delete the game
       gameRepository.delete(game);
+
+       */
   }
 
 

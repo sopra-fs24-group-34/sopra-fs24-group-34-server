@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,16 +75,6 @@ public class GameUserServiceIntegrationTest {
     }
 
     @Test
-    void createPlayer_validInputs() {
-        List<Player> list = new ArrayList<>();
-
-        Player newplayer = gameUserService.createplayer(1L);
-        list.add(newplayer);
-
-        assertEquals(list.size(), 1);
-    }
-
-    @Test
     void getChosenCharacterofOpponent_validInputs() {
         Image image = new Image();
         image.setId(1L);
@@ -93,7 +82,7 @@ public class GameUserServiceIntegrationTest {
         opp.setPlayerId(2L);
         opp.setChosencharacter(1L);
         Game game = new Game();
-        game.setCreatorId(1L);
+        game.setCreatorPlayerId(1L);
         game.setInvitedPlayerId(2L);
 
         when(playerrepository.findByPlayerId(2L)).thenReturn(opp);
@@ -139,7 +128,7 @@ public class GameUserServiceIntegrationTest {
         invited.setPlayerId(2L);
         Game game = new Game();
         game.setGameId(1L);
-        game.setCreatorId(player.getPlayerId());
+        game.setCreatorPlayerId(player.getPlayerId());
         game.setInvitedPlayerId(invited.getPlayerId());
         gamerepository.save(game);
         gamerepository.flush();

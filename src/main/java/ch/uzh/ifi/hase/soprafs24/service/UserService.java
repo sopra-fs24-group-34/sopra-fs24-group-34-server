@@ -75,7 +75,7 @@ public class UserService {
 
   public AuthenticationDTO createGuestUser(User newGuestUser) {
     checkIfUserExists(newGuestUser);
-    newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
+    newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
     newGuestUser.setToken(UUID.randomUUID().toString());
 
     // saves the given entity but data is only persisted in the database once
