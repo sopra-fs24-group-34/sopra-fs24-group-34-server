@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service;
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
@@ -137,9 +137,9 @@ public class GameUserServiceIntegrationTest {
         when(playerrepository.findByPlayerId(1L)).thenReturn(player);
         when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
 
-        RoundStatus result = gameUserService.determineStatus(1L);
+        GameStatus result = gameUserService.determineStatus(1L);
 
-        assertEquals(result, RoundStatus.CHOOSING);
+        assertEquals(result, GameStatus.CHOOSING);
     }
 
     @Test
@@ -148,9 +148,9 @@ public class GameUserServiceIntegrationTest {
         response.setGuess(true);
         response.setPlayerId(1L);
         response.setStrikes(0);
-        response.setRoundStatus(RoundStatus.GUESSING);
+        response.setRoundStatus(GameStatus.GUESSING);
 
-        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, RoundStatus.GUESSING);
+        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, GameStatus.GUESSING);
 
         assertEquals(result.getGuess(), response.getGuess());
         assertEquals(result.getStrikes(), response.getStrikes());

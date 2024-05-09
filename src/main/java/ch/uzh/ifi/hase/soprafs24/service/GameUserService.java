@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
@@ -92,33 +92,33 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-    public RoundStatus determineStatus(Long gameId) {
+    public GameStatus determineStatus(Long gameId) {
         Game game = new Game();
         try {
             game = gameRepository.findByGameId(gameId);
         } catch (Exception e) {
             System.out.println("Game is null");
-            return RoundStatus.CHOOSING;
+            return GameStatus.CHOOSING;
         }
 
         Player creator = playerRepository.findByPlayerId(game.getCreatorPlayerId());
         Player invited = playerRepository.findByPlayerId(game.getInvitedPlayerId());
         if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
-            return RoundStatus.CHOOSING;
+            return GameStatus.CHOOSING;
         } else if(!checkStrikes(creator.getPlayerId()) || !checkStrikes(invited.getPlayerId())) {
-            return RoundStatus.END;
+            return GameStatus.END;
         }
-        return RoundStatus.GUESSING;
+        return GameStatus.GUESSING;
     }
 
-  public Response createResponse(Boolean guess, Long playerId, int strikes, RoundStatus roundStatus) {
+  public Response createResponse(Boolean guess, Long playerId, int strikes, GameStatus gameStatus) {
       // creates a response that is send back to the frontend
       //Player player = playerRepository.findByPlayerId(playerId);
       Response response = new Response();
       response.setGuess(guess);
       response.setPlayerId(playerId);
       response.setStrikes(strikes);
-      response.setRoundStatus(roundStatus);
+      response.setRoundStatus(gameStatus);
       return response;
   }
 

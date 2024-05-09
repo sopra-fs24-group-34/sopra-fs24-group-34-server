@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
@@ -154,15 +154,15 @@ public class GameService {
       deleteGame(game);
       //return r;
         int strikes = gameUserService.getStrikesss(playerId);
-        //RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
-        RoundStatus roundStatus = RoundStatus.END;
-        return gameUserService.createResponse(true, playerId, strikes, roundStatus);
+        //GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+        GameStatus gameStatus = GameStatus.END;
+        return gameUserService.createResponse(true, playerId, strikes, gameStatus);
     } else {
         if (gameUserService.checkStrikes(playerId)) {
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikesss(playerId);
-            RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
-            return gameUserService.createResponse(false, playerId, strikes, roundStatus);
+            GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+            return gameUserService.createResponse(false, playerId, strikes, gameStatus);
         }
         else {
             Response response = new Response();
@@ -170,7 +170,7 @@ public class GameService {
             response.setPlayerId(playerId);
             //nedim-j: change from 3 to maxguesses
             response.setStrikes(3);
-            response.setRoundStatus(RoundStatus.END);
+            response.setRoundStatus(GameStatus.END);
             deleteGame(game);
             return response;
         }
@@ -182,7 +182,7 @@ public class GameService {
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikesss(playerId);
-    return gameUserService.createResponse(true, playerId, strikes, RoundStatus.END);
+    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
 
   private void deleteGame(Game game) {

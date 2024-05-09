@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
@@ -193,13 +193,13 @@ public class GameServiceIntegrationTest {
         response.setGuess(true);
         response.setStrikes(0);
         response.setPlayerId(2L);
-        response.setRoundStatus(RoundStatus.END);
+        response.setRoundStatus(GameStatus.END);
 
         System.out.println(guess.getGameId());
         Mockito.when(gameUserService.getChosenCharacterofOpponent(createdgame, 2L)).thenReturn(1L);
         Mockito.when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
         Mockito.when(gameUserService.getStrikesss(2L)).thenReturn(0);
-        Mockito.when(gameUserService.createResponse(true, 2L, 0, RoundStatus.END)).thenReturn(response);
+        Mockito.when(gameUserService.createResponse(true, 2L, 0, GameStatus.END)).thenReturn(response);
 
         Response result = gameservice.guesssimage(guess);
 
