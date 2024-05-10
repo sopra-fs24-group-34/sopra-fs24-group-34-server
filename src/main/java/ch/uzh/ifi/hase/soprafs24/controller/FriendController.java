@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,6 +33,7 @@ public class FriendController {
     @PostMapping("/users/{userId}/friends/add")
     @ResponseStatus(HttpStatus.CREATED)
     public void sendFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPostDTO friendRequestPostDTO) {
+        System.out.println("DO FRIEND REQUEST POST");
         User sender = userService.getUser(userId);
         User receiver = userService.getUserByUsername(friendRequestPostDTO.getReceiverUserName());
         FriendRequest friendRequest = DTOMapper.INSTANCE.convertFriendRequestPostDTOtoEntity(friendRequestPostDTO);
@@ -41,12 +43,13 @@ public class FriendController {
     }
 
 
+
     // Handle friend request (accept or decline)
     @PostMapping("/users/{userId}/friends/answer")
     @ResponseStatus(HttpStatus.OK)
-    public void answerFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPutDTO friendRequestPutDTO){
+    public boolean answerFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPutDTO friendRequestPutDTO){
         FriendRequest friendrequest = DTOMapper.INSTANCE.convertFriendRequestPutDTOtoEntity(friendRequestPutDTO);
-        friendService.answerFriendRequest(friendrequest, friendRequestPutDTO.isAnswer());
+        return friendService.answerFriendRequest(friendrequest, friendRequestPutDTO.isAnswer());
 
     }
 
@@ -76,7 +79,25 @@ public class FriendController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<FriendGetDTO> getAllUsers(@PathVariable Long userId) {
+        System.out.println("DO FRIENDS GETTER");
         User user = userService.getUser(userId);
         return friendService.getFriends(user);
+    }
+
+    // Get all friend requests
+    @GetMapping("/users/{userId}/friends/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public List<FriendGetDTO> getFriendRequests(@PathVariable Long userId) {
+        System.out.println("DO FRIEND REQUESTS GETTER");
+        User receiver = userService.getUser(userId);
+        List<FriendRequest> friendRequests = friendService.getFriendRequests(receiver);
+        List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
+        for (FriendRequest friendRequest : friendRequests) {
+            FriendGetDTO friendGetDTO = friendService.convertFriendRequestToFriend(friendRequest);
+            System.out.println(friendGetDTO.getFriendUsername());
+            System.out.println(friendGetDTO.getFriendId());
+            friendGetDTOs.add(friendGetDTO);
+        }
+        return friendGetDTOs;
     }
 }

@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -36,12 +34,17 @@ public class FriendService {
     public void createFriendRequest(FriendRequest friendRequest){
         User sender = userRepository.findUserById(friendRequest.getSenderId());
         User receiver = userRepository.findUserById(friendRequest.getReceiverId());
+        assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
         sender.addFriendRequest(friendRequest);
         friendRequestRepository.save(friendRequest);
         friendRequestRepository.flush();
     }
 
-    public void answerFriendRequest(FriendRequest friendRequest, boolean answer){
+    public List<FriendRequest> getFriendRequests(User user) {
+        return user.getFriendRequests();
+    }
+
+    public boolean answerFriendRequest(FriendRequest friendRequest, boolean answer){
         User sender = userRepository.findUserById(friendRequest.getSenderId());
         if (!sender.getFriendRequests().contains(friendRequest)) {
             throw new IllegalArgumentException("This friend request does not exist");
@@ -50,15 +53,24 @@ public class FriendService {
         if (answer) {
             User receiver = userRepository.findUserById(friendRequest.getReceiverId());
             sender.addFriend(receiver);
+            return true;
         }
+        return false;
     }
 
     public List<FriendGetDTO> getFriends(User user) {
-        Set<User> friends = user.getFriendsList();
+        List<User> friends = user.getFriendsList();
         List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
-        for (User friend : friends) {
-            friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));
-        }
+        for (User friend : friends) friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));
         return friendGetDTOs;
+    }
+
+    public FriendGetDTO convertFriendRequestToFriend(FriendRequest friendRequest) {
+        FriendGetDTO friendGetDTO = new FriendGetDTO();
+        User user = userRepository.findUserById(friendRequest.getSenderId());
+        friendGetDTO.setFriendIcon(user.getUsericon());
+        friendGetDTO.setFriendUsername(user.getUsername());
+        friendGetDTO.setFriendId(user.getId());
+        return friendGetDTO;
     }
 }

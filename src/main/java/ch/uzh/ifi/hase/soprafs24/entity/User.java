@@ -4,7 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +50,7 @@ public class User implements Serializable {
           inverseJoinColumns = @JoinColumn(name = "friendId")
     )
     // smailalijagic: user can have many friends and be friends with manyp
-  private Set<FriendRequest> friendRequests = new HashSet<>(); // smailalijagic: userfriendlist contains Users
+  private List<FriendRequest> friendRequests = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
 
 
   @ManyToMany(cascade = CascadeType.ALL)
@@ -60,7 +60,7 @@ public class User implements Serializable {
           inverseJoinColumns = @JoinColumn(name = "friendId")
   )
   // smailalijagic: user can have many friends and be friends with many
-  private Set<User> friendsList = new HashSet<>(); // smailalijagic: userfriendlist contains Users
+  private List<User> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
 
   @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
   private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
@@ -119,11 +119,11 @@ public class User implements Serializable {
     this.usericon = usericon;
   }
 
-  public Set<User> getFriendsList() {
+  public List<User> getFriendsList() {
     return friendsList;
   }
 
-  public void setFriendsList(Set<User> FriendsList) {
+  public void setFriendsList(List<User> FriendsList) {
     this.friendsList = FriendsList;
   }
 
@@ -163,11 +163,11 @@ public class User implements Serializable {
       this.friendRequests.add(friendRequest);
   }
 
-  public Set<FriendRequest> getFriendRequests() {
+  public List<FriendRequest> getFriendRequests() {
       return friendRequests;
   }
 
-  public void setFriendRequests(Set<FriendRequest> pendingFriendRequests) {
+  public void setFriendRequests(List<FriendRequest> pendingFriendRequests) {
       this.friendRequests = pendingFriendRequests;
   }
 }
