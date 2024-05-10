@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 
 @Entity
 public class Game implements Serializable {
@@ -17,10 +16,10 @@ public class Game implements Serializable {
     private Long maxguesses; // smailalijagic: handle guesses for each player in frontend
 
     @Column(nullable = true)
-    private Long creatorId; // smailalijagic: creator
+    private Long creatorPlayerId; // smailalijagic: creator
 
     @Column(nullable = true)
-    private Long invitedplayerId; // smailalijagic: invited user
+    private Long invitedPlayerId; // smailalijagic: invited user
 
     @Column(nullable = true)
     private Long guessingtime; // smailalijagic:
@@ -67,20 +66,20 @@ public class Game implements Serializable {
         this.guessingtime = guessingtime;
     }
 
-    public Long getCreatorId() {
-        return creatorId;
+    public Long getCreatorPlayerId() {
+        return creatorPlayerId;
     }
 
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
+    public void setCreatorPlayerId(Long creatorPlayerId) {
+        this.creatorPlayerId = creatorPlayerId;
     }
 
     public Long getInvitedPlayerId() {
-        return invitedplayerId;
+        return invitedPlayerId;
     }
 
     public void setInvitedPlayerId(Long invitedplayerId) {
-        this.invitedplayerId = invitedplayerId;
+        this.invitedPlayerId = invitedplayerId;
     }
 
     public List<Image> getGameImages() {

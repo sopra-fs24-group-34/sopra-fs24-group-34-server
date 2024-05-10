@@ -1,13 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 
 public class Response {
 
     private Boolean guess;
     private Long playerId;
     private int strikes;
-    private RoundStatus roundStatus;
+    private GameStatus gameStatus;
 
     public Boolean getGuess() {
         return guess;
@@ -33,11 +33,11 @@ public class Response {
         this.strikes = strikes;
     }
 
-    public RoundStatus getRoundStatus() {
-        return roundStatus;
+    public GameStatus getRoundStatus() {
+        return gameStatus;
     }
 
-    public void setRoundStatus(RoundStatus roundStatus) {
-        this.roundStatus = roundStatus;
+    public void setRoundStatus(GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
     }
 }

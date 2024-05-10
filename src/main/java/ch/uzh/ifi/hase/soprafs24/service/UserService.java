@@ -3,7 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +53,15 @@ public class UserService {
         }
     }
 
-    public AuthenticationResponseDTO createUser(User newUser) {
+    public AuthenticationDTO createUser(User newUser) {
         checkIfUserExists(newUser);
         if (newUser.getUsername() == null || newUser.getPassword() == null) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
         }
         newUser.setStatus(UserStatus.ONLINE);
         newUser.setToken(UUID.randomUUID().toString());
+        newUser.setTotalplayed(0L);
+        newUser.setTotalwins(0L);
         newUser.setProfilePicture("/static/media/puck.a9a8a388abb9f9bab805.jpeg");
 
         // saves the given entity but data is only persisted in the database once
@@ -66,14 +69,14 @@ public class UserService {
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
-        log.debug("Created Information for User: {}", newUser);
-        return new AuthenticationResponseDTO(newUser.getId(), newUser.getToken(), newUser.getProfilePicture());
-    }
+    log.debug("Created Information for User: {}", newUser);
+    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newUser);
+  }
 
-    public AuthenticationResponseDTO createGuestUser(User newGuestUser) {
-        checkIfUserExists(newGuestUser);
-        newGuestUser.setStatus(UserStatus.INLOBBY); // smailalijagic: created user waits per default in lobby
-        newGuestUser.setToken(UUID.randomUUID().toString());
+  public AuthenticationDTO createGuestUser(User newGuestUser) {
+    checkIfUserExists(newGuestUser);
+    newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
+    newGuestUser.setToken(UUID.randomUUID().toString());
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -87,9 +90,9 @@ public class UserService {
         newGuestUser = userRepository.save(newGuestUser); // smailalijagic: update guestuser
         userRepository.flush();
 
-        log.debug("Created Information for User: {}", newGuestUser);
-        return new AuthenticationResponseDTO(newGuestUser.getId(), newGuestUser.getToken(), newGuestUser.getProfilePicture());
-    }
+    log.debug("Created Information for User: {}", newGuestUser);
+    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newGuestUser);
+  }
 
 
     /**
@@ -112,17 +115,17 @@ public class UserService {
         return false; // smailalijagic: user = null --> does not exist yet
     }
 
-    public AuthenticationResponseDTO loginUser(User loginUser) {
-        User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
+  public AuthenticationDTO loginUser(User loginUser) {
+    User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
-        if (existingUser != null) {
-            // User is authenticated
-            existingUser.setStatus(UserStatus.ONLINE);
-            return new AuthenticationResponseDTO(existingUser.getId(), existingUser.getToken(), existingUser.getProfilePicture());
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-        }
+    if (existingUser != null) {
+      // User is authenticated
+      existingUser.setStatus(UserStatus.ONLINE);
+      return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(existingUser);
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
+  }
 
     public User updateUser(User updatedUser, Long userId) {
         //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted

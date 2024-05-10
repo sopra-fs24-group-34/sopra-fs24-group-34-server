@@ -41,6 +41,14 @@ public interface DTOMapper {
     @Mapping(source = "totalwins", target = "totalwins")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "profilePicture", target = "profilePicture")
+    @Mapping(source = "totalplayed", target = "totalplayed")
+    @Mapping(source = "totalwins", target = "totalwins")
+    UserStatsGetDTO convertEntityToUserStatsGetDTO(User user);
+
     @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
@@ -56,8 +64,11 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "token", target = "token")
-    @Mapping(source = "profilePicture", target = "profilePicture")
-    AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
+    AuthenticationDTO convertEntityToAuthenticationDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "token", target = "token")
+    User convertAuthenticationDTOtoUser(AuthenticationDTO authenticationDTO);
 
 
     //@Mapping(source = "id", target = "id")
@@ -113,7 +124,7 @@ public interface DTOMapper {
   ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
 
 
-    @Mapping(source = "creator_userid", target = "creatorId")
+    @Mapping(source = "creator_userid", target = "creatorPlayerId")
     @Mapping(source = "invited_userid", target = "invitedPlayerId")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game

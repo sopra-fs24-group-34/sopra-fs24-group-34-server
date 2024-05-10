@@ -10,8 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.NoSuchElementException;
 
 /**
  * User Controller
@@ -32,16 +30,17 @@ public class UserController {
   @GetMapping("/users")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers() {
+  public List<UserStatsGetDTO> getAllUsers() {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
-    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+    List<UserStatsGetDTO> userStatsGetDTOs = new ArrayList<>();
 
     // convert each user to the API representation
     for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+      userStatsGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserStatsGetDTO(user));
     }
-    return userGetDTOs;
+    return userStatsGetDTOs;
   }
 
   // nedim-j: copied from M1, please adjust if needed
@@ -57,7 +56,7 @@ public class UserController {
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public AuthenticationResponseDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO createUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
     User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
@@ -67,7 +66,7 @@ public class UserController {
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
     User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
@@ -77,7 +76,7 @@ public class UserController {
   @PostMapping("/guestuser/create")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public AuthenticationResponseDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
     // smailalijagic:
     // Set default name: Guest
     // and password: 12345
