@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.service;
-
-public class LobbyUserServiceTest {
-}
+//package ch.uzh.ifi.hase.soprafs24.service;
+//
+//public class LobbyUserServiceTest {
+//}

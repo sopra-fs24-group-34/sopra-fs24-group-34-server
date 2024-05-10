@@ -6,10 +6,6 @@ instance_class: F2
 env_variables:
   UNSPLASH_API_accessKey: "PWHJuYQL8bteX-4JFPeu_Io6DfznbwLiA9ze5tWRTlI"
   UNSPLASH_API_secretKey: "zZ602hyHh-uc_4uKq4CS7IoYWfZz7itzl14In2ttD9Y"
-  PUSHER_APP_ID: "1789620"
-  PUSHER_KEY: "87dd3817ca48322d3e02"
-  PUSHER_SECRET: "995b9aea5d280fbadffa"
-  PUSHER_CLUSTER: "eu"
 
 resources:
   cpu: 8

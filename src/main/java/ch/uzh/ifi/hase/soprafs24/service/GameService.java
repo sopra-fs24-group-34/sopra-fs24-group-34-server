@@ -1,12 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.GuessPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,18 +30,22 @@ public class GameService {
   private final ImageRepository imageRepository;
   private final GameUserService gameUserService;
   private final LobbyRepository lobbyRepository;
-    private final UnsplashService unsplashService; // Inject UnsplashService
-    private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+  private final UnsplashService unsplashService; // Inject UnsplashService
+  private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+  private final LobbyService lobbyService;
+  private final AuthenticationService authenticationService;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
     this.unsplashService = unsplashService;
-  }
+    this.lobbyService = lobbyService;
+    this.authenticationService = authenticationService;
+    }
 
   public List<Game> getGames() {
     return this.gameRepository.findAll();
@@ -57,7 +61,7 @@ public class GameService {
 
     if (player.getChosencharacter() == null) {
       player.setChosencharacter(guess.getImageId());
-      gameUserService.saveplayerchanges(player);
+      gameUserService.savePlayerChanges(player);
     } else {
       throw new IllegalStateException("The player has already chosen a character.");
     }
@@ -68,8 +72,9 @@ public class GameService {
       return gameUserService.getPlayer(playerId).getChosencharacter() != null;
   }
 
-  public Game creategame(Long lobbyid, Game game) {
+  public Game creategame(Long lobbyid, Game game, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
+
     // till: check if both players exist
     //gameUserService.checkIfUserExists(game.getCreatorId());
     //gameUserService.checkIfUserExists(game.getInvitedPlayerId());
@@ -80,20 +85,29 @@ public class GameService {
     // till: checks if the user is actually the creator of the lobby
     // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
+    //nedim-j: check if user making request is the host
+    if(!lobbyService.isLobbyOwner(lobbyid, authenticationDTO)) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not the host");
+    }
+
     // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();
-    User user = gameUserService.getUser(game.getCreatorId());
-    player1.setUser(user);
+    User creator = gameUserService.getUser(game.getCreatorPlayerId());
+    player1.setUserId(creator.getId());
+    creator.setStatus(UserStatus.PLAYING);
 
     Player player2 = new Player();
     User inviteduser = gameUserService.getUser(game.getInvitedPlayerId());
-    player2.setUser(inviteduser);
+    player2.setUserId(inviteduser.getId());
+    inviteduser.setStatus(UserStatus.PLAYING);
 
     // till: Save the changes
-    gameUserService.saveplayerchanges(player1);
-    gameUserService.saveplayerchanges(player2);
+    gameUserService.savePlayerChanges(player1);
+    gameUserService.savePlayerChanges(player2);
+    gameUserService.saveUserChanges(creator);
+    gameUserService.saveUserChanges(inviteduser);
 
-    game.setCreatorId(player1.getPlayerId());
+    game.setCreatorPlayerId(player1.getPlayerId());
     game.setInvitedPlayerId(player2.getPlayerId());
 
     // save changes to game
@@ -132,18 +146,18 @@ public class GameService {
 
     if (oppChosenCharacter.equals(guess.getImageId())){
       //Response r = handleWin(playerId);
-      //deleteGame(game);
+      deleteGame(game);
       //return r;
         int strikes = gameUserService.getStrikesss(playerId);
-        //RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
-        RoundStatus roundStatus = RoundStatus.END;
-        return gameUserService.createResponse(true, playerId, strikes, roundStatus);
+        //GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+        GameStatus gameStatus = GameStatus.END;
+        return gameUserService.createResponse(true, playerId, strikes, gameStatus);
     } else {
         if (gameUserService.checkStrikes(playerId)) {
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikesss(playerId);
-            RoundStatus roundStatus = gameUserService.determineStatus(game.getGameId());
-            return gameUserService.createResponse(false, playerId, strikes, roundStatus);
+            GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+            return gameUserService.createResponse(false, playerId, strikes, gameStatus);
         }
         else {
             Response response = new Response();
@@ -151,8 +165,8 @@ public class GameService {
             response.setPlayerId(playerId);
             //nedim-j: change from 3 to maxguesses
             response.setStrikes(3);
-            response.setRoundStatus(RoundStatus.END);
-            //deleteGame(game);
+            response.setRoundStatus(GameStatus.END);
+            deleteGame(game);
             return response;
         }
     }
@@ -163,16 +177,23 @@ public class GameService {
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikesss(playerId);
-    return gameUserService.createResponse(true, playerId, strikes, RoundStatus.END);
+    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
 
   private void deleteGame(Game game) {
-      //Get the users
-      Player creator = gameUserService.getPlayer(game.getCreatorId());
-      User user = creator.getUser();
-      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
-      User invitedUser = invitedPlayer.getUser();
 
+      //Get the users
+      Player creator = gameUserService.getPlayer(game.getCreatorPlayerId());
+      User host = gameUserService.getUser(creator.getUserId());
+      Player invitedPlayer = gameUserService.getPlayer(game.getInvitedPlayerId());
+      User invitedUser = gameUserService.getUser(invitedPlayer.getUserId());
+
+      host.setStatus(UserStatus.ONLINE);
+      invitedUser.setStatus(UserStatus.ONLINE);
+      gameUserService.saveUserChanges(host);
+      gameUserService.saveUserChanges(invitedUser);
+
+      /*
       //set the game in the Usergamelobbylist to null
       gameUserService.updategamelobbylist(user);
       gameUserService.updategamelobbylist(invitedUser);
@@ -182,6 +203,8 @@ public class GameService {
 
       //delete the game
       gameRepository.delete(game);
+
+       */
   }
 
 
