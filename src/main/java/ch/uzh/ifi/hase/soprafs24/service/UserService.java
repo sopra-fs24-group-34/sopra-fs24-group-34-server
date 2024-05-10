@@ -126,21 +126,29 @@ public class UserService {
 
     public User updateUser(User updatedUser, Long userId) {
         //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
-        User exsistingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
+        User existingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
         // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
-        if (!Objects.equals(updatedUser.getUsername(), "") && !checkIfUserExists(updatedUser)) {
-            exsistingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
+        if (!Objects.equals(updatedUser.getUsername(), "") && !Objects.equals(existingUser.getUsername(), updatedUser.getUsername())) {
+            existingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
+
+            // dario: needed else error in changes
+            if (checkIfUserExists(updatedUser)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username exists");
+            }
+            existingUser.setUsername(updatedUser.getUsername());
         }
-        if (!Objects.equals(updatedUser.getPassword(), "")) {
-            exsistingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
+
+        // dario: update password
+        if (!Objects.equals(updatedUser.getPassword(), "") && !Objects.equals(existingUser.getPassword(), updatedUser.getPassword())) {
+            existingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
         }
-        exsistingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
-        exsistingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
-        exsistingUser.setProfilePicture(updatedUser.getProfilePicture());
+        existingUser.setUserfriendlist(updatedUser.getUserfriendlist()); // smailalijagic: update friendlist
+        existingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
+        existingUser.setProfilePicture(updatedUser.getProfilePicture());
 
 
-        updatedUser = userRepository.save(exsistingUser);
+        updatedUser = userRepository.save(existingUser);
         userRepository.flush();
 
         return updatedUser;
