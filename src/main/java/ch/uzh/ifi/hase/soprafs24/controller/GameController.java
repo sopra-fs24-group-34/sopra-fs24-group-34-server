@@ -26,7 +26,6 @@ public class GameController {
   private final LobbyService lobbyService;
   private final Gson gson = new Gson();
 
-    @Autowired
   GameController(GameService gameService, GameUserService gameUserService, WebSocketHandler webSocketHandler, LobbyService lobbyService) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
@@ -49,26 +48,24 @@ public class GameController {
     return gameService.getGame(gameid);
   }
 
-  @PostMapping("/game/{lobbyid}/start")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Game createGame(@PathVariable("lobbyid") Long lobbyid, @RequestBody String requestBody) {
+  @MessageMapping("/startGame")
+  public Game createGame(String stringJsonRequest) {
     // smailalijagic:
     // 1. correct Lobby, till: gameid is not created yet, compare with lobbyid
     // 2. User1 online?
     // 3. User2 online?
     // 4. remove lobby
     // 5. load game --> game logic (follows)
-    Map<String, Object> requestMap = gson.fromJson(requestBody, Map.class);
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
     GamePostDTO gamePostDTO = gson.fromJson(gson.toJson(requestMap.get("gamePostDTO")), GamePostDTO.class);
     AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
     Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
-    //nedim-j: made new game to return in websocket, feel free to adjust
-    Game createdGame = gameService.creategame(lobbyid, game, authenticationDTO);
+    Game createdGame = gameService.creategame(lobbyId, game, authenticationDTO);
 
-    webSocketHandler.sendMessage("/lobbies/"+lobbyid, "game-started", createdGame);
+    webSocketHandler.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
     return createdGame;
   }
@@ -82,13 +79,18 @@ public class GameController {
     return player;
   }
 
-  @PutMapping("/game/character/choose")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  @ResponseBody
-  public void chooseImage(@RequestBody GuessPostDTO guessPostDTO){
+  @MessageMapping("/chooseImage")
+  public void chooseImage(String stringJsonRequest){
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
+
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
+    //nedim-j: use for round-basis, authentication:
+    //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
+      System.out.println("Request received: " + stringJsonRequest);
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
@@ -113,28 +115,20 @@ public class GameController {
      */
   }
 
-  @PostMapping("/game/character/guess")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  @ResponseBody
-  public Response guessImage(@RequestBody GuessPostDTO guessPostDTO){
+  @MessageMapping("/guessImage")
+  public Response guessImage(String stringJsonRequest){
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
+    //nedim-j: use for round-basis, authentication:
+    //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.guesssimage(guess);
+    System.out.println("Request received: " + stringJsonRequest);
 
     webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
     return response;
   }
-
-  @DeleteMapping("/game/{gameId}/delete")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public void deleteGame(@PathVariable("gameId") String gameid, User user1, User user2) {
-    // smailalijagic:
-    // delete game from database
-    // update stats
-    // load new page
-  }
-
-
 
     // Endpoints regarding game-specific images
     @GetMapping("/games/{gameId}/images")
