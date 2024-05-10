@@ -33,16 +33,18 @@ public class GameService {
   private final UnsplashService unsplashService; // Inject UnsplashService
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
+  private final AuthenticationService authenticationService;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
+    this.authenticationService = authenticationService;
     }
 
   public List<Game> getGames() {
@@ -72,6 +74,7 @@ public class GameService {
 
   public Game creategame(Long lobbyid, Game game, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
+
     // till: check if both players exist
     //gameUserService.checkIfUserExists(game.getCreatorId());
     //gameUserService.checkIfUserExists(game.getInvitedPlayerId());
@@ -82,18 +85,10 @@ public class GameService {
     // till: checks if the user is actually the creator of the lobby
     // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
-
-      //nedim-j: check if user making request is the host. maybe shift to a AuthenticationService.java?
-      User potHost = new User();
-      try {
-          potHost = DTOMapper.INSTANCE.convertAuthenticationDTOtoUser(authenticationDTO);
-      } catch (Exception e) {
-          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No Authentification header sent");
-      }
-
-      if(!lobbyService.isLobbyOwner(potHost, lobbyid)) {
-          throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not the host");
-      }
+    //nedim-j: check if user making request is the host
+    if(!lobbyService.isLobbyOwner(lobbyid, authenticationDTO)) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not the host");
+    }
 
     // till: Create Player instances and set Users to keep connection
     Player player1 = new Player();

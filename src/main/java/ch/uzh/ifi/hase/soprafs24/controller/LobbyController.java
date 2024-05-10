@@ -7,8 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,6 +17,7 @@ import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class LobbyController {
@@ -25,6 +25,7 @@ public class LobbyController {
     private final LobbyService lobbyService;
     private final WebSocketHandler webSocketHandler;
     private final GameUserService gameUserService;
+    private final Gson gson = new Gson();
 
     LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler, GameUserService gameUserService) {
         this.lobbyService = lobbyService;
@@ -124,7 +125,7 @@ public class LobbyController {
     }
 
     @MessageMapping("/updateReadyStatus")
-    public void addMessage(String stringJsonRequest) {
+    public void updateStatus(String stringJsonRequest) {
         try {
             //nedim-j: search/create an own decorator for string parsing maybe
             JsonParser parser = new JsonParser();
@@ -143,6 +144,25 @@ public class LobbyController {
             webSocketHandler.sendMessage(destination, "user-statusUpdate", userGetDTO);
         } catch(Exception e) {
             System.out.println("Something went wrong with ready status: "+e);
+        }
+    }
+
+    @MessageMapping("/closeLobby")
+    public void closeLobby(String stringJsonRequest) {
+        try {
+
+            Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+            Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
+            AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
+            //System.out.println("Request translated: " + readyStatus + " " + lobbyId + " " + userId);
+            lobbyService.closeLobby(lobbyId, authenticationDTO);
+
+            String destination = "/lobbies/" + lobbyId;
+
+            webSocketHandler.sendMessage(destination, "lobby-closed", "Lobby has been closed");
+        } catch(Exception e) {
+            System.out.println("Something went wrong with Lobby closing: "+e);
         }
     }
 

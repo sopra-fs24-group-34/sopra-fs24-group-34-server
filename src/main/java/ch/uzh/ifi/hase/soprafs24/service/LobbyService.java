@@ -5,6 +5,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.slf4j.Logger;
@@ -23,17 +24,16 @@ import java.util.UUID;
 @Service
 @Transactional
 public class LobbyService {
-
-    private final Logger log = LoggerFactory.getLogger(LobbyService.class);
-
+  private final Logger log = LoggerFactory.getLogger(LobbyService.class);
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
-
   private final UserRepository userRepository; // smailalijagic: needed to verify user
+  private final AuthenticationService authenticationService;
 
   @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository) {
+  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
+      this.authenticationService = authenticationService;
   }
 
   public List<User> getUsers() {
@@ -55,8 +55,6 @@ public class LobbyService {
     return userByUsername != null;// smailalijagic: user = null --> does not exist yet
   }
 
-
-
   public List<Lobby> getLobbies() {
     return this.lobbyRepository.findAll();
   }
@@ -76,9 +74,16 @@ public class LobbyService {
     return lobbyById != null;// smailalijagic: lobby = null --> does not exist yet
   }
 
-  public Boolean isLobbyOwner(User user, Long lobbyid) {
-    Lobby lobbyById = lobbyRepository.findByLobbyid(lobbyid);
-    return Objects.equals(lobbyById.getCreator_userid(), user.getId());
+  public Boolean isLobbyOwner(Long lobbyid, AuthenticationDTO authenticationDTO) {
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
+    User host = getUser(lobby.getCreator_userid());
+    return authenticationService.isAuthenticated(host, authenticationDTO);
+  }
+
+  public void closeLobby(Long lobbyId, AuthenticationDTO authenticationDTO) {
+        if(isLobbyOwner(lobbyId, authenticationDTO)) {
+            deleteLobby(lobbyRepository.findByLobbyid(lobbyId));
+        }
   }
 
   public void deleteLobby(Lobby lobby) {
