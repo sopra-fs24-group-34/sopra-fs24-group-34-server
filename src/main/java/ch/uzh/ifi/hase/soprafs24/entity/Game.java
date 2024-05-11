@@ -25,6 +25,7 @@ public class Game implements Serializable {
     private Long guessingtime; // smailalijagic:
 
     //@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+    @Column(length = 7000) // smailalijagic: 7000bytes --> 1750-7000 (=1000 words) chars max. possible = 65'535 bytes --> 16'383-65'535 chars
     private Chat chat = new Chat();
 
     @ManyToMany

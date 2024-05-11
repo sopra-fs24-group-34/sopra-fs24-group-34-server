@@ -24,7 +24,9 @@ public class Chat implements Serializable {
 
   //@OneToMany(cascade = CascadeType.ALL)
   //@JoinColumn(name = "chat_id")
-  private List<ChatTuple> messages = new ArrayList<ChatTuple>(); // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
+  //private List<ChatTuple> messages = new ArrayList<ChatTuple>(); // smailalijagic: messages = {"1", "Is it male?", "2", "Yes", "2", "Does she have red hair?", "1", "Yes", "1", "..."}
+
+    private List<String> messages = new ArrayList<>();
 
   //private List<String> messages;
 
@@ -36,22 +38,33 @@ public class Chat implements Serializable {
   //  this.messages = new ArrayList<>(); // smailalijagic: initialization
   //}
 
-  public void addMessage(String message, Long writerid) {
-    ChatTuple finalMessage = new ChatTuple();
-    finalMessage.setMessage(message);
-    finalMessage.setUserid(writerid);
-    this.messages.add(finalMessage); // smailalijagic: adding messages to DB/repository (=sending message)
-    this.setLastmessage(message);
-    // smailalijagic: messages = {("1", "Is it male?"), ("2", "Yes"), ("2", "Does she have red hair?"), ("1", "Yes"), ("1", "...")}
-  }
+//  public void addMessage(String message, Long writerid) {
+//    ChatTuple finalMessage = new ChatTuple();
+//    finalMessage.setMessage(message);
+//    finalMessage.setUserid(writerid);
+//    this.messages.add(finalMessage); // smailalijagic: adding messages to DB/repository (=sending message)
+//    this.setLastmessage(message);
+//    // smailalijagic: messages = {("1", "Is it male?"), ("2", "Yes"), ("2", "Does she have red hair?"), ("1", "Yes"), ("1", "...")}
+//  }
+//
+//  //public List<ChatTuple<String, Long>> getMessages() {
+//  //  return messages; // smailalijagic: getting message from DB/repository (=reading message)
+//  //}
+//
+//  public List<ChatTuple> getMessages() {
+//    return messages; // smailalijagic: getting message from DB/repository (=reading message)
+//  }
 
-  //public List<ChatTuple<String, Long>> getMessages() {
-  //  return messages; // smailalijagic: getting message from DB/repository (=reading message)
-  //}
+    public List<String> getMessages() {
+        return messages;
+    }
 
-  public List<ChatTuple> getMessages() {
-    return messages; // smailalijagic: getting message from DB/repository (=reading message)
-  }
+    public void setMessages(String message) {
+        List<String> temp = messages;
+        temp.add(message);
+        this.messages = temp;
+        setLastmessage(message);
+    }
 
   public void setLastmessage(String lastmessage) {
     this.lastmessage = lastmessage;
