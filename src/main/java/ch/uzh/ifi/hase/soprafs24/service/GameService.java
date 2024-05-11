@@ -140,33 +140,28 @@ public class GameService {
 
     if (oppChosenCharacter.equals(guess.getImageId())){
       Response r = handleWin(playerId);
-      handleLoss(gameUserService.getOpponentId(game, playerId)); //nedim-j: do we also send a websocket for the loss of opponent?
+      //handle opponents loss
+      gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
       deleteGame(game);
       return r;
-      /* safe to remove?
-        int strikes = gameUserService.getStrikes(playerId);
-        GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
-        return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
-       */
     } else {
-        if (gameUserService.checkStrikes(playerId)) {
+        //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikes(playerId);
             GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
-            return gameUserService.createResponse(false, playerId, strikes, gameStatus);
-        }
-        else {
-            Response response = new Response();
-            response.setGuess(false);
-            response.setPlayerId(playerId);
-            //nedim-j: change from 3 to maxguesses
-            response.setStrikes(3);
-            response.setRoundStatus(GameStatus.END);
-            deleteGame(game);
-            return response;
+            if(gameStatus != GameStatus.END) {
+                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
+            }
+            else {
+                Response r = handleLoss(playerId);
+                //handle opponents win
+                handleWin(gameUserService.getOpponentId(game, playerId)); //nedim-j: do we also send a websocket for the loss of opponent?
+                deleteGame(game);
+                return r;
+            }
         }
     }
-  }
+
 
   public Response handleWin(Long playerId) {
     //nedim-j: handle stats increase etc.
@@ -176,12 +171,12 @@ public class GameService {
     return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
 
-  public void handleLoss(Long playerId) {
+  public Response handleLoss(Long playerId) {
     //nedim-j: handle stats increase etc.
     gameUserService.increaseGamesPlayed(playerId);
-    //gameUserService.increaseWinTotal(playerId); //nedim-j: mb increaseLoss? round-based games could be drawn as well
-    //int strikes = gameUserService.getStrikes(playerId);
-    //return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
+     //nedim-j: mb increaseLoss? round-based games could be drawn as well
+    int strikes = gameUserService.getStrikes(playerId);
+    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
 }
 
   private void deleteGame(Game game) {
