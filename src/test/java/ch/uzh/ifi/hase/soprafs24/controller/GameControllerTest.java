@@ -1,18 +1,13 @@
 
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,7 +65,7 @@ public class GameControllerTest {
             // Mock the response from game service
             Game createdGame = new Game();
             createdGame.setGameId(1L);
-            given(gameService.creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class))).willReturn(createdGame);
+            given(gameService.createGame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class))).willReturn(createdGame);
 
             MockHttpServletRequestBuilder postRequest = post("/game/{lobbyid}/start", lobbyId)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +77,7 @@ public class GameControllerTest {
                     .andExpect(jsonPath("$.gameId", is(createdGame.getGameId().intValue())));
 
             // verify that creategame was called with the expected arguments
-            verify(gameService).creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class));
+            verify(gameService).createGame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class));
         }
 
 

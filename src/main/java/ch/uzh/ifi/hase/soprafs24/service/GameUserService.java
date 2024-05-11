@@ -39,22 +39,27 @@ public class GameUserService {
       return userRepository.findUserById(userId);
   }
 
-
-  public Long getChosenCharacterofOpponent(Game game, Long playerid) {
+  public Long getOpponentId(Game game, Long playerId) {
       // till: get players from the game
-      Long creatorid = game.getCreatorPlayerId();
+      Long creatorId = game.getCreatorPlayerId();
 
       // create Long for opponentplayerid
-      Long opponentid;
+      Long opponentId;
       // Find the opponent player (the player who is not the one making the guess)
-      if (playerid.equals(creatorid)){
-          opponentid = game.getInvitedPlayerId();
+      if (playerId.equals(creatorId)){
+          opponentId = game.getInvitedPlayerId();
       } else {
-          opponentid = game.getCreatorPlayerId();
+          opponentId = game.getCreatorPlayerId();
       }
+      return opponentId;
+  }
 
+
+  public Long getChosenCharacterOfOpponent(Game game, Long playerId) {
+
+      Long opponentId = getOpponentId(game, playerId);
       // get player to get chosencharacter
-      Player opponent = playerRepository.findByPlayerId(opponentid);
+      Player opponent = playerRepository.findByPlayerId(opponentId);
 
       return opponent.getChosencharacter();
   }
@@ -80,7 +85,7 @@ public class GameUserService {
         return true;
     }
 
-    public int getStrikesss(Long playerId) {
+    public int getStrikes(Long playerId) {
       return getPlayer(playerId).getStrikes();
     }
 
@@ -133,8 +138,6 @@ public class GameUserService {
       }
       userRepository.save(user);
       userRepository.flush();
-      userRepository.save(user);
-      userRepository.flush();
   }
 
   public void increaseGamesPlayed(Long playerId){
@@ -184,16 +187,6 @@ public class GameUserService {
     return user.getStatus() == UserStatus.ONLINE;
   }
 
-  public Boolean checkForCorrectLobby(Long lobbyid, Long userid) {
-    // gets the Lobby
-    Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
-    // checks if the userid is the same as the one saved in the lobby
-    if (lobby.getCreator_userid().equals(userid)){
-      return true;
-    } else {
-      return false;
-        }
-    }
 
   public Boolean checkIfUserExists(Long userid){
         User user = userRepository.findUserById(userid);
