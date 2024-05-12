@@ -32,24 +32,20 @@ public class FriendController {
     // add friend request
     @PostMapping("/users/{userId}/friends/add")
     @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
     public void sendFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPostDTO friendRequestPostDTO) {
         System.out.println("DO FRIEND REQUEST POST");
-        User sender = userService.getUser(userId);
-        User receiver = userService.getUserByUsername(friendRequestPostDTO.getReceiverUserName());
-        FriendRequest friendRequest = DTOMapper.INSTANCE.convertFriendRequestPostDTOtoEntity(friendRequestPostDTO);
-        friendRequest.setReceiverId(receiver.getId());
-        friendRequest.setSenderUserName(sender.getUsername());
-        friendService.createFriendRequest(friendRequest);
+        friendService.createFriendRequest(friendRequestPostDTO);
     }
 
 
 
     // Handle friend request (accept or decline)
-    @PostMapping("/users/{userId}/friends/answer")
+    @PutMapping("/users/{userId}/friends/answer")
     @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
     public boolean answerFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPutDTO friendRequestPutDTO){
-        FriendRequest friendrequest = DTOMapper.INSTANCE.convertFriendRequestPutDTOtoEntity(friendRequestPutDTO);
-        return friendService.answerFriendRequest(friendrequest, friendRequestPutDTO.isAnswer());
+        return friendService.answerFriendRequest(friendRequestPutDTO);
 
     }
 
@@ -70,6 +66,7 @@ public class FriendController {
     // Delete friend
     @DeleteMapping("/users/{userId}/friends/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
     public void deleteFriend(@PathVariable Long userId) {
 
     }
@@ -87,6 +84,7 @@ public class FriendController {
     // Get all friend requests
     @GetMapping("/users/{userId}/friends/requests")
     @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
     public List<FriendGetDTO> getFriendRequests(@PathVariable Long userId) {
         System.out.println("DO FRIEND REQUESTS GETTER");
         User receiver = userService.getUser(userId);

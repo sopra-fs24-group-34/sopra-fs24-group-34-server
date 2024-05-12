@@ -43,7 +43,7 @@ public class User implements Serializable {
   @Column()
   private String usericon; // smailalijagic: added --> String datatype correct?
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany
   @JoinTable(
           name = "friendRequests",
           joinColumns = @JoinColumn(name = "userId"),
@@ -53,7 +53,7 @@ public class User implements Serializable {
   private List<FriendRequest> friendRequests = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
 
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany
   @JoinTable(
           name = "friends",
           joinColumns = @JoinColumn(name = "userId"),
@@ -161,6 +161,10 @@ public class User implements Serializable {
 
   public void addFriendRequest(FriendRequest friendRequest) {
       this.friendRequests.add(friendRequest);
+  }
+
+  public void removeFriendRequest(FriendRequest friendRequest) {
+      this.friendRequests.remove(friendRequest);
   }
 
   public List<FriendRequest> getFriendRequests() {
