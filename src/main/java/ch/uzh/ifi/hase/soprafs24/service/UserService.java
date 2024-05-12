@@ -54,7 +54,10 @@ public class UserService {
     }
 
     public AuthenticationDTO createUser(User newUser) {
-        checkIfUserExists(newUser);
+        if(checkIfUserExists(newUser)) {
+            String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+        }
         if (newUser.getUsername() == null || newUser.getPassword() == null) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
         }
@@ -74,7 +77,10 @@ public class UserService {
   }
 
   public AuthenticationDTO createGuestUser(User newGuestUser) {
-    checkIfUserExists(newGuestUser);
+      if(checkIfUserExists(newGuestUser)) {
+          String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+          throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+      }
     newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
     newGuestUser.setToken(UUID.randomUUID().toString());
 
@@ -107,12 +113,15 @@ public class UserService {
      */
     private Boolean checkIfUserExists(User userToBeCreated) {
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-
+        return userByUsername != null;
+        //nedim-j: should not handle that here
+        /*
         String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
         if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         }
-        return false; // smailalijagic: user = null --> does not exist yet
+
+         */
     }
 
   public AuthenticationDTO loginUser(User loginUser) {
@@ -136,9 +145,11 @@ public class UserService {
             existingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
 
             // dario: needed else error in changes
+            /*
             if (checkIfUserExists(updatedUser)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Username exists");
             }
+             */
             existingUser.setUsername(updatedUser.getUsername());
         }
 
