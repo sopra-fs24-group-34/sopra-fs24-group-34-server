@@ -71,6 +71,9 @@ public class User implements Serializable {
   @Column(nullable = true)
   private Long totalwins; // smailalijagic: number of won games
 
+  @ElementCollection
+  private List<String> lobbyInvitations = new ArrayList<>();
+
   public Long getId() {
     return id;
   }
@@ -173,5 +176,13 @@ public class User implements Serializable {
 
   public void setFriendRequests(List<FriendRequest> pendingFriendRequests) {
       this.friendRequests = pendingFriendRequests;
+  }
+
+  public List<String> getLobbyInvitations() {
+      return lobbyInvitations;
+  }
+
+  public void setLobbyInvitations(List<String> LobbyInvitations) {
+      lobbyInvitations = LobbyInvitations;
   }
 }

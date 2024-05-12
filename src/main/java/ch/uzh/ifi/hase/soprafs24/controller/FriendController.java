@@ -4,12 +4,17 @@ import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyInvitationPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,6 +26,8 @@ public class FriendController {
 
     private final FriendService friendService;
     private final UserService userService;
+
+    private WebSocketHandler webSocketHandler;
 
     @Autowired
     FriendController(FriendService friendService, UserService userService) {
@@ -49,14 +56,19 @@ public class FriendController {
 
     }
 
-    //Invite friend into game
-    /*@PostMapping("/game/invite/{userId}")
+    //Invite friend into lobby
+    @PostMapping("/lobby/invite")
     @ResponseStatus(HttpStatus.CREATED)
-    public void gameInvitation(@PathVariable Long userId, @RequestBody FriendRequestDTO gameInvitationDTO) {
+    @ResponseBody
+    public void lobbyInvite(@RequestBody LobbyInvitationPostDTO lobbyInvitationPostDTO) {
+        System.out.println("DO LOBBY INVITE POST");
+        Long userId = lobbyInvitationPostDTO.getCreatorId();
+        Long invitedUserId = lobbyInvitationPostDTO.getInvitedUserId();
 
-    }*/
+        friendService.inviteFriendtoLobby(userId, invitedUserId);
+    }
 
-    // Handle game invitation
+    // Handle lobby invitation
     /*@PostMapping("/game/{userId}/invitationresponse")
     @ResponseStatus(HttpStatus.OK)
     public void handleGameInvitation(@PathVariable Long userId, @RequestBody FriendRequestDTO friendRequestDTO){

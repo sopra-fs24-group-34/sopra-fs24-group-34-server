@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyInvitationPostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,6 +88,19 @@ public class FriendService {
         return false;
         }
 
+    public boolean checkFriendRequest(FriendRequest sentFriendRequest, List<FriendRequest> friendRequestsList){
+        if (friendRequestsList == null) {
+            return false; // List is empty, so no ChildObject with the attributes exists
+        }
+        for (FriendRequest friendRequest : friendRequestsList) {
+            if (friendRequest.getSenderId() == sentFriendRequest.getSenderId()
+                    && friendRequest.getSenderUserName().equals(sentFriendRequest.getSenderUserName())) {
+                return true; // Found a FriendRequest from the User
+            }
+        }
+        return false;
+    }
+
     public List<FriendGetDTO> getFriends(User user) {
         List<User> friends = user.getFriendsList();
         List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
@@ -100,5 +115,23 @@ public class FriendService {
         friendGetDTO.setFriendUsername(user.getUsername());
         friendGetDTO.setFriendId(user.getId());
         return friendGetDTO;
+    }
+
+    public void inviteFriendtoLobby(Long userId, Long invitedUserId) {
+        User user = userRepository.findUserById(userId);
+        User invitedUser = userRepository.findUserById(invitedUserId);
+
+        if (invitedUser.getStatus() != UserStatus.ONLINE) {
+            System.out.println("The invited Friend cannot be invited to a Lobby right now.");
+        }
+        if (user.getStatus() != UserStatus.ONLINE){
+            System.out.println("The user cannot send a lobby invitation right now.");
+        }
+        List<String> invitations = invitedUser.getLobbyInvitations();
+        invitations.add(user.getUsername());
+        invitedUser.setLobbyInvitations(invitations);
+        userRepository.save(invitedUser);
+        userRepository.flush();
+
     }
 }
