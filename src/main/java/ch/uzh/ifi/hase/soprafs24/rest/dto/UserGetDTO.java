@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +23,9 @@ public class UserGetDTO {
 
   private Long id;
 
-  private Set<User> friendsList; // smailalijagic: adding and removing friends from friendlist
+  private List<FriendRequest> friendRequests = new ArrayList<>();
+
+  private Set<FriendGetDTO> friendsList; // smailalijagic: adding and removing friends from friendlist
 
   private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
 
@@ -79,11 +83,19 @@ public class UserGetDTO {
     this.status = status;
   }
 
-  public Set<User> getFriendsList() {
+    public void setFriendRequests(List<FriendRequest> friendRequests) {
+        this.friendRequests = friendRequests;
+    }
+
+    public List<FriendRequest> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public Set<FriendGetDTO> getFriendsList() {
     return friendsList;
   }
 
-  public void setFriendsList(Set<User> userfriendlist) {
+  public void setFriendsList(Set<FriendGetDTO> userfriendlist) {
     this.friendsList = userfriendlist;
   }
 

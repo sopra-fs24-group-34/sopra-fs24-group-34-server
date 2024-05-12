@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -53,14 +55,15 @@ public class User implements Serializable {
   private List<FriendRequest> friendRequests = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
 
 
-  @ManyToMany
+  /**@OneToMany
   @JoinTable(
           name = "friends",
           joinColumns = @JoinColumn(name = "userId"),
           inverseJoinColumns = @JoinColumn(name = "friendId")
   )
-  // smailalijagic: user can have many friends and be friends with many
-  private List<User> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
+  // smailalijagic: user can have many friends and be friends with many*/
+  @ElementCollection
+  private List<Friend> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
 
   @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
   private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
@@ -73,6 +76,8 @@ public class User implements Serializable {
 
   @ElementCollection
   private List<String> lobbyInvitations = new ArrayList<>();
+
+
 
   public Long getId() {
     return id;
@@ -122,15 +127,15 @@ public class User implements Serializable {
     this.usericon = usericon;
   }
 
-  public List<User> getFriendsList() {
+  public List<Friend> getFriendsList() {
     return friendsList;
   }
 
-  public void setFriendsList(List<User> FriendsList) {
+  public void setFriendsList(List<Friend> FriendsList) {
     this.friendsList = FriendsList;
   }
 
-  public void addFriend(User friend) {
+  public void addFriend(Friend friend) {
     this.friendsList.add(friend);
   }
 

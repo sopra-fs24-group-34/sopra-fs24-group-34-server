@@ -1,15 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyInvitationPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -63,30 +61,37 @@ public class FriendService {
     public boolean answerFriendRequest(FriendRequestPutDTO friendRequestPutDTO){
         User sender = userRepository.findUserById(friendRequestPutDTO.getSenderId());
         User receiver = userRepository.findUserById(friendRequestPutDTO.getReceiverId());
-
+        System.out.println("Works 1");
         if (friendRequestRepository.findBySenderIdAndReceiverId(sender.getId(), receiver.getId()) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such friend request");
         }
         FriendRequest friendRequest = friendRequestRepository.findBySenderIdAndReceiverId(sender.getId(), receiver.getId());
-
+        System.out.println("Works 2");
         for (FriendRequest request : sender.getFriendRequests()) System.out.println(request.getSenderId() + " " + request.getReceiverId());
         for (FriendRequest request : receiver.getFriendRequests()) System.out.println(request.getSenderId() + " " + request.getReceiverId());
-
+        System.out.println("Works 3");
         if (!sender.getFriendRequests().contains(friendRequest) && receiver.getFriendRequests().contains(friendRequest)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such friend request in the database");
         }
-
+        System.out.println("Works 4");
         sender.removeFriendRequest(friendRequest);
         receiver.removeFriendRequest(friendRequest);
         friendRequestRepository.delete(friendRequest);
-
         if (friendRequestPutDTO.isAnswer()) {
-            sender.addFriend(receiver);
-            receiver.addFriend(sender);
+            sender.addFriend(createFriend(receiver)); //till: create Friend and add id as value for a friend
+            receiver.addFriend(createFriend(sender)); //same
             return true;
             }
         return false;
         }
+
+    private Friend createFriend(User user) {
+        Friend friend = new Friend();
+        friend.setFriendId(user.getId());
+        friend.setFriendIcon(user.getUsericon());
+        friend.setFriendUsername(user.getUsername());
+        return friend;
+    }
 
     public boolean checkFriendRequest(FriendRequest sentFriendRequest, List<FriendRequest> friendRequestsList){
         if (friendRequestsList == null) {
@@ -101,11 +106,11 @@ public class FriendService {
         return false;
     }
 
-    public List<FriendGetDTO> getFriends(User user) {
-        List<User> friends = user.getFriendsList();
-        List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
-        for (User friend : friends) friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));
-        return friendGetDTOs;
+    public List<Friend> getFriends(User user) {
+        List<Friend> friends = user.getFriendsList();
+        /**List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
+        for (UserGetDTO friend : friends) friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));*/
+        return friends;
     }
 
     public FriendGetDTO convertFriendRequestToFriend(FriendRequest friendRequest) {

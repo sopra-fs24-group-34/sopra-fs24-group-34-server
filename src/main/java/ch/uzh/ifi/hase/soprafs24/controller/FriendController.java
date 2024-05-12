@@ -1,10 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyInvitationPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
@@ -37,10 +35,10 @@ public class FriendController {
 
 
     // add friend request
-    @PostMapping("/users/{userId}/friends/add")
+    @PostMapping("/users/friends/add")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public void sendFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPostDTO friendRequestPostDTO) {
+    public void sendFriendRequest(@RequestBody FriendRequestPostDTO friendRequestPostDTO) {
         System.out.println("DO FRIEND REQUEST POST");
         friendService.createFriendRequest(friendRequestPostDTO);
     }
@@ -48,10 +46,11 @@ public class FriendController {
 
 
     // Handle friend request (accept or decline)
-    @PutMapping("/users/{userId}/friends/answer")
+    @PutMapping("/users/friends/answer")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public boolean answerFriendRequest(@PathVariable Long userId, @RequestBody FriendRequestPutDTO friendRequestPutDTO){
+    public boolean answerFriendRequest(@RequestBody FriendRequestPutDTO friendRequestPutDTO){
+        System.out.println("DO FRIEND ANSWER POST");
         return friendService.answerFriendRequest(friendRequestPutDTO);
 
     }
@@ -87,7 +86,7 @@ public class FriendController {
     @GetMapping("/users/{userId}/friends")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<FriendGetDTO> getAllUsers(@PathVariable Long userId) {
+    public List<Friend> getAllFriends(@PathVariable Long userId) {
         System.out.println("DO FRIENDS GETTER");
         User user = userService.getUser(userId);
         return friendService.getFriends(user);

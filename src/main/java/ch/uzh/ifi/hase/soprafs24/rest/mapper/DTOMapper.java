@@ -40,6 +40,7 @@ public interface DTOMapper {
     @Mapping(source = "totalplayed", target = "totalplayed")
     @Mapping(source = "totalwins", target = "totalwins")
     @Mapping(source = "lobbyInvitations", target = "lobbyinvitations")
+    @Mapping(source = "friendRequests", target = "friendRequests")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
     @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
