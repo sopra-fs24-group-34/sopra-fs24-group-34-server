@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public AuthenticationDTO createUser(User newUser) {
-        if(checkIfUserExists(newUser)) {
+        if(checkIfUsernameExists(newUser)) {
             String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         }
@@ -77,7 +77,7 @@ public class UserService {
   }
 
   public AuthenticationDTO createGuestUser(User newGuestUser) {
-      if(checkIfUserExists(newGuestUser)) {
+      if(checkIfUsernameExists(newGuestUser)) {
           String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
           throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
       }
@@ -111,16 +111,19 @@ public class UserService {
      * @throws org.springframework.web.server.ResponseStatusException
      * @see User
      */
-    private Boolean checkIfUserExists(User userToBeCreated) {
-        User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-        return userByUsername != null;
+    private Boolean checkIfUsernameExists(User userToBeCreated) {
+        try {
+            User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
+            return userByUsername != null;
+        } catch(Exception e) {
+            return false;
+        }
         //nedim-j: should not handle that here
         /*
         String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
         if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         }
-
          */
     }
 
@@ -141,16 +144,17 @@ public class UserService {
         User existingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
         // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
-        if (!Objects.equals(updatedUser.getUsername(), "") && !Objects.equals(existingUser.getUsername(), updatedUser.getUsername())) {
-            existingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
+        if(!Objects.equals(updatedUser.getUsername(), "") && !Objects.equals(existingUser.getUsername(), updatedUser.getUsername())) {
+            if (!checkIfUsernameExists(updatedUser)) {
+                existingUser.setUsername(updatedUser.getUsername()); // smailalijagic: update username
 
-            // dario: needed else error in changes
-            /*
-            if (checkIfUserExists(updatedUser)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username exists");
+                // dario: needed else error in changes
+                existingUser.setUsername(updatedUser.getUsername());
             }
-             */
-            existingUser.setUsername(updatedUser.getUsername());
+            else {
+                String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+                throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+            }
         }
 
         // dario: update password
@@ -162,10 +166,10 @@ public class UserService {
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
 
 
-        updatedUser = userRepository.save(existingUser);
+        userRepository.save(existingUser);
         userRepository.flush();
 
-        return updatedUser;
+        return existingUser;
     }
 
     public void deleteUser(Long id) {
