@@ -41,6 +41,7 @@ public class User implements Serializable {
   @Column(nullable = true)
   private String profilePicture;
 
+  @Column(length = 5000) // smailalijagic: 5000bytes --> don't know how many bytes per user needed chars max. possible = 65'535 bytes --> 16'383-65'535 chars
   @ManyToMany(cascade = CascadeType.ALL) // smailalijagic: user can have many friends and be friends with many
   private List<User> userfriendlist; // smailalijagic: userfriendlist contains Users
 
