@@ -47,6 +47,8 @@ public class GameController {
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public Game createGame(@PathVariable("lobbyid") Long lobbyid, @RequestBody GamePostDTO gamePostDTO) {
+    System.out.println("CreatorId: " + gamePostDTO.getCreator_userid());
+    System.out.println("InvitedUserId: "+ gamePostDTO.getInvited_userid());
     // smailalijagic:
     // 1. correct Lobby, till: gameid is not created yet, compare with lobbyid
     // 2. User1 online?
@@ -55,6 +57,8 @@ public class GameController {
     // 5. load game --> game logic (follows)
     Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
     //nedim-j: made new game to return in pusher, feel free to adjust
+    System.out.println("CreatorId: " + game.getCreatorId());
+    System.out.println("InvitedUserId: "+game.getInvitedPlayerId());
     Game createdGame = gameService.creategame(lobbyid, game);
 
     webSocketHandler.sendMessage("/lobbies/"+lobbyid, "game-started", createdGame);

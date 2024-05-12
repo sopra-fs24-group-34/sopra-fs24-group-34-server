@@ -18,7 +18,7 @@ public class Player implements Serializable {
     private int strikes;
 
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "userid")
     private User user;
 
 

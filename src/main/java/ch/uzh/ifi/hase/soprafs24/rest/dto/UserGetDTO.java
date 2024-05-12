@@ -29,6 +29,8 @@ public class UserGetDTO {
 
   private Long totalwins; // smailalijagic: natural number in range [0, n)
 
+  private List<String> lobbyinvitations;
+
   public String getPassword() {
     return password;
   }
@@ -108,4 +110,12 @@ public class UserGetDTO {
   public void setTotalwins(Long totalwins) {
     this.totalwins = totalwins;
   }
+
+    public List<String> getLobbyinvitations() {
+        return lobbyinvitations;
+    }
+
+    public void setLobbyinvitations(List<String> Lobbyinvitations) {
+        lobbyinvitations = Lobbyinvitations;
+    }
 }
