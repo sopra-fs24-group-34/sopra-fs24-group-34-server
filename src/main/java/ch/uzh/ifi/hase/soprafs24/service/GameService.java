@@ -7,7 +7,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -63,30 +62,25 @@ public class GameService {
       player.setChosencharacter(guess.getImageId());
       gameUserService.savePlayerChanges(player);
     } else {
-      throw new IllegalStateException("The player has already chosen a character.");
+      //throw new IllegalStateException("The player has already chosen a character.");
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "The player has already chosen a character");
     }
     return gameUserService.createResponse(false, player.getPlayerId(), player.getStrikes(), gameUserService.determineStatus(guess.getGameId()));
   }
 
-  public Boolean playerHasSelected(Long playerId) {
-      return gameUserService.getPlayer(playerId).getChosencharacter() != null;
-  }
-
-  public Game creategame(Long lobbyid, Game game, AuthenticationDTO authenticationDTO) {
-    Lobby lobby = lobbyRepository.findByLobbyid(lobbyid); // smailalijagic: get lobby object
+  public Game createGame(Long lobbyId, Game game, AuthenticationDTO authenticationDTO) {
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyId); // smailalijagic: get lobby object
 
     // till: check if both players exist
     //gameUserService.checkIfUserExists(game.getCreatorId());
     //gameUserService.checkIfUserExists(game.getInvitedPlayerId());
     // till: check if both players are online
-    //nedim-j: should keep it commented out atm, because ready/inlobby/online status not done yet
+    //nedim-j: should keep it commented out atm, because status not done yet, also make it checkIfUserInlobbyReady
     //gameUserService.checkIfUserOnline(game.getCreatorId());
     //gameUserService.checkIfUserOnline(game.getInvitedPlayerId());
-    // till: checks if the user is actually the creator of the lobby
-    // gameUserService.checkForCorrectLobby(lobbyid, game.getCreatorId());
 
     //nedim-j: check if user making request is the host
-    if(!lobbyService.isLobbyOwner(lobbyid, authenticationDTO)) {
+    if(!lobbyService.isLobbyOwner(lobbyId, authenticationDTO)) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not the host");
     }
 
@@ -126,7 +120,7 @@ public class GameService {
     return game;
   }
 
-  public Response guesssimage(Guess guess){
+  public Response guessImage(Guess guess){
     //till: check if game exists
     // checkIfGameExists(guess.getGameId());
     //till: check if Imageid exists
@@ -134,7 +128,7 @@ public class GameService {
     //till: check if player is in the game
     Game game = new Game();
     try {
-        game = gameRepository.findByGameId(Long.valueOf(guess.getGameId()));
+        game = gameRepository.findByGameId(guess.getGameId());
     } catch(Exception e) {
         System.out.println("Game is null in GameService.guessImage");
     }
@@ -142,43 +136,48 @@ public class GameService {
     //gameUserService.checkIfPlayerinGame(game, playerId);
 
     //get the chosencharacter of the Opponent
-    Long oppChosenCharacter = gameUserService.getChosenCharacterofOpponent(game, playerId);
+    Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
 
     if (oppChosenCharacter.equals(guess.getImageId())){
-      //Response r = handleWin(playerId);
+      Response r = handleWin(playerId);
+      //handle opponents loss
+      gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
       deleteGame(game);
-      //return r;
-        int strikes = gameUserService.getStrikesss(playerId);
-        //GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
-        GameStatus gameStatus = GameStatus.END;
-        return gameUserService.createResponse(true, playerId, strikes, gameStatus);
+      return r;
     } else {
-        if (gameUserService.checkStrikes(playerId)) {
+        //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
             gameUserService.increaseStrikesByOne(playerId);
-            int strikes = gameUserService.getStrikesss(playerId);
+            int strikes = gameUserService.getStrikes(playerId);
             GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
-            return gameUserService.createResponse(false, playerId, strikes, gameStatus);
-        }
-        else {
-            Response response = new Response();
-            response.setGuess(false);
-            response.setPlayerId(playerId);
-            //nedim-j: change from 3 to maxguesses
-            response.setStrikes(3);
-            response.setRoundStatus(GameStatus.END);
-            deleteGame(game);
-            return response;
+            if(gameStatus != GameStatus.END) {
+                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
+            }
+            else {
+                Response r = handleLoss(playerId);
+                //handle opponents win
+                handleWin(gameUserService.getOpponentId(game, playerId)); //nedim-j: do we also send a websocket for the loss of opponent?
+                deleteGame(game);
+                return r;
+            }
         }
     }
-  }
+
 
   public Response handleWin(Long playerId) {
-      //nedim-j: handle stats increase etc.
+    //nedim-j: handle stats increase etc.
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
-    int strikes = gameUserService.getStrikesss(playerId);
+    int strikes = gameUserService.getStrikes(playerId);
     return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
+
+  public Response handleLoss(Long playerId) {
+    //nedim-j: handle stats increase etc.
+    gameUserService.increaseGamesPlayed(playerId);
+     //nedim-j: mb increaseLoss? round-based games could be drawn as well
+    int strikes = gameUserService.getStrikes(playerId);
+    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
+}
 
   private void deleteGame(Game game) {
 
@@ -206,9 +205,6 @@ public class GameService {
 
        */
   }
-
-
-
 
   public Boolean checkIfGameExists(Long gameId) {
     try {

@@ -7,13 +7,10 @@ import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -63,7 +60,7 @@ public class GameController {
 
     Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
-    Game createdGame = gameService.creategame(lobbyId, game, authenticationDTO);
+    Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
 
     webSocketHandler.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
@@ -90,29 +87,11 @@ public class GameController {
     //nedim-j: use for round-basis, authentication:
     //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
-      System.out.println("Request received: " + stringJsonRequest);
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
     webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
 
-    /*
-    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Game game = gameService.getGame(guess.getGameId());
-    Long creatorId = game.getCreatorId();
-    Long invitedId = game.getInvitedPlayerId();
-    if(!gameService.playerHasSelected(guess.getPlayerId())) {
-        gameService.selectimage(guess);
-        //if(gameService.playerHasSelected(creatorId) && gameService.playerHasSelected(invitedId)) {
-
-            String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
-            pusher.trigger(channelName, "round-update", message);
-        //}
-    }
-    else {
-        throw new RuntimeException("You have already chosen a character");
-    }
-     */
   }
 
   @MessageMapping("/guessImage")
@@ -123,8 +102,7 @@ public class GameController {
     //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Response response = gameService.guesssimage(guess);
-    System.out.println("Request received: " + stringJsonRequest);
+    Response response = gameService.guessImage(guess);
 
     webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
     return response;
