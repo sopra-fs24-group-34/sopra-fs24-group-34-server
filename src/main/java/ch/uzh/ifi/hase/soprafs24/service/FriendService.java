@@ -6,10 +6,14 @@ import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -31,11 +35,21 @@ public class FriendService {
         this.friendRequestRepository = friendRequestRepository;
     }
 
-    public void createFriendRequest(FriendRequest friendRequest){
-        User sender = userRepository.findUserById(friendRequest.getSenderId());
-        User receiver = userRepository.findUserById(friendRequest.getReceiverId());
+    public void createFriendRequest(FriendRequestPostDTO friendRequestPostDTO){
+        FriendRequest friendRequest = new FriendRequest();
+        User sender = userRepository.findUserById(friendRequestPostDTO.getSenderId());
+        User receiver = userRepository.findByUsername(friendRequestPostDTO.getReceiverUserName());
+
+        assert sender != receiver: "You cannot send a friend request to yourself";
+
+        friendRequest.setSenderUserName(sender.getUsername());
+        friendRequest.setReceiverUserName(receiver.getUsername());
+        friendRequest.setSenderId(sender.getId());
+        friendRequest.setReceiverId(receiver.getId());
+
         assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
         sender.addFriendRequest(friendRequest);
+        receiver.addFriendRequest(friendRequest);
         friendRequestRepository.save(friendRequest);
         friendRequestRepository.flush();
     }
@@ -44,19 +58,33 @@ public class FriendService {
         return user.getFriendRequests();
     }
 
-    public boolean answerFriendRequest(FriendRequest friendRequest, boolean answer){
-        User sender = userRepository.findUserById(friendRequest.getSenderId());
-        if (!sender.getFriendRequests().contains(friendRequest)) {
-            throw new IllegalArgumentException("This friend request does not exist");
+    public boolean answerFriendRequest(FriendRequestPutDTO friendRequestPutDTO){
+        User sender = userRepository.findUserById(friendRequestPutDTO.getSenderId());
+        User receiver = userRepository.findUserById(friendRequestPutDTO.getReceiverId());
+
+        if (friendRequestRepository.findBySenderIdAndReceiverId(sender.getId(), receiver.getId()) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such friend request");
         }
-        sender.getFriendRequests().remove(friendRequest);
-        if (answer) {
-            User receiver = userRepository.findUserById(friendRequest.getReceiverId());
+        FriendRequest friendRequest = friendRequestRepository.findBySenderIdAndReceiverId(sender.getId(), receiver.getId());
+
+        for (FriendRequest request : sender.getFriendRequests()) System.out.println(request.getSenderId() + " " + request.getReceiverId());
+        for (FriendRequest request : receiver.getFriendRequests()) System.out.println(request.getSenderId() + " " + request.getReceiverId());
+
+        if (!sender.getFriendRequests().contains(friendRequest) && receiver.getFriendRequests().contains(friendRequest)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no such friend request in the database");
+        }
+
+        sender.removeFriendRequest(friendRequest);
+        receiver.removeFriendRequest(friendRequest);
+        friendRequestRepository.delete(friendRequest);
+
+        if (friendRequestPutDTO.isAnswer()) {
             sender.addFriend(receiver);
+            receiver.addFriend(sender);
             return true;
-        }
+            }
         return false;
-    }
+        }
 
     public List<FriendGetDTO> getFriends(User user) {
         List<User> friends = user.getFriendsList();
