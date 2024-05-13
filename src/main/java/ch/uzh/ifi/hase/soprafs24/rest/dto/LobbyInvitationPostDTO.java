@@ -4,7 +4,7 @@ public class LobbyInvitationPostDTO {
 
     private Long creatorId;
 
-    private Long invitedUserId;
+    private String invitedUserName;
 
     private Long lobbyId;
 
@@ -16,12 +16,12 @@ public class LobbyInvitationPostDTO {
         this.creatorId = creatorId;
     }
 
-    public void setInvitedUserId(Long invitedUserId) {
-        this.invitedUserId = invitedUserId;
+    public void setInvitedUserId(String invitedUserName) {
+        this.invitedUserName = invitedUserName;
     }
 
-    public Long getInvitedUserId() {
-        return invitedUserId;
+    public String getInvitedUserId() {
+        return invitedUserName;
     }
 
     public Long getLobbyId() {

@@ -63,10 +63,10 @@ public class FriendController {
     public void lobbyInvite(@RequestBody LobbyInvitationPostDTO lobbyInvitationPostDTO) {
         System.out.println("DO LOBBY INVITE POST");
         Long userId = lobbyInvitationPostDTO.getCreatorId();
-        Long invitedUserId = lobbyInvitationPostDTO.getInvitedUserId();
+        String invitedUsername = lobbyInvitationPostDTO.getInvitedUserId();
         Long lobbyId = lobbyInvitationPostDTO.getLobbyId();
 
-        friendService.inviteFriendtoLobby(userId, invitedUserId, lobbyId);
+        friendService.inviteFriendtoLobby(userId, invitedUsername, lobbyId);
     }
 
     // Handle lobby invitation

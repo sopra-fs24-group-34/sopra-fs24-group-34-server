@@ -119,9 +119,9 @@ public class FriendService {
         return friendGetDTO;
     }
 
-    public void inviteFriendtoLobby(Long creatorId, Long invitedUserId, Long lobbyId) {
+    public void inviteFriendtoLobby(Long creatorId, String invitedUserName, Long lobbyId) {
         User creator = userRepository.findUserById(creatorId);
-        User invitedUser = userRepository.findUserById(invitedUserId);
+        User invitedUser = userRepository.findByUsername(invitedUserName);
 
         if (invitedUser.getStatus() != UserStatus.ONLINE) {
             System.out.println("The invited Friend cannot be invited to a Lobby right now.");
@@ -129,14 +129,10 @@ public class FriendService {
         if (creator.getStatus() != UserStatus.INLOBBY){
             System.out.println("The user cannot send a lobby invitation right now.");
         }
-        List<LobbyInvitation> invitations = invitedUser.getLobbyInvitations(); //till: create a Set of the Creator's username and the lobbyId
         LobbyInvitation invitation = new LobbyInvitation();
         invitation.setCreatorUsername(creator.getUsername());
         invitation.setLobbyId(lobbyId);
-        invitations.add(invitation);
-        invitedUser.setLobbyInvitations(invitations); //till: add the set to the List of invitations
-        userRepository.save(invitedUser);
-        userRepository.flush();
+        invitedUser.addLobbyInvitation(invitation);
     }
 
     public void answerLobbyInvitation(LobbyInvitationPutDTO lobbyInvitationPutDTO) {

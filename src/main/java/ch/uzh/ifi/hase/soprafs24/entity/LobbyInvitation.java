@@ -7,8 +7,11 @@ public class LobbyInvitation {
 
     private String creatorUsername;
 
+    private String creatorIcon;
+
     private Long lobbyId;
 
+    private Long creatorId;
 
     public String getCreatorUsername() {
         return creatorUsername;
@@ -24,5 +27,21 @@ public class LobbyInvitation {
 
     public Long getLobbyId() {
         return lobbyId;
+    }
+
+    public String getCreatorIcon() {
+        return creatorIcon;
+    }
+
+    public void setCreatorIcon(String creatorIcon) {
+        this.creatorIcon = creatorIcon;
+    }
+
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
     }
 }

@@ -190,4 +190,12 @@ public class User implements Serializable {
   public void setLobbyInvitations(List<LobbyInvitation> LobbyInvitations) {
       lobbyInvitations = LobbyInvitations;
   }
+
+  public void addLobbyInvitation(LobbyInvitation lobbyInvitation) {
+      this.lobbyInvitations.add(lobbyInvitation);
+  }
+
+  public void deleteLobbyInvitation(LobbyInvitation lobbyInvitation) {
+      this.lobbyInvitations.remove(lobbyInvitation);
+  }
 }
