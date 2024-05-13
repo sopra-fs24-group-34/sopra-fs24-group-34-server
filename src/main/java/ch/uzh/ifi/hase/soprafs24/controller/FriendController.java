@@ -78,11 +78,12 @@ public class FriendController {
     }
 
     // Delete friend
-    @DeleteMapping("/users/{userId}/friends/delete")
+    @DeleteMapping("/users/{userId}/friends/delete/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void deleteFriend(@PathVariable Long userId) {
-
+    public void deleteFriend(@PathVariable Long userId, @PathVariable Long friendId) {
+        User user = userService.getUser(userId);
+        friendService.deleteFriend(user, friendId);
     }
 
     // Get all friends. (Only return Id, username and usericon)

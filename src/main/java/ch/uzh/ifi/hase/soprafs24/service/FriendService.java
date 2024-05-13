@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -159,5 +156,32 @@ public class FriendService {
             userRepository.save(invitedUser);
             userRepository.flush();
         }
+    }
+
+    public void deleteFriend(User user, Long friendId) {
+        List<Friend> userFriendsList = new ArrayList<>(user.getFriendsList());
+        System.out.println("Userfriendlist: " + userFriendsList);
+        for (Friend friend : userFriendsList) {
+            System.out.println(friend.getFriendId() + " " + friendId);
+            if (friend.getFriendId() == friendId) {
+                userFriendsList.remove(friend);
+                user.setFriendsList(userFriendsList);
+                System.out.println(userFriendsList);
+                break;
+            }
+        }
+        User deletedFriend = userRepository.findUserById(friendId);
+        List<Friend> deletedFriendFriendsList = deletedFriend.getFriendsList();
+        for (Friend friend : deletedFriend.getFriendsList()){
+            if (friend.getFriendId() == user.getId()) {
+                deletedFriendFriendsList.remove(friend);
+                deletedFriend.setFriendsList(deletedFriendFriendsList);
+                System.out.println(deletedFriendFriendsList);
+                break;
+            }
+        }
+        userRepository.save(user);
+        userRepository.save(deletedFriend);
+        userRepository.flush();
     }
 }

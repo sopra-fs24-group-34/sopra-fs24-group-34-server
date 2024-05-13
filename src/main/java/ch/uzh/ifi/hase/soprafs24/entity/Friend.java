@@ -34,4 +34,11 @@ public class Friend {
     public void setFriendIcon(String friendIcon) {
         this.friendIcon = friendIcon;
     }
+
+    @Override
+    public String toString() {
+        return "Friend{id=" + friendId + ", name=" + friendUsername + "}";
+    }
+
+
 }
