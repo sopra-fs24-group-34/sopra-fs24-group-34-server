@@ -109,6 +109,9 @@ public class LobbyService {
     List<Lobby> lobbyList = user.getUsergamelobbylist();
     lobbyList.add(newlobby);
     user.setUsergamelobbylist(lobbyList);
+    user.setStatus(UserStatus.INLOBBY);
+    userRepository.save(user);
+    userRepository.flush();
 
     log.debug("Created Information for Lobby: {}", newlobby);
     return newlobby.getLobbyid();

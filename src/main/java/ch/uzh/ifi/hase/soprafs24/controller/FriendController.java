@@ -56,23 +56,26 @@ public class FriendController {
     }
 
     //Invite friend into lobby
-    @PostMapping("/lobby/invite")
+    @PostMapping("/lobbies/invite")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public void lobbyInvite(@RequestBody LobbyInvitationPostDTO lobbyInvitationPostDTO) {
         System.out.println("DO LOBBY INVITE POST");
         Long userId = lobbyInvitationPostDTO.getCreatorId();
         Long invitedUserId = lobbyInvitationPostDTO.getInvitedUserId();
+        Long lobbyId = lobbyInvitationPostDTO.getLobbyId();
 
-        friendService.inviteFriendtoLobby(userId, invitedUserId);
+        friendService.inviteFriendtoLobby(userId, invitedUserId, lobbyId);
     }
 
     // Handle lobby invitation
-    /*@PostMapping("/game/{userId}/invitationresponse")
+    @PostMapping("/lobbies/invitation/answer")
     @ResponseStatus(HttpStatus.OK)
-    public void handleGameInvitation(@PathVariable Long userId, @RequestBody FriendRequestDTO friendRequestDTO){
+    public void handleGameInvitation(@RequestBody LobbyInvitationPutDTO lobbyInvitationPutDTO){
+        System.out.println("DO LOBBY ANSWER POST");
+        friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
 
-    }*/
+    }
 
     // Delete friend
     @DeleteMapping("/users/{userId}/friends/delete")

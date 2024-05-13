@@ -63,7 +63,7 @@ public class User implements Serializable {
   )
   // smailalijagic: user can have many friends and be friends with many*/
   @ElementCollection
-  private List<Friend> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
+  private List<Friend> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Friends
 
   @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
   private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
@@ -75,7 +75,7 @@ public class User implements Serializable {
   private Long totalwins; // smailalijagic: number of won games
 
   @ElementCollection
-  private List<String> lobbyInvitations = new ArrayList<>();
+  private List<LobbyInvitation> lobbyInvitations = new ArrayList<>();
 
 
 
@@ -183,11 +183,11 @@ public class User implements Serializable {
       this.friendRequests = pendingFriendRequests;
   }
 
-  public List<String> getLobbyInvitations() {
+  public List<LobbyInvitation> getLobbyInvitations() {
       return lobbyInvitations;
   }
 
-  public void setLobbyInvitations(List<String> LobbyInvitations) {
+  public void setLobbyInvitations(List<LobbyInvitation> LobbyInvitations) {
       lobbyInvitations = LobbyInvitations;
   }
 }

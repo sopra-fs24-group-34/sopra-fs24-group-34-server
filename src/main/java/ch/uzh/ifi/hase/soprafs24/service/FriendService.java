@@ -1,9 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.entity.Friend;
-import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
@@ -17,7 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -122,21 +122,42 @@ public class FriendService {
         return friendGetDTO;
     }
 
-    public void inviteFriendtoLobby(Long userId, Long invitedUserId) {
-        User user = userRepository.findUserById(userId);
+    public void inviteFriendtoLobby(Long creatorId, Long invitedUserId, Long lobbyId) {
+        User creator = userRepository.findUserById(creatorId);
         User invitedUser = userRepository.findUserById(invitedUserId);
 
         if (invitedUser.getStatus() != UserStatus.ONLINE) {
             System.out.println("The invited Friend cannot be invited to a Lobby right now.");
         }
-        if (user.getStatus() != UserStatus.ONLINE){
+        if (creator.getStatus() != UserStatus.INLOBBY){
             System.out.println("The user cannot send a lobby invitation right now.");
         }
-        List<String> invitations = invitedUser.getLobbyInvitations();
-        invitations.add(user.getUsername());
-        invitedUser.setLobbyInvitations(invitations);
+        List<LobbyInvitation> invitations = invitedUser.getLobbyInvitations(); //till: create a Set of the Creator's username and the lobbyId
+        LobbyInvitation invitation = new LobbyInvitation();
+        invitation.setCreatorUsername(creator.getUsername());
+        invitation.setLobbyId(lobbyId);
+        invitations.add(invitation);
+        invitedUser.setLobbyInvitations(invitations); //till: add the set to the List of invitations
         userRepository.save(invitedUser);
         userRepository.flush();
+    }
 
+    public void answerLobbyInvitation(LobbyInvitationPutDTO lobbyInvitationPutDTO) {
+        User creator = userRepository.findUserById(lobbyInvitationPutDTO.getCreatorId());
+        User invitedUser = userRepository.findUserById(lobbyInvitationPutDTO.getInvitedUserId());
+
+        if (creator.getStatus() != UserStatus.INLOBBY) {
+            System.out.println("The User who invited you is not in the Lobby anymore");
+        }
+        else if (lobbyInvitationPutDTO.getAnswer()){ //till: if answer is true invitedUser joins lobby and User Status is adjusted
+            Lobby lobby = lobbyRepository.findByLobbyid(lobbyInvitationPutDTO.getLobbyId());
+            lobby.setInvited_userid(lobbyInvitationPutDTO.getInvitedUserId());
+            lobbyRepository.save(lobby);
+            lobbyRepository.flush();
+
+            invitedUser.setStatus(UserStatus.INLOBBY); //Update the User Status
+            userRepository.save(invitedUser);
+            userRepository.flush();
+        }
     }
 }

@@ -1,12 +1,14 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-public class LobbyInvitationPostDTO {
+public class LobbyInvitationPutDTO {
 
     private Long creatorId;
 
     private Long invitedUserId;
 
     private Long lobbyId;
+
+    private boolean answer;
 
     public Long getCreatorId() {
         return creatorId;
@@ -30,5 +32,13 @@ public class LobbyInvitationPostDTO {
 
     public void setLobbyId(Long lobbyId) {
         this.lobbyId = lobbyId;
+    }
+
+    public boolean getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(boolean answer) {
+        this.answer = answer;
     }
 }

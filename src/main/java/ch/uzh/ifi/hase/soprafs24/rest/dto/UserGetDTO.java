@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
+import ch.uzh.ifi.hase.soprafs24.entity.LobbyInvitation;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class UserGetDTO {
 
   private Long totalwins; // smailalijagic: natural number in range [0, n)
 
-  private List<String> lobbyinvitations;
+  private List<LobbyInvitation> lobbyinvitations;
 
   public String getPassword() {
     return password;
@@ -123,11 +124,11 @@ public class UserGetDTO {
     this.totalwins = totalwins;
   }
 
-    public List<String> getLobbyinvitations() {
+    public List<LobbyInvitation> getLobbyinvitations() {
         return lobbyinvitations;
     }
 
-    public void setLobbyinvitations(List<String> Lobbyinvitations) {
+    public void setLobbyinvitations(List<LobbyInvitation> Lobbyinvitations) {
         lobbyinvitations = Lobbyinvitations;
     }
 }
