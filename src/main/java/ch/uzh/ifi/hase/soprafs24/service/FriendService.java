@@ -184,4 +184,8 @@ public class FriendService {
         userRepository.save(deletedFriend);
         userRepository.flush();
     }
+
+    public List<LobbyInvitation> getLobbyInviations(User receiver) {
+        return receiver.getLobbyInvitations();
+    }
 }

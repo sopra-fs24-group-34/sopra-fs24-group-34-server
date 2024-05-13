@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
+import ch.uzh.ifi.hase.soprafs24.entity.LobbyInvitation;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
@@ -113,4 +114,15 @@ public class FriendController {
         }
         return friendGetDTOs;
     }
+
+    @GetMapping("/users/{userId}/lobbies/invitations")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<LobbyInvitation> getLobbyInvitations(@PathVariable Long userId){
+        System.out.println("DO LOBBY INVITATIONS GETTER");
+        User receiver = userService.getUser(userId);
+        List<LobbyInvitation> lobbyInvitations = friendService.getLobbyInviations(receiver);
+        return lobbyInvitations;
+    }
+
 }
