@@ -16,11 +16,11 @@ public class LobbyInvitationPostDTO {
         this.creatorId = creatorId;
     }
 
-    public void setInvitedUserId(String invitedUserName) {
+    public void setInvitedUserName(String invitedUserName) {
         this.invitedUserName = invitedUserName;
     }
 
-    public String getInvitedUserId() {
+    public String getInvitedUserName() {
         return invitedUserName;
     }
 

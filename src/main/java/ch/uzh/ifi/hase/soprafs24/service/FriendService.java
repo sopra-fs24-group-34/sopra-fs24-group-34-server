@@ -132,6 +132,8 @@ public class FriendService {
         LobbyInvitation invitation = new LobbyInvitation();
         invitation.setCreatorUsername(creator.getUsername());
         invitation.setLobbyId(lobbyId);
+        invitation.setCreatorId(creatorId);
+        invitation.setCreatorIcon(creator.getUsericon());
         invitedUser.addLobbyInvitation(invitation);
     }
 
@@ -152,6 +154,15 @@ public class FriendService {
             userRepository.save(invitedUser);
             userRepository.flush();
         }
+        List<LobbyInvitation> lobbyInvitations = new ArrayList<>(invitedUser.getLobbyInvitations());
+        for (LobbyInvitation lobbyInvitation : invitedUser.getLobbyInvitations()){
+            if (lobbyInvitation.getCreatorId() == creator.getId()){
+                lobbyInvitations.remove(lobbyInvitation);
+            }
+        }
+        invitedUser.setLobbyInvitations(lobbyInvitations);
+        userRepository.save(invitedUser);
+        userRepository.flush();
     }
 
     public void deleteFriend(User user, Long friendId) {
