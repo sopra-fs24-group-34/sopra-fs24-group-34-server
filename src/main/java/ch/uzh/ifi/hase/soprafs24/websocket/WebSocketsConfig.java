@@ -27,18 +27,4 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
     }
 
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/ws").allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com",
-                "wss://sopra-fs24-group-34-client.oa.r.appspot.com").allowedMethods("*").allowCredentials(true);
-    }
-
-    /*
-    //nedim-j: don't know if we can do this dynamically. "/lobbies" (above) seems to be enough though, pls verify
-    public void createLobbyRegistry (Long lobbyId) {
-        String lobbyEndpoint = "/lobbies/" + lobbyId;
-        MessageBrokerRegistry registry = new MessageBrokerRegistry();
-        registry.enableSimpleBroker(lobbyEndpoint);
-    }
-     */
-
 }
