@@ -17,9 +17,8 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private int strikes;
 
-    @OneToOne
-    @JoinColumn(name = "id")
-    private User user;
+    @Column(nullable = true)
+    private Long userId;
 
 
     public Long getPlayerId() {
@@ -46,12 +45,12 @@ public class Player implements Serializable {
         this.strikes = strikes;
     }
 
-  public User getUser() {
-        return user;
+  public Long getUserId() {
+        return userId;
     }
 
-  public void setUser(User user) {
-        this.user = user;
+  public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
 }

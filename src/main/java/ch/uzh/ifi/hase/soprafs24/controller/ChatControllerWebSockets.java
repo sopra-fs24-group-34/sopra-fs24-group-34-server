@@ -64,20 +64,30 @@ public class ChatControllerWebSockets {
 
         //Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
 
-            MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
+            Game game = chatServiceWebSockets.getGameByGameId(gameId);
+
+            Chat chat = chatServiceWebSockets.addMessage(message, userId, gameId);
+
+            MessageGetDTO messageGetDTO = DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
+
+            //MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
 
             String destination = "/games/" + gameId + "/chat"; // smailalijagic: search chat in here
             //messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
             webSocketHandler.sendMessage(destination, "chat-message", messageGetDTO);
+
+            chatServiceWebSockets.updateGameChat(game, chat);
+
         } catch(Exception e) {
             System.out.println("Something went wrong with chat: "+e);
         }
     }
 
-    @GetMapping("/game/{gameId}/chat")
+    @GetMapping("/games/{gameId}/chat")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<ChatTuple> getAllMessages(@PathVariable("gameId") Long gameId) {
+    public List<String> getAllMessages(@PathVariable("gameId") Long gameId) {
+    //public List<ChatTuple> getAllMessages(@PathVariable("gameId") Long gameId) {
         // smailalijagic: get Game --> get chat
         Game game = chatServiceWebSockets.getGameByGameId(gameId);
         // smailalijagic: get Chat

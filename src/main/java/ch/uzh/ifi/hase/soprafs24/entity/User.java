@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,11 +39,28 @@ public class User implements Serializable {
   @Column(nullable = false)
   private UserStatus status;
 
-  @Column(nullable = true)
-  private String profilePicture;
+  @Column()
+  private String profilePicture; // smailalijagic: added --> String datatype correct?
 
-  @ManyToMany(cascade = CascadeType.ALL) // smailalijagic: user can have many friends and be friends with many
-  private List<User> userfriendlist; // smailalijagic: userfriendlist contains Users
+  @ManyToMany
+  @JoinTable(
+          name = "friendRequests",
+          joinColumns = @JoinColumn(name = "userId"),
+          inverseJoinColumns = @JoinColumn(name = "friendId")
+    )
+    // smailalijagic: user can have many friends and be friends with manyp
+  private List<FriendRequest> friendRequests = new ArrayList<>(); // smailalijagic: userfriendlist contains Users
+
+
+  /**@OneToMany
+  @JoinTable(
+          name = "friends",
+          joinColumns = @JoinColumn(name = "userId"),
+          inverseJoinColumns = @JoinColumn(name = "friendId")
+  )
+  // smailalijagic: user can have many friends and be friends with many*/
+  @ElementCollection
+  private List<Friend> friendsList = new ArrayList<>(); // smailalijagic: userfriendlist contains Friends
 
   @OneToMany(cascade = CascadeType.ALL) // smailalijagic: users can create as many lobbies as they want, but every lobby is owned by one user
   private List<Lobby> usergamelobbylist; // smailalijagic: contains all game lobbies that a user created
@@ -52,6 +70,11 @@ public class User implements Serializable {
 
   @Column(nullable = true)
   private Long totalwins; // smailalijagic: number of won games
+
+  @ElementCollection
+  private List<LobbyInvitation> lobbyInvitations = new ArrayList<>();
+
+
 
   public Long getId() {
     return id;
@@ -97,16 +120,24 @@ public class User implements Serializable {
     return profilePicture;
   }
 
-  public void setProfilePicture(String profilepicture) {
-    this.profilePicture = profilepicture;
+  public void setProfilePicture(String profilePicture) {
+    this.profilePicture = profilePicture;
   }
 
-  public List<User> getUserfriendlist() {
-    return userfriendlist;
+  public List<Friend> getFriendsList() {
+    return friendsList;
   }
 
-  public void setUserfriendlist(List<User> userfriendlist) {
-    this.userfriendlist = userfriendlist;
+  public void setFriendsList(List<Friend> FriendsList) {
+    this.friendsList = FriendsList;
+  }
+
+  public void addFriend(Friend friend) {
+    this.friendsList.add(friend);
+  }
+
+  public void removeFriend(User friend) {
+    this.friendsList.remove(friend);
   }
 
   public List<Lobby> getUsergamelobbylist() {
@@ -133,4 +164,35 @@ public class User implements Serializable {
     this.totalwins = totalwins;
   }
 
+  public void addFriendRequest(FriendRequest friendRequest) {
+      this.friendRequests.add(friendRequest);
+  }
+
+  public void removeFriendRequest(FriendRequest friendRequest) {
+      this.friendRequests.remove(friendRequest);
+  }
+
+  public List<FriendRequest> getFriendRequests() {
+      return friendRequests;
+  }
+
+  public void setFriendRequests(List<FriendRequest> pendingFriendRequests) {
+      this.friendRequests = pendingFriendRequests;
+  }
+
+  public List<LobbyInvitation> getLobbyInvitations() {
+      return lobbyInvitations;
+  }
+
+  public void setLobbyInvitations(List<LobbyInvitation> LobbyInvitations) {
+      lobbyInvitations = LobbyInvitations;
+  }
+
+  public void addLobbyInvitation(LobbyInvitation lobbyInvitation) {
+      this.lobbyInvitations.add(lobbyInvitation);
+  }
+
+  public void deleteLobbyInvitation(LobbyInvitation lobbyInvitation) {
+      this.lobbyInvitations.remove(lobbyInvitation);
+  }
 }
