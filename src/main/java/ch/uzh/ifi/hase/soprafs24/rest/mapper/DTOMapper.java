@@ -47,7 +47,7 @@ public interface DTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
@@ -129,6 +129,6 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "friendId")
     @Mapping(source = "username", target = "friendUsername")
-    @Mapping(source = "usericon", target = "friendIcon")
+    @Mapping(source = "profilePicture", target = "friendIcon")
     FriendGetDTO convertEntityToFriendGetDTO(User friend);
 }
