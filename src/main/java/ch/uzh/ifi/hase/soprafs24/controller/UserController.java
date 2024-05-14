@@ -1,10 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -13,8 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.NoSuchElementException;
 
 /**
  * User Controller
@@ -35,16 +30,17 @@ public class UserController {
   @GetMapping("/users")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public List<UserGetDTO> getAllUsers() {
+  public List<UserStatsGetDTO> getAllUsers() {
     // fetch all users in the internal representation
     List<User> users = userService.getUsers();
-    List<UserGetDTO> userGetDTOs = new ArrayList<>();
+
+    List<UserStatsGetDTO> userStatsGetDTOs = new ArrayList<>();
 
     // convert each user to the API representation
     for (User user : users) {
-      userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+      userStatsGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserStatsGetDTO(user));
     }
-    return userGetDTOs;
+    return userStatsGetDTOs;
   }
 
   // nedim-j: copied from M1, please adjust if needed
@@ -60,7 +56,7 @@ public class UserController {
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public AuthenticationResponseDTO createUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO createUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
     User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
@@ -70,7 +66,7 @@ public class UserController {
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public AuthenticationResponseDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
     // convert API user to internal representation
     User loginUser = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
@@ -80,7 +76,7 @@ public class UserController {
   @PostMapping("/guestuser/create")
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
-  public AuthenticationResponseDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
+  public AuthenticationDTO createGuestUser(@RequestBody UserPostDTO userPostDTO) {
     // smailalijagic:
     // Set default name: Guest
     // and password: 12345
@@ -95,7 +91,6 @@ public class UserController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
   public UserGetDTO updateUser(@PathVariable ("userId") String id, @RequestBody UserPutDTO userPutDTO) {
-    // smailalijagic: rename function to updateUser
     Long userId = Long.valueOf(id); // smailalijagic: added
     User userInput = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
 
@@ -105,12 +100,20 @@ public class UserController {
 
   }
 
-  @DeleteMapping("guestuser/{guestuserId}")
+  @DeleteMapping("guestusers/{guestuserId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ResponseBody
-  public void deleteGuestUser(@PathVariable("guestuserId") String id) {
-    Long guestuserId = Long.valueOf(id);
-    userService.deleteGuestUser(guestuserId);
+  public void deleteGuestUser(@PathVariable("guestuserId") Long guestuserId) {
+    userService.deleteUser(guestuserId);
   }
 
+  @DeleteMapping("users/{userId}/delete")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteUser(@PathVariable("userId") Long userId, @RequestBody UserDeleteDTO userDeleteDTO) {
+    User user = DTOMapper.INSTANCE.covertUserDeleteDTOtoEntity(userDeleteDTO);
+    if (!user.getId().equals(userId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not possible to delete different users");
+    }
+    userService.deleteUser(userId);
+  }
 }

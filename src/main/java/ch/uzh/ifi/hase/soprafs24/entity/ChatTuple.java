@@ -6,15 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
-@Table(name = "CHATTUPLE")
 public class ChatTuple{
   private String message;
   private Long userid;
-
-  @Id
-  @GeneratedValue
-  private Long id;
 
     //public ChatTuple(String message, Long userid) {
   //  this.message = message;
@@ -35,14 +29,6 @@ public class ChatTuple{
 
   public void setUserid(Long userid) {
     this.userid = userid;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Long getId() {
-    return id;
   }
 
 }

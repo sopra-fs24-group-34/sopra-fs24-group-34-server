@@ -7,12 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.context.annotation.ComponentScan;
 
 
 @RestController
 @SpringBootApplication
+@EnableWebMvc
 @ComponentScan(basePackages = {"ch.uzh.ifi.hase.soprafs24"})
 public class Application {
   public static void main(String[] args) {SpringApplication.run(Application.class, args);}

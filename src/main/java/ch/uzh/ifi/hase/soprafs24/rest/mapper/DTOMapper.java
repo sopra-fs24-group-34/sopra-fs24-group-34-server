@@ -33,20 +33,30 @@ public interface DTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
-    @Mapping(source = "userfriendlist", target = "userfriendlist")
+    @Mapping(source = "profilePicture", target = "profilePicture")
+    @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
     @Mapping(source = "totalwins", target = "totalwins")
+    @Mapping(source = "lobbyInvitations", target = "lobbyinvitations")
+    @Mapping(source = "friendRequests", target = "friendRequests")
     UserGetDTO convertEntityToUserGetDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "profilePicture", target = "profilePicture")
+    @Mapping(source = "totalplayed", target = "totalplayed")
+    @Mapping(source = "totalwins", target = "totalwins")
+    UserStatsGetDTO convertEntityToUserStatsGetDTO(User user);
 
     @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
-    @Mapping(source = "userfriendlist", target = "userfriendlist")
+    @Mapping(source = "profilePicture", target = "profilePicture")
+    @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
@@ -56,7 +66,11 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "token", target = "token")
-    AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
+    AuthenticationDTO convertEntityToAuthenticationDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "token", target = "token")
+    User convertAuthenticationDTOtoUser(AuthenticationDTO authenticationDTO);
 
 
     //@Mapping(source = "id", target = "id")
@@ -65,7 +79,7 @@ public interface DTOMapper {
     // source = MessagePostDTO, target = Chat
 
     //@Mapping(source = "id", target = "id")
-    @Mapping(source = "messages", target = "message")
+    @Mapping(source = "lastmessage", target = "message")
     MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
     // source = Chat, target = MessageGetDTO
 
@@ -112,9 +126,26 @@ public interface DTOMapper {
   ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
 
 
-    @Mapping(source = "creator_userid", target = "creatorId")
+    @Mapping(source = "creator_userid", target = "creatorPlayerId")
     @Mapping(source = "invited_userid", target = "invitedPlayerId")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "id", target = "id")
+    User covertUserDeleteDTOtoEntity(UserDeleteDTO userDeleteDTO);
+    // smailalijagic: source = UserDeleteDTO, target = User
+
+    @Mapping(source = "senderId", target = "senderId")
+    @Mapping(source = "receiverUserName", target = "receiverUserName")
+    FriendRequest convertFriendRequestPostDTOtoEntity(FriendRequestPostDTO friendRequestPostDTO);
+
+    @Mapping(source = "senderId", target = "senderId")
+    @Mapping(source = "receiverId", target = "receiverId")
+    FriendRequest convertFriendRequestPutDTOtoEntity(FriendRequestPutDTO friendRequestPutDTO);
+
+    @Mapping(source = "id", target = "friendId")
+    @Mapping(source = "username", target = "friendUsername")
+    @Mapping(source = "profilePicture", target = "friendIcon")
+    FriendGetDTO convertEntityToFriendGetDTO(User friend);
 }

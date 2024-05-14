@@ -3,31 +3,34 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import net.bytebuddy.asm.Advice;
+import com.google.gson.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import com.pusher.rest.Pusher;
+import java.util.Map;
 
 @RestController
 public class LobbyController {
 
     private final LobbyService lobbyService;
-    private final Pusher pusher;
+    private final WebSocketHandler webSocketHandler;
+    private final GameUserService gameUserService;
+    private final Gson gson = new Gson();
 
-    LobbyController(LobbyService lobbyService, Pusher pusher) {
+    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler, GameUserService gameUserService) {
         this.lobbyService = lobbyService;
-        this.pusher = pusher;
+        this.webSocketHandler = webSocketHandler;
+        this.gameUserService = gameUserService;
     }
 
     @ExceptionHandler(Exception.class)
@@ -70,7 +73,9 @@ public class LobbyController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public Long createlobby(@PathVariable("userId") Long userId) {
-        return lobbyService.createlobby(userId);
+        Long lobbyId = lobbyService.createLobby(userId);
+        //webSocketsConfig.configureMessageBrokerForLobby(lobbyId);
+        return lobbyId;
     }
 
     @PutMapping("/lobbies/settings/{lobbyId}")
@@ -94,11 +99,12 @@ public class LobbyController {
     @PutMapping("lobbies/join/{lobbyId}/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Lobby joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+    public void joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
         // smailalijagic: update lobby for guest
         // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
         Long lobbyId = Long.valueOf(id1);
         Long userId = Long.valueOf(id2);
+
         if (lobbyService.checkIfLobbyExists(lobbyId)) {
             Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
             if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
@@ -106,20 +112,61 @@ public class LobbyController {
             }
             User user = lobbyService.getUser(userId); // smailalijagic: get user
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+            user.setStatus(UserStatus.INLOBBY_PREPARING);
+            gameUserService.saveUserChanges(user);
 
-            //nedim-j: adjust if needed
-            pusher.trigger("lobby-events", "user-joined", DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
-            //return DTOMapper.INSTANCE.convertEntityToLobbyPutDTO(lobby); // smailalijagic: return api representation
-            return lobby; // smailalijagic: return api representation
-            // smailalijagic: load lobby screen
+            webSocketHandler.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
 
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
         }
     }
 
+    @MessageMapping("/updateReadyStatus")
+    public void updateStatus(String stringJsonRequest) {
+        try {
+            //nedim-j: search/create an own decorator for string parsing maybe
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(stringJsonRequest).getAsJsonObject();
 
+            String readyStatus = jsonObject.get("readyStatus").getAsString();
+            Long lobbyId = Long.parseLong(jsonObject.get("lobbyId").getAsString());
+            Long userId = Long.parseLong(jsonObject.get("userId").getAsString());
+
+            //System.out.println("Request translated: " + readyStatus + " " + lobbyId + " " + userId);
+
+            UserGetDTO userGetDTO = lobbyService.updateReadyStatus(userId, readyStatus);
+
+            String destination = "/lobbies/" + lobbyId;
+
+            webSocketHandler.sendMessage(destination, "user-statusUpdate", userGetDTO);
+        } catch(Exception e) {
+            System.out.println("Something went wrong with ready status: "+e);
+        }
+    }
+
+    @MessageMapping("/closeLobby")
+    public void closeLobby(String stringJsonRequest) {
+        try {
+
+            Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+            Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
+            AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
+            //System.out.println("Request translated: " + readyStatus + " " + lobbyId + " " + userId);
+            lobbyService.closeLobby(lobbyId, authenticationDTO);
+
+            String destination = "/lobbies/" + lobbyId;
+
+            webSocketHandler.sendMessage(destination, "lobby-closed", "Lobby has been closed");
+        } catch(Exception e) {
+            System.out.println("Something went wrong with Lobby closing: "+e);
+        }
+    }
+
+    /*
     @DeleteMapping("/lobbies/{lobbyId}/start")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -141,4 +188,6 @@ public class LobbyController {
         // smailalijagic: some return statement...
         return true;
     }
+
+     */
 }

@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 
 public class UserPutDTO {
   // smailalijagic: all updatable data
@@ -15,13 +16,13 @@ public class UserPutDTO {
 
   private UserStatus status;
 
-  private String usericon; // smailalijagic: check this again --> String correct datatype?
+  private String profilePicture;
 
   private String token;
 
   private Long id;
 
-  private List<User> userfriendlist; // smailalijagic: adding and removing friends from friendlist
+  private Set<User> friendsList; // smailalijagic: adding and removing friends from friendlist
 
   private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
 
@@ -45,12 +46,12 @@ public class UserPutDTO {
     this.username = username;
   }
 
-  public String getUsericon() {
-    return usericon;
+  public String getProfilePicture() {
+    return profilePicture;
   }
 
-  public void setUsericon(String usericon) {
-    this.usericon = usericon;
+  public void setProfilePicture(String profilePicture) {
+    this.profilePicture = profilePicture;
   }
 
   public String getToken() {
@@ -77,12 +78,12 @@ public class UserPutDTO {
     this.status = status;
   }
 
-  public List<User> getUserfriendlist() {
-    return userfriendlist;
+  public Set<User> getFriendsList() {
+    return friendsList;
   }
 
-  public void setUserfriendlist(List<User> userfriendlist) {
-    this.userfriendlist = userfriendlist;
+  public void setFriendsList(Set<User> friendsList) {
+    this.friendsList = friendsList;
   }
 
   public List<Lobby> getUsergamelobbylist() {

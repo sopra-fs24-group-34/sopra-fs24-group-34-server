@@ -6,26 +6,29 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import org.springframework.beans.factory.annotation.Autowired;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
-import com.pusher.rest.Pusher;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import com.google.gson.Gson;
 
 @RestController
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
-  private final Pusher pusher;
+  private final WebSocketHandler webSocketHandler;
+  private final LobbyService lobbyService;
+  private final Gson gson = new Gson();
 
-  @Autowired
-  GameController(GameService gameService, GameUserService gameUserService, Pusher pusher) {
+  GameController(GameService gameService, GameUserService gameUserService, WebSocketHandler webSocketHandler, LobbyService lobbyService) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
-    this.pusher = pusher;
-  }
+    this.webSocketHandler = webSocketHandler;
+        this.lobbyService = lobbyService;
+    }
 
   @GetMapping("/games")
   @ResponseStatus(HttpStatus.OK)
@@ -42,32 +45,26 @@ public class GameController {
     return gameService.getGame(gameid);
   }
 
-  @PostMapping("/game/{lobbyid}/start")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public Game createGame(@PathVariable("lobbyid") Long lobbyid, @RequestBody GamePostDTO gamePostDTO) {
+  @MessageMapping("/startGame")
+  public Game createGame(String stringJsonRequest) {
     // smailalijagic:
     // 1. correct Lobby, till: gameid is not created yet, compare with lobbyid
     // 2. User1 online?
     // 3. User2 online?
     // 4. remove lobby
     // 5. load game --> game logic (follows)
-    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
-    //nedim-j: made new game to return in pusher, feel free to adjust
-    Game createdGame = gameService.creategame(lobbyid, game);
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
+    GamePostDTO gamePostDTO = gson.fromJson(gson.toJson(requestMap.get("gamePostDTO")), GamePostDTO.class);
+    AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
-    pusher.trigger("lobby-events", "game-started", createdGame);
+    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+
+    Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
+
+    webSocketHandler.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
     return createdGame;
-  }
-
-  @PostMapping("/player/{playerid}")
-  @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
-  public Player createplayer(@PathVariable ("playerid") Long playerid) {
-    // method to create a player to check with Postman
-    Player player = gameUserService.createplayer(playerid);
-    return player;
   }
 
   @GetMapping("/player/{playerid}")
@@ -79,62 +76,37 @@ public class GameController {
     return player;
   }
 
-  @PutMapping("/game/character/choose")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  @ResponseBody
-  public void chooseImage(@RequestBody GuessPostDTO guessPostDTO){
+  @MessageMapping("/chooseImage")
+  public void chooseImage(String stringJsonRequest){
     // till:
     // 1. ImageID exists?
     // 2. chosencharacter still null?
+
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
+    //nedim-j: use for round-basis, authentication:
+    //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.chooseImage(guess);
 
-    String channelName = "gameRound"+guess.getGameId();
-    pusher.trigger(channelName, "round-update", response);
+    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
 
-    /*
-    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Game game = gameService.getGame(guess.getGameId());
-    Long creatorId = game.getCreatorId();
-    Long invitedId = game.getInvitedPlayerId();
-    if(!gameService.playerHasSelected(guess.getPlayerId())) {
-        gameService.selectimage(guess);
-        //if(gameService.playerHasSelected(creatorId) && gameService.playerHasSelected(invitedId)) {
-
-            String message = "Player " + guess.getPlayerId() + " has chosen character " + guess.getImageId();
-            pusher.trigger(channelName, "round-update", message);
-        //}
-    }
-    else {
-        throw new RuntimeException("You have already chosen a character");
-    }
-     */
   }
 
-  @PostMapping("/game/character/guess")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  @ResponseBody
-  public Response guessImage(@RequestBody GuessPostDTO guessPostDTO){
-    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Response response = gameService.guesssimage(guess);
+  @MessageMapping("/guessImage")
+  public Response guessImage(String stringJsonRequest){
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
+    //nedim-j: use for round-basis, authentication:
+    //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
-    String channelName = "gameRound"+guess.getGameId();
-    //String message = "Player " + guess.getPlayerId() + " has guessed " + guess.getImageId() + " and it was " + m;
-    pusher.trigger(channelName, "round-update", response);
+    Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
+    Response response = gameService.guessImage(guess);
+
+    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
     return response;
   }
-
-  @DeleteMapping("/game/{gameId}/delete")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public void deleteGame(@PathVariable("gameId") String gameid, User user1, User user2) {
-    // smailalijagic:
-    // delete game from database
-    // update stats
-    // load new page
-  }
-
-
 
     // Endpoints regarding game-specific images
     @GetMapping("/games/{gameId}/images")

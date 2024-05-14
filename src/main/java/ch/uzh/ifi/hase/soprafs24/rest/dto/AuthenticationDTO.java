@@ -1,15 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-public class AuthenticationResponseDTO {
+public class AuthenticationDTO {
     private Long id;
     private String token;
 
-    public AuthenticationResponseDTO() {
-    }
-    public AuthenticationResponseDTO(Long id, String token) {
-        this.id = id;
-        this.token = token;
-    }
     public Long getId() {
         return id;
     }

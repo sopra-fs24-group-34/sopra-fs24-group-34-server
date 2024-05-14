@@ -1,23 +1,32 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class Game {
+public class Game implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
     private Long gameId;
 
+    @Column(nullable = true)
     private Long maxguesses; // smailalijagic: handle guesses for each player in frontend
 
-    private Long creatorId; // smailalijagic: creator
+    @Column(nullable = true)
+    private Long creatorPlayerId; // smailalijagic: creator
 
-    private Long invitedplayerId; // smailalijagic: invited user
+    @Column(nullable = true)
+    private Long invitedPlayerId; // smailalijagic: invited user
 
+    @Column(nullable = true)
     private Long guessingtime; // smailalijagic:
+
+    //@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+    @Column(length = 7000) // smailalijagic: 7000bytes --> 1750-7000 (=1000 words) chars max. possible = 65'535 bytes --> 16'383-65'535 chars
+    private Chat chat = new Chat();
 
     @ManyToMany
     @JoinTable(
@@ -27,12 +36,12 @@ public class Game {
     )
     private List<Image> gameImages; // images associated to a game
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Chat chat = new Chat();
-
+    //@OneToOne(cascade = CascadeType.ALL)
     public Chat getChat() {
         return chat;
     }
+
+    public void setChat(Chat chat) { this.chat = chat; }
 
     public Long getGameId() {
         return gameId;
@@ -58,20 +67,20 @@ public class Game {
         this.guessingtime = guessingtime;
     }
 
-    public Long getCreatorId() {
-        return creatorId;
+    public Long getCreatorPlayerId() {
+        return creatorPlayerId;
     }
 
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
+    public void setCreatorPlayerId(Long creatorPlayerId) {
+        this.creatorPlayerId = creatorPlayerId;
     }
 
     public Long getInvitedPlayerId() {
-        return invitedplayerId;
+        return invitedPlayerId;
     }
 
     public void setInvitedPlayerId(Long invitedplayerId) {
-        this.invitedplayerId = invitedplayerId;
+        this.invitedPlayerId = invitedplayerId;
     }
 
     public List<Image> getGameImages() {
@@ -79,4 +88,5 @@ public class Game {
     }
 
     public void setGameImages(List<Image> gameImages) { this.gameImages = gameImages;}
+
 }
