@@ -17,7 +17,6 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // smailalijagic: Registering WebSocket endpoint
         registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:3000").withSockJS();
-        registry.addEndpoint("/websocket-demo").setAllowedOrigins("http://localhost:3000").withSockJS();
     }
 
     @Override
@@ -28,7 +27,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/websocket-demo").allowedOrigins("http://localhost:3000").allowedMethods("*").allowCredentials(true);
+        registry.addMapping("/ws").allowedOrigins("http://localhost:3000").allowedMethods("*").allowCredentials(true);
     }
 
     /*

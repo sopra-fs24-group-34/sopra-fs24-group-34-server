@@ -85,7 +85,7 @@ public class FriendService {
     private Friend createFriend(User user) {
         Friend friend = new Friend();
         friend.setFriendId(user.getId());
-        friend.setFriendIcon(user.getUsericon());
+        friend.setFriendIcon(user.getProfilePicture());
         friend.setFriendUsername(user.getUsername());
         return friend;
     }
@@ -113,7 +113,7 @@ public class FriendService {
     public FriendGetDTO convertFriendRequestToFriend(FriendRequest friendRequest) {
         FriendGetDTO friendGetDTO = new FriendGetDTO();
         User user = userRepository.findUserById(friendRequest.getSenderId());
-        friendGetDTO.setFriendIcon(user.getUsericon());
+        friendGetDTO.setFriendIcon(user.getProfilePicture());
         friendGetDTO.setFriendUsername(user.getUsername());
         friendGetDTO.setFriendId(user.getId());
         return friendGetDTO;
