@@ -16,7 +16,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // smailalijagic: Registering WebSocket endpoint
-        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:3000").withSockJS();
+        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com").withSockJS();
     }
 
     @Override
@@ -27,7 +27,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/ws").allowedOrigins("http://localhost:3000").allowedMethods("*").allowCredentials(true);
+        registry.addMapping("/ws").allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com").allowedMethods("*").allowCredentials(true);
     }
 
     /*
