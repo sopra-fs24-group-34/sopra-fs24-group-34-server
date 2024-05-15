@@ -133,11 +133,14 @@ some text
 
 ## 7. Authors and Acknowledgment
 Frontend Developer
-
+- []()
+- []()
+- []()
 
 Backend Developer
-- [smailalijagic] (https://www.github.com/smailalijagic)
-- 
+- [Smail Alijagic](https://www.github.com/smailalijagic)
+- []()
+- []()
 
 ## 8. Licencse
 some text
