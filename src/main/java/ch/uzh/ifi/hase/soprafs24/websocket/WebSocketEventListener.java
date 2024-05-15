@@ -1,8 +1,9 @@
-package ch.uzh.ifi.hase.soprafs24;
+package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 
@@ -10,8 +11,9 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 public class WebSocketEventListener {
 
     @EventListener
-    public void handleWebSocketConnectListener(SessionConnectEvent event) {
-        System.out.println("New WebSocket Connection has been formed");
+    public void handleWebSocketConnectListener(SessionConnectedEvent event) {
+        System.out.println("New WebSocket Connection has been formed with event: " + event);
+        //event.getSource();
     }
 
     @EventListener
@@ -20,4 +22,6 @@ public class WebSocketEventListener {
         System.out.println("Session Disconnected: " + sessionId);
 
     }
+
+
 }

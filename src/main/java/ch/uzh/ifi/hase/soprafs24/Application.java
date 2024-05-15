@@ -37,7 +37,9 @@ public class Application {
 
               // Allow WebSocket connections
               registry.addMapping("/ws/**")
-                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/", "wss://sopra-fs24-group-34-client.oa.r.appspot.com", "ws://sopra-fs24-group-34-client.oa.r.appspot.com")
+                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/",
+                              "wss://sopra-fs24-group-34-client.oa.r.appspot.com",
+                              "ws://sopra-fs24-group-34-client.oa.r.appspot.com")
                       .allowedMethods("*")
                       .allowCredentials(true)
                       .allowedHeaders("*");

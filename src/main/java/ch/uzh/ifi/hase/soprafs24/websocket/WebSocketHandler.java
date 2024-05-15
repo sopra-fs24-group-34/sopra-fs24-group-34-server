@@ -23,11 +23,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         this.messagingTemplate = messagingTemplate;
     }
 
-    public void handleLobbyJoin(Lobby lobby, User user) {
-        Long lobbyId = lobby.getLobbyid();
-        UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-    }
-
     public void sendMessage(String destination, String event_type, Object data) {
         JsonObject messageJson = new JsonObject();
         messageJson.addProperty("event-type", event_type);

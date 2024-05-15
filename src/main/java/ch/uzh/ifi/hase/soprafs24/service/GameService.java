@@ -9,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
@@ -387,6 +388,30 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while deleting image from your game", e);
         }
     }
+
+    @Scheduled(fixedRate = 15000) // Check every 15 seconds
+    public void checkGameTimeout() {
+        //List<Game> activeGames = getActiveGames();
+
+        for (Game game : gameRepository.findAll()) {
+            if (isPlayerInactive(game.getCreatorPlayerId())) {
+                gameUserService.increaseGamesPlayed(game.getCreatorPlayerId());
+                handleWin(game.getInvitedPlayerId());
+                deleteGame(game);
+            } else if (isPlayerInactive(game.getInvitedPlayerId())) {
+                gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
+                handleWin(game.getCreatorPlayerId());
+                deleteGame(game);
+            }
+        }
+    }
+
+    private boolean isPlayerInactive(Long playerId) {
+        // Check if player is inactive based on last activity time
+        // Return true if inactive, false otherwise
+        return true;
+    }
+
 }
 
 

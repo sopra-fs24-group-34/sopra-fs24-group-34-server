@@ -16,14 +16,15 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // smailalijagic: Registering WebSocket endpoint
-        registry.addEndpoint("/ws").setAllowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com",
-                "wss://sopra-fs24-group-34-client.oa.r.appspot.com").withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com",
+                "wss://sopra-fs24-group-34-client.oa.r.appspot.com")
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // smailalijagic: Configuring message broker to enable broadcasting to "/topic"
-        registry.enableSimpleBroker("/topic", "/games", "/lobbies", "/chat");
+        registry.enableSimpleBroker( "/games", "/lobbies");
         registry.setApplicationDestinationPrefixes("/app");
     }
 
