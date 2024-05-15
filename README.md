@@ -1,6 +1,6 @@
 # SoPra FS24 group 34 Server - Guess Who?
 
-## [Introduction](#introduction)
+## Introduction
 Does the person have brown eyes? No! Did you forgot this game? "Guess Who" is back. We implemented the traditional tabletop game where users have to guess characters by asking yes or no characters. 
 The rules are simple:
 1. **Setup**:  Each player selects a character card without revealing it to their opponent. This card represents the character the opponent must guess
@@ -24,16 +24,16 @@ The rules are simple:
    3. [Activity Diagram](#activity)
    4. [Figma Mockups](#figma)
 
-## [Technologies](#technologies)
+## 2. Technologies
 For this webapplication we used ReactJS in the frontend and Java Spring in the backend. More specifically we used the following technologies
 - HTML/CSS/JavaScript/TypeScript: ...
 - Java: ...
 - Websockets: ...
 
-## [High-level Components](#HLC)
+## 3. High-level Components
 some text
 
-## [Launch & Deployment](#LD)
+## 4. Launch & Deployment
 ### Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 -   Guides: http://spring.io/guides
@@ -132,7 +132,12 @@ some text
 some text
 
 ## 7. Authors and Acknowledgment
-some text
+Frontend Developer
+
+
+Backend Developer
+- [@smailalijagic] (https://www.github.com/smailalijagic)
+- 
 
 ## 8. Licencse
 some text
