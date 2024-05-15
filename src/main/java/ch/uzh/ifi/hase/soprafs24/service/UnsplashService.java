@@ -31,6 +31,11 @@ public class UnsplashService {
   @Value("${unsplash.api.accessKey}")
   private String accessKey;
 
+  public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+  }
+
+
     public void saveRandomPortraitImagesToDatabase(int count) {
         try {
             int page = 1;
@@ -109,26 +114,7 @@ public class UnsplashService {
             return imageUrls;
 
         } catch (Exception e) {
-            // Log any exceptions
-            logger.severe("Error while retrieving image URLs from database: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while retrieving image URLs from database");
-        }
-    }
-
-
-    public static void deleteImage(Long imageId, ImageRepository imageRepository) {
-        try {
-            Image image = imageRepository.findImageById(imageId); //Check if image in db
-            if (image == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found");
-            }
-
-            imageRepository.delete(image);
-
-        } catch (Exception e) {
-            // Log any exceptions
-            logger.severe("Error while deleting image from database: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while deleting image from database");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error while retrieving image URLs from database");
         }
     }
 }
