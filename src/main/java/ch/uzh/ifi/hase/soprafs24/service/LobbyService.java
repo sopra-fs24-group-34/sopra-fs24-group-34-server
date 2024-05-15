@@ -8,6 +8,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import org.apache.catalina.Manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,15 @@ public class LobbyService {
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
   private final UserRepository userRepository; // smailalijagic: needed to verify user
   private final AuthenticationService authenticationService;
+  private final WebSocketHandler webSocketHandler;
 
-  @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService) {
+    @Autowired
+  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService, WebSocketHandler webSocketHandler) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
-      this.authenticationService = authenticationService;
-  }
+    this.authenticationService = authenticationService;
+    this.webSocketHandler = webSocketHandler;
+    }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
@@ -102,13 +106,11 @@ public class LobbyService {
     newlobby = lobbyRepository.save(newlobby);
     lobbyRepository.flush();
 
+    // Create a WebSocket session for the lobby
+    //webSocketHandler.createSession(newlobby.getLobbyid());
+
     User user = userRepository.findUserById(userId);
 
-    /*
-    List<Lobby> lobbyList = user.getUsergamelobbylist();
-    lobbyList.add(newlobby);
-    user.setUsergamelobbylist(lobbyList);
-     */
     user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);
     userRepository.flush();

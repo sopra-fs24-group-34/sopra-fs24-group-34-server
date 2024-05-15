@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,10 +35,11 @@ public class GameService {
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
   private final AuthenticationService authenticationService;
+  private final WebSocketHandler webSocketHandler;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService, WebSocketHandler webSocketHandler) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
@@ -45,6 +47,7 @@ public class GameService {
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
     this.authenticationService = authenticationService;
+    this.webSocketHandler = webSocketHandler;
     }
 
   public List<Game> getGames() {
@@ -392,13 +395,13 @@ public class GameService {
     @Scheduled(fixedRate = 15000) // Check every 15 seconds
     public void checkGameTimeout() {
         //List<Game> activeGames = getActiveGames();
-
+        System.out.println("Scheduled activity check ");
         for (Game game : gameRepository.findAll()) {
-            if (isPlayerInactive(game.getCreatorPlayerId())) {
+            if (!webSocketHandler.isPlayerActive(game.getCreatorPlayerId())) {
                 gameUserService.increaseGamesPlayed(game.getCreatorPlayerId());
                 handleWin(game.getInvitedPlayerId());
                 deleteGame(game);
-            } else if (isPlayerInactive(game.getInvitedPlayerId())) {
+            } else if (!webSocketHandler.isPlayerActive(game.getInvitedPlayerId())) {
                 gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
                 handleWin(game.getCreatorPlayerId());
                 deleteGame(game);
@@ -406,11 +409,7 @@ public class GameService {
         }
     }
 
-    private boolean isPlayerInactive(Long playerId) {
-        // Check if player is inactive based on last activity time
-        // Return true if inactive, false otherwise
-        return true;
-    }
+
 
 }
 
