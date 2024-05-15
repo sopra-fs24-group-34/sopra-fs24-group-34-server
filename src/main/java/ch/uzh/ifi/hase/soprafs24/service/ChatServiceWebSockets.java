@@ -35,14 +35,6 @@ public class ChatServiceWebSockets {
         Game game = gameRepository.findByGameId(gameId);
         Chat chat = game.getChat();
         Chat updated_chat = chat;
-        //log.debug("Last message = " + chat.getLastmessage());
-        //Chat updated_chat = chat;
-        //if (game.getChat() != chat) {
-        //  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "chat not found"); // smailalijagic: double check
-        //}
-
-        // smailalijagic: final update
-        //String message = chat.getLastmessage();
 
         User user = userRepository.findUserById(userId);
         //assert checkIfUserExists(user);
@@ -51,18 +43,8 @@ public class ChatServiceWebSockets {
         }
         String myMessage = user.getUsername() + ": " + message;
         updated_chat.setMessages(myMessage);
-        //updated_chat.addMessage(myMessage, userId);
-
-        //chat.setLastmessage(message);
-
-        //game.setChat(updated_chat);
-        //gameRepository.save(game);
-        //gameRepository.flush();
 
         return updated_chat;
-
-        //return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
-
     }
 
     public void updateGameChat(Game game, Chat chat) {
@@ -84,11 +66,10 @@ public class ChatServiceWebSockets {
         }
     }
 
-//    public List<Chat> getAllChats() {
-//        return chatRepository.findAll();
-//    }
-//
-//    public Chat getChat(Long chatid) {
-//        return this.chatRepository.findChatById(chatid);
-//    }
+    public List<String> getAllMessages(Long gameId) {
+        Game game = this.gameRepository.findByGameId(gameId);
+        Chat chat = game.getChat();
+        return chat.getMessages();
+    }
+
 }
