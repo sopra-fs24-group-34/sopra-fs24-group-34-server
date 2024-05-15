@@ -83,17 +83,17 @@ public class UserService {
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
-    log.debug("Created Information for User: {}", newUser);
-    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newUser);
-  }
+        log.debug("Created Information for User: {}", newUser);
+        return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newUser);
+    }
 
-  public AuthenticationDTO createGuestUser(User newGuestUser) {
-      if(checkIfUsernameExists(newGuestUser)) {
-          String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-          throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
-      }
-    newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
-    newGuestUser.setToken(UUID.randomUUID().toString());
+    public AuthenticationDTO createGuestUser(User newGuestUser) {
+        if(checkIfUsernameExists(newGuestUser)) {
+            String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
+        }
+        newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
+        newGuestUser.setToken(UUID.randomUUID().toString());
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -107,21 +107,10 @@ public class UserService {
         newGuestUser = userRepository.save(newGuestUser); // smailalijagic: update guestuser
         userRepository.flush();
 
-    log.debug("Created Information for User: {}", newGuestUser);
-    return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newGuestUser);
-  }
+        log.debug("Created Information for User: {}", newGuestUser);
+        return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(newGuestUser);
+    }
 
-
-    /**
-     * This is a helper method that will check the uniqueness criteria of the
-     * username and the name
-     * defined in the User entity. The method will do nothing if the input is unique
-     * and throw an error otherwise.
-     *
-     * @param userToBeCreated
-     * @throws org.springframework.web.server.ResponseStatusException
-     * @see User
-     */
     private Boolean checkIfUsernameExists(User userToBeCreated) {
         try {
             User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
@@ -138,17 +127,17 @@ public class UserService {
          */
     }
 
-  public AuthenticationDTO loginUser(User loginUser) {
-    User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
+    public AuthenticationDTO loginUser(User loginUser) {
+        User existingUser = userRepository.findByUsernameAndPassword(loginUser.getUsername(), loginUser.getPassword());
 
-    if (existingUser != null) {
-      // User is authenticated
-      existingUser.setStatus(UserStatus.ONLINE);
-      return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(existingUser);
-    } else {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        if (existingUser != null) {
+            // User is authenticated
+            existingUser.setStatus(UserStatus.ONLINE);
+            return DTOMapper.INSTANCE.convertEntityToAuthenticationDTO(existingUser);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
     }
-  }
 
     public User updateUser(User updatedUser, Long userId) {
         //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
@@ -189,12 +178,15 @@ public class UserService {
         // smailalijagic: guest user?
         if (username.startsWith("GUEST") && user.getStatus().equals(UserStatus.OFFLINE)) {
             this.userRepository.deleteById(id); // smailallijagic: guest can only be deleted if offline --> automatic deletion
-        } else {
+        } else if (user.getStatus().equals(UserStatus.ONLINE) && !username.startsWith("GUEST")) {
             // smailalijagic: user
-            if (user.getStatus().equals(UserStatus.ONLINE)) {
-                this.userRepository.deleteById(id); // smailalijagic: user can only be deleted if online
+            this.userRepository.deleteById(id); // smailalijagic: user can only be deleted if online
+        } else {
+            if (username.startsWith("GUEST")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deletion denied: Guest is deleted when offline");
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deletion denied: User can only be deleted when online");
             }
         }
     }
-
 }

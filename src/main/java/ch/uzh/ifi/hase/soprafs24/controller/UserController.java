@@ -110,7 +110,7 @@ public class UserController {
   @DeleteMapping("users/{userId}/delete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUser(@PathVariable("userId") Long userId, @RequestBody UserDeleteDTO userDeleteDTO) {
-    User user = DTOMapper.INSTANCE.covertUserDeleteDTOtoEntity(userDeleteDTO);
+    User user = DTOMapper.INSTANCE.convertUserDeleteDTOtoEntity(userDeleteDTO);
     if (!user.getId().equals(userId)) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not possible to delete different users");
     }
