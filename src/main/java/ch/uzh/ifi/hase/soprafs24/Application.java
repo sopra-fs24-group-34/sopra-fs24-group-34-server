@@ -15,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 @RestController
 @SpringBootApplication
 @EnableWebMvc
-@ComponentScan(basePackages = {"ch.uzh.ifi.hase.soprafs24"})
+@ComponentScan("ch.uzh.ifi.hase.soprafs24")
 public class Application {
   public static void main(String[] args) {SpringApplication.run(Application.class, args);}
 
@@ -37,9 +37,10 @@ public class Application {
 
               // Allow WebSocket connections
               registry.addMapping("/ws/**")
-                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/",
-                              "wss://sopra-fs24-group-34-client.oa.r.appspot.com",
-                              "ws://sopra-fs24-group-34-client.oa.r.appspot.com")
+                      .allowedOriginPatterns("ws://localhost:*", "wss://localhost:*",
+                              "http://localhost:*", "https://localhost:*",
+                              "ws://sopra-fs24-group-34-*", "wss://sopra-fs24-group-34-*",
+                              "http://sopra-fs24-group-34-*", "https://sopra-fs24-group-34-*")
                       .allowedMethods("*")
                       .allowCredentials(true)
                       .allowedHeaders("*");

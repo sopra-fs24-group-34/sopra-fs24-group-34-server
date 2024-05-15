@@ -17,8 +17,9 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // smailalijagic: Registering WebSocket endpoint
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com",
-                "wss://sopra-fs24-group-34-client.oa.r.appspot.com")
+                .setAllowedOriginPatterns("ws://localhost:*", "wss://localhost:*", "http://localhost:*", "https://localhost:*",
+                        "ws://sopra-fs24-group-34-*", "wss://sopra-fs24-group-34-*",
+                        "http://sopra-fs24-group-34-*", "https://sopra-fs24-group-34-*")
                 .withSockJS();
     }
 
