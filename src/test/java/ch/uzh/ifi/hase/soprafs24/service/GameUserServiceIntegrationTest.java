@@ -1,174 +1,174 @@
-//package ch.uzh.ifi.hase.soprafs24.service;
-//import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
-//import ch.uzh.ifi.hase.soprafs24.entity.*;
-//import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-//import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
-//import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-//import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//
-//@ExtendWith(MockitoExtension.class)
-//public class GameUserServiceIntegrationTest {
-//
-//    @Mock
-//    private GameRepository gamerepository;
-//    @Mock
-//    private UserRepository userRepository;
-//    @Mock
-//    private PlayerRepository playerrepository;
-//
-//    @InjectMocks
-//    private GameUserService gameUserService;
-//
-//
-//    private Player player;
-//
-//    private User user;
-//
-//
-//    @BeforeEach
-//    void setup(){
-//        player = new Player();
-//        player.setPlayerId(1L);
-//        player.setStrikes(0);
-//        playerrepository.save(player);
-//        playerrepository.flush();
-//    }
-//
-//    @AfterEach
-//    void teardown() {
-//        userRepository.deleteAll();
-//    }
-//
-//    @Test
-//    void getPlayer_validInputs() {
-//        when(playerrepository.findByPlayerId(anyLong())).thenReturn(player);
-//
-//        Player result = gameUserService.getPlayer(1L);
-//
-//        assertEquals(result, player);
-//    }
-//
-//    @Test
-//    void getUser_validInputs() {
-//        user = new User();
-//        user.setId(1L);
-//
-//
-//        when(userRepository.findUserById(anyLong())).thenReturn(user);
-//
-//        User result = gameUserService.getUser(1L);
-//
-//        assertEquals(result, user);
-//    }
-//
+package ch.uzh.ifi.hase.soprafs24.service;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+
+@ExtendWith(MockitoExtension.class)
+public class GameUserServiceIntegrationTest {
+
+    @Mock
+    private GameRepository gamerepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PlayerRepository playerrepository;
+
+    @InjectMocks
+    private GameUserService gameUserService;
+
+
+    private Player player;
+
+    private User user;
+
+
+    @BeforeEach
+    void setup(){
+        player = new Player();
+        player.setPlayerId(1L);
+        player.setStrikes(0);
+        playerrepository.save(player);
+        playerrepository.flush();
+    }
+
+    @AfterEach
+    void teardown() {
+        userRepository.deleteAll();
+    }
+
+    @Test
+    void getPlayer_validInputs() {
+        when(playerrepository.findByPlayerId(anyLong())).thenReturn(player);
+
+        Player result = gameUserService.getPlayer(1L);
+
+        assertEquals(result, player);
+    }
+
+    @Test
+    void getUser_validInputs() {
+        user = new User();
+        user.setId(1L);
+
+
+        when(userRepository.findUserById(anyLong())).thenReturn(user);
+
+        User result = gameUserService.getUser(1L);
+
+        assertEquals(result, user);
+    }
+
 //    @Test
 //    void createPlayer_validInputs() {
 //        List<Player> list = new ArrayList<>();
 //
-//        Player newplayer = gameUserService.createplayer(1L);
+//        Player newplayer = gameUserService.createlayer(1L);
 //        list.add(newplayer);
 //
 //        assertEquals(list.size(), 1);
 //    }
-//
-//    @Test
-//    void getChosenCharacterofOpponent_validInputs() {
-//        Image image = new Image();
-//        image.setId(1L);
-//        Player opp = new Player();
-//        opp.setPlayerId(2L);
-//        opp.setChosencharacter(1L);
-//        Game game = new Game();
-//        game.setCreatorId(1L);
-//        game.setInvitedPlayerId(2L);
-//
-//        when(playerrepository.findByPlayerId(2L)).thenReturn(opp);
-//
-//        Long result = gameUserService.getChosenCharacterofOpponent(game, 1L);
-//
-//        assertEquals(result, 1L);
-//    }
-//
-//
-//    @Test
-//    void checkStrikes_validInput() {
-//        when(gameUserService.getPlayer(1L)).thenReturn(player);
-//
-//        Boolean result = gameUserService.checkStrikes(player.getPlayerId());
-//
-//        assertTrue(result);
-//    }
-//
-//    @Test
-//    void getStrikes_validInput(){
-//        when(gameUserService.getPlayer(1L)).thenReturn(player);
-//
-//        Integer number = gameUserService.getStrikesss(1L);
-//
-//        assertEquals(number,0);
-//    }
-//
-//    @Test
-//    void increaseStrikesByOne_validInputs(){
-//        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
-//
-//        assertEquals(player.getStrikes(), 0);
-//
-//        gameUserService.increaseStrikesByOne(1L);
-//
-//        assertEquals(player.getStrikes(), 1);
-//    }
-//
-//    @Test
-//    void determineStatus_wrongInputs() {
-//        Player invited = new Player();
-//        invited.setPlayerId(2L);
-//        Game game = new Game();
-//        game.setGameId(1L);
-//        game.setCreatorId(player.getPlayerId());
-//        game.setInvitedPlayerId(invited.getPlayerId());
-//        gamerepository.save(game);
-//        gamerepository.flush();
-//
-//        when(gamerepository.findByGameId(1L)).thenReturn(game);
-//        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
-//        when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
-//
-//        RoundStatus result = gameUserService.determineStatus(1L);
-//
-//        assertEquals(result, RoundStatus.CHOOSING);
-//    }
-//
-//    @Test
-//    void createResponse_validInputs() {
-//        Response response = new Response();
-//        response.setGuess(true);
-//        response.setPlayerId(1L);
-//        response.setStrikes(0);
-//        response.setRoundStatus(RoundStatus.GUESSING);
-//
-//        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, RoundStatus.GUESSING);
-//
-//        assertEquals(result.getGuess(), response.getGuess());
-//        assertEquals(result.getStrikes(), response.getStrikes());
-//        assertEquals(result.getPlayerId(), response.getPlayerId());
-//        assertEquals(result.getRoundStatus(), response.getRoundStatus());
-//    }
-//
+
+    @Test
+    void getChosenCharacterofOpponent_validInputs() {
+        Image image = new Image();
+        image.setId(1L);
+        Player opp = new Player();
+        opp.setPlayerId(2L);
+        opp.setChosencharacter(1L);
+        Game game = new Game();
+        game.setCreatorPlayerId(1L);
+        game.setInvitedPlayerId(2L);
+
+        when(playerrepository.findByPlayerId(2L)).thenReturn(opp);
+
+        Long result = gameUserService.getChosenCharacterOfOpponent(game, 1L);
+
+        assertEquals(result, 1L);
+    }
+
+
+    @Test
+    void checkStrikes_validInput() {
+        when(gameUserService.getPlayer(1L)).thenReturn(player);
+
+        Boolean result = gameUserService.checkStrikes(player.getPlayerId());
+
+        assertTrue(result);
+    }
+
+    @Test
+    void getStrikes_validInput(){
+        when(gameUserService.getPlayer(1L)).thenReturn(player);
+
+        Integer number = gameUserService.getStrikes(1L);
+
+        assertEquals(number,0);
+    }
+
+    @Test
+    void increaseStrikesByOne_validInputs(){
+        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
+
+        assertEquals(player.getStrikes(), 0);
+
+        gameUserService.increaseStrikesByOne(1L);
+
+        assertEquals(player.getStrikes(), 1);
+    }
+
+    @Test
+    void determineStatus_wrongInputs() {
+        Player invited = new Player();
+        invited.setPlayerId(2L);
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setCreatorPlayerId(player.getPlayerId());
+        game.setInvitedPlayerId(invited.getPlayerId());
+        gamerepository.save(game);
+        gamerepository.flush();
+
+        when(gamerepository.findByGameId(1L)).thenReturn(game);
+        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
+        when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
+
+        GameStatus result = gameUserService.determineStatus(1L);
+
+        assertEquals(result, GameStatus.CHOOSING);
+    }
+
+    @Test
+    void createResponse_validInputs() {
+        Response response = new Response();
+        response.setGuess(true);
+        response.setPlayerId(1L);
+        response.setStrikes(0);
+        response.setRoundStatus(GameStatus.GUESSING);
+
+        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, GameStatus.GUESSING);
+
+        assertEquals(result.getGuess(), response.getGuess());
+        assertEquals(result.getStrikes(), response.getStrikes());
+        assertEquals(result.getPlayerId(), response.getPlayerId());
+        assertEquals(result.getRoundStatus(), response.getRoundStatus());
+    }
+
 //    @Test
 //    void increaseWinTotal_validInputs() {
 //        User user = new User();
@@ -183,7 +183,7 @@
 //        assertNotNull(user.getTotalwins());
 //        assertEquals(user.getTotalwins(), 1L);
 //    }
-//
+
 //    @Test
 //    void increaseGamesPlayed_validInputs() {
 //        User user = new User();
@@ -198,27 +198,27 @@
 //        assertNotNull(user.getTotalplayed());
 //        assertEquals(user.getTotalplayed(), 1L);
 //    }
-//
-//    @Test
-//    void updategamelobbylist_validInputs() {
-//        Game game = new Game();
-//        game.setGameId(1L);
-//        Lobby lobby = new Lobby();
-//        lobby.setLobbyid(1L);
-//        lobby.setGame(game);
-//        List<Lobby> list = new ArrayList<>();
-//        list.add(lobby);
-//        User user = new User();
-//        user.setId(1L);
-//        user.setUsergamelobbylist(list);
-//
-//        List<Lobby> lobbylist = user.getUsergamelobbylist();
-//
-//        assertNotNull(lobby.getGame());
-//
-//        gameUserService.updategamelobbylist(user);
-//
-//        assertNull(lobby.getGame());
-//    }
-//
-//}
+
+    @Test
+    void updategamelobbylist_validInputs() {
+        Game game = new Game();
+        game.setGameId(1L);
+        Lobby lobby = new Lobby();
+        lobby.setLobbyid(1L);
+        lobby.setGame(game);
+        List<Lobby> list = new ArrayList<>();
+        list.add(lobby);
+        User user = new User();
+        user.setId(1L);
+        user.setUsergamelobbylist(list);
+
+        List<Lobby> lobbylist = user.getUsergamelobbylist();
+
+        assertNotNull(lobby.getGame());
+
+        gameUserService.updategamelobbylist(user);
+
+        assertNull(lobby.getGame());
+    }
+
+}

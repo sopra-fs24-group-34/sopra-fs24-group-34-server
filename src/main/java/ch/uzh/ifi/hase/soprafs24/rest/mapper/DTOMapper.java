@@ -133,7 +133,7 @@ public interface DTOMapper {
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "id", target = "id")
-    User covertUserDeleteDTOtoEntity(UserDeleteDTO userDeleteDTO);
+    User convertUserDeleteDTOtoEntity(UserDeleteDTO userDeleteDTO);
     // smailalijagic: source = UserDeleteDTO, target = User
 
     @Mapping(source = "senderId", target = "senderId")
