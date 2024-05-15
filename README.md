@@ -136,7 +136,7 @@ Frontend Developer
 
 
 Backend Developer
-- [@smailalijagic] (https://www.github.com/smailalijagic)
+- [smailalijagic] (https://www.github.com/smailalijagic)
 - 
 
 ## 8. Licencse
