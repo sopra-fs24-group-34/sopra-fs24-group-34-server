@@ -2,7 +2,11 @@
 
 ## Introduction
 Does the person have brown eyes? No! Did you forgot this game? "Guess Who" is back. We implemented the traditional tabletop game where users have to guess characters by asking yes or no characters. 
-
+The rules are simple:
+1. **Setup**:  Each player selects a character card without revealing it to their opponent. This card represents the character the opponent must guess
+2. **Taking Turns**: Players take turns asking yes or no questions about the opponent's character in order to narrow down the possibilities.
+3. **Elimination**: Based on the answers to the questions, players can start eliminating characters that do not fit the description until they are confident enough to make a guess.
+4. **Winning**: The first player to correctly guess their opponent's character wins the game!
 
 
 ## Table of Contents
@@ -15,17 +19,36 @@ Does the person have brown eyes? No! Did you forgot this game? "Guess Who" is ba
 7. [Authors and Acknowledgment](#AAA)
 8. [Licencse](#licence)
 9. [Further Material](#FM)
-1. [Links](#links)
    1. [UML Diagram](#uml)
    2. [Component Diagram](#component)
    3. [Activity Diagram](#activity)
    4. [Figma Mockups](#figma)
-2. ...
 
-## Technologies
+## 2. Technologies
+For this webapplication we used ReactJS in the frontend and Java Spring in the backend. More specifically we used the following technologies
+- HTML/CSS/JavaScript/TypeScript: ...
+- Java: ...
+- Websockets: ...
 
+## 3. High-level Components
+some text
 
-## Links
+## 4. Launch & Deployment
+some text
+
+## 5. Interface User Flow
+some text
+
+## 6. Roadmap
+some text
+
+## 7. Authos and Acknowledgment
+some text
+
+## 8. Licencse
+some text
+
+## 9. Appendix
 - [UML Diagram](https://lucid.app/lucidchart/bdc43c7c-3a02-4163-9724-150a430a899a/edit?invitationId=inv_7c71d23b-ad34-4ca4-b878-67235064b5df&page=0_0#)
 - [Component Diagram](https://lucid.app/lucidchart/49acbc96-3e66-4064-99c4-4174bcf3b833/edit?invitationId=inv_56df17db-d1b8-4ae0-b4c8-e27462ec2213&page=0_0#)
 - [Activity Diagram](https://lucid.app/lucidchart/e5d280ab-f80c-4e6c-8c0b-7544ba9b8936/edit?invitationId=inv_10376661-1660-47e2-b32b-fbf7d82989de&page=0_0#)
