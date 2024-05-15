@@ -1,25 +1,28 @@
 # SoPra FS24 group 34 Server
 
-## Introduction(#introduction)
-Here comes some text...
+## Introduction
+Does the person have brown eyes? No! Did you forgot this game? "Guess Who" is back. We implemented the traditional tabletop game where users have to guess characters by asking yes or no characters. 
 
 
-# Table of Contents
-1. Introduction(#introduction)
-2. Technologies(#technologies)
-3. High-level Components(#HLC)
-4. Launch & Deployment(#LD)
-5. Interface User Flow(#IUF)
-6. Roadmap(#roadmap)
-7. Authors and Acknowledgment(#AAA)
-8. Licencse(#licence)
-9. Further Material(#FM)
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Technologies](#technologies)
+3. [High-level Components](#HLC)
+4. [Launch & Deployment](#LD)
+5. [Interface User Flow](#IUF)
+6. [Roadmap](#roadmap)
+7. [Authors and Acknowledgment](#AAA)
+8. [Licencse](#licence)
+9. [Further Material](#FM)
 1. [Links](#links)
    1. [UML Diagram](#uml)
    2. [Component Diagram](#component)
    3. [Activity Diagram](#activity)
    4. [Figma Mockups](#figma)
 2. ...
+
+## Technologies
 
 
 ## Links
