@@ -24,16 +24,16 @@ The rules are simple:
    3. [Activity Diagram](#activity)
    4. [Figma Mockups](#figma)
 
-## 2. [Technologies](#technologies)
+## [Technologies](#technologies)
 For this webapplication we used ReactJS in the frontend and Java Spring in the backend. More specifically we used the following technologies
 - HTML/CSS/JavaScript/TypeScript: ...
 - Java: ...
 - Websockets: ...
 
-## 3. [High-level Components](#HLC)
+## [High-level Components](#HLC)
 some text
 
-## 4. Launch & Deployment
+## Launch & Deployment
 # SoPra RESTful Service Template FS24
 ## Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
