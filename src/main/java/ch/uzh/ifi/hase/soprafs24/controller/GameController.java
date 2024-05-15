@@ -116,12 +116,7 @@ public class GameController {
 
         return gameService.getGameImages(gameId);
     }
-    @PostMapping("/games/{gameId}/images")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public void saveGameImages(@PathVariable Long gameId) {
-        gameService.saveGameImages(gameId, 20);
-    }
+
     @DeleteMapping("/games/{gameId}/images/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
