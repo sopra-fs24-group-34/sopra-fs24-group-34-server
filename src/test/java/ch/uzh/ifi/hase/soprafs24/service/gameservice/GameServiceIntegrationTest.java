@@ -1,8 +1,9 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameservice;
 
-import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
@@ -76,7 +77,7 @@ public class GameServiceIntegrationTest {
 
         createdgame = new Game();
         createdgame.setGameId(4L);
-        createdgame.setCreatorId(1L);
+        createdgame.setCreatorPlayerId(1L);
         createdgame.setInvitedPlayerId(2L);
 
         gamerepository.save(createdgame);
@@ -123,23 +124,27 @@ public class GameServiceIntegrationTest {
             playerrepository.flush();
             player.setPlayerId(5L);
             return null; // Since the method is void, return null
-        }).when(gameUserService).saveplayerchanges(any(Player.class));
+        }).when(gameUserService).savePlayerChanges(any(Player.class));
 
         Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
 
 
         Game newgame = new Game();
         newgame.setGameId(4L);
-        newgame.setCreatorId(5L);
+        newgame.setCreatorPlayerId(5L);
         newgame.setInvitedPlayerId(5L);
         gamerepository.save(newgame);
         gamerepository.flush();
 
-        Game result = gameservice.creategame(3L, createdgame);
+        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+        authenticationDTO.setId(1L);
+        authenticationDTO.setToken(creator.getToken());
 
-        assertEquals(result.getCreatorId(), newgame.getCreatorId());
+        Game result = gameservice.createGame(3L, createdgame, authenticationDTO);
+
+        assertEquals(result.getCreatorPlayerId(), newgame.getCreatorPlayerId());
         assertEquals(result.getInvitedPlayerId(), newgame.getInvitedPlayerId());
-        System.out.println(result.getCreatorId());
+        System.out.println(result.getCreatorPlayerId());
         // assertEquals(playerrepository.findByPlayerId(result.getCreatorId()).getUser(), playerrepository.findByPlayerId(newgame.getCreatorId()).getUser());
 
     }
@@ -163,7 +168,7 @@ public class GameServiceIntegrationTest {
             playerrepository.flush();
             anyplayer.setPlayerId(5L);
             return null; // Since the method is void, return null
-        }).when(gameUserService).saveplayerchanges(any(Player.class));
+        }).when(gameUserService).savePlayerChanges(any(Player.class));
 
 
         gameservice.chooseImage(guess);
@@ -188,15 +193,15 @@ public class GameServiceIntegrationTest {
         response.setGuess(true);
         response.setStrikes(0);
         response.setPlayerId(2L);
-        response.setRoundStatus(RoundStatus.END);
+        response.setRoundStatus(GameStatus.END);
 
         System.out.println(guess.getGameId());
-        Mockito.when(gameUserService.getChosenCharacterofOpponent(createdgame, 2L)).thenReturn(1L);
+        Mockito.when(gameUserService.getChosenCharacterOfOpponent(createdgame, 2L)).thenReturn(1L);
         Mockito.when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
-        Mockito.when(gameUserService.getStrikesss(2L)).thenReturn(0);
-        Mockito.when(gameUserService.createResponse(true, 2L, 0, RoundStatus.END)).thenReturn(response);
+        Mockito.when(gameUserService.getStrikes(2L)).thenReturn(0);
+        Mockito.when(gameUserService.createResponse(true, 2L, 0, GameStatus.END)).thenReturn(response);
 
-        Response result = gameservice.guesssimage(guess);
+        Response result = gameservice.guessImage(guess);
 
         // this will only give back true when the Mockito functions are called with the right arguments
         assertEquals(result.getGuess(), true);
