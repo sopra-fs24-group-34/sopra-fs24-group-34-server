@@ -26,16 +26,4 @@ public class ImageController {
         return "Successfully fetched and saved images to the database.";
     }
 
-    /*
-    @GetMapping("/images")
-    public List<ImageDTO> getImageUrls(@RequestParam(defaultValue = "20") int count) {
-        //gets images from database
-        return unsplashService.getImageUrlsFromDatabase(count);
-    }
-     */
-    @DeleteMapping("/images/{imageId}")
-    public void deleteImage(@PathVariable Long imageId) {
-
-        UnsplashService.deleteImage(imageId, imageRepository);
-    }
 }
