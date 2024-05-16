@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -13,11 +14,25 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Scope("singleton")
 public class WebSocketSessionService {
+
+    //nedim-j: ensure that there is only one instance of SessionService
+    private static WebSocketSessionService instance;
+
+    private WebSocketSessionService() {
+        // Private constructor to prevent instantiation
+    }
+
+    public static WebSocketSessionService getInstance() {
+        if (instance == null) {
+            instance = new WebSocketSessionService();
+        }
+        return instance;
+    }
+
+
     private final Map<Long, List<WebSocketSession>> sessionsMap = new HashMap<>(); // Map to store WebSocket sessions to corresponding lobby/game
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
-
 
     public void addActiveSession(WebSocketSession session) {
         String sessionId = session.getId();
@@ -45,7 +60,7 @@ public class WebSocketSessionService {
             }
 
             // Step 6: Remove the session from activeSessions
-            //activeSessions.remove(sessionId);
+            activeSessions.remove(sessionId);
         }
     }
 
@@ -53,14 +68,22 @@ public class WebSocketSessionService {
         return sessionsMap;
     }
 
+
+
+
+
+
+
+
+
+    //nedim-j: for debugging
     public void printSessionsMap() {
         System.out.println("Sessions Map:");
         for (Map.Entry<Long, List<WebSocketSession>> entry : sessionsMap.entrySet()) {
             Long lobbyOrGameId = entry.getKey();
             List<WebSocketSession> sessionsList = entry.getValue();
 
-            System.out.println("Lobby/Game ID: " + lobbyOrGameId);
-            System.out.println("Sessions:");
+            System.out.println("  Lobby/Game ID: " + lobbyOrGameId + ":");
             for (WebSocketSession session : sessionsList) {
                 System.out.println("    Session ID: " + session.getId());
                 // You can print more details about the session if needed
@@ -70,7 +93,7 @@ public class WebSocketSessionService {
     }
 
     public void printActiveSessions() {
-        System.out.println("Active Sessions:");
+        System.out.println("Sessions without Lobby/Game:");
         if (!activeSessions.isEmpty()) {
             for (Map.Entry<String, WebSocketSession> entry : activeSessions.entrySet()) {
                 String sessionId = entry.getKey();

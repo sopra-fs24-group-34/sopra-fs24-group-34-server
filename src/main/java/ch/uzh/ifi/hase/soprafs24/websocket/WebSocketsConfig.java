@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 
 // WebSocketsConfig.java
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
@@ -29,6 +30,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
-        registration.addDecoratorFactory(handler -> new WebSocketCustomHandler(handler));
+        registration.addDecoratorFactory(WebSocketCustomHandler::new);
     }
+
 }

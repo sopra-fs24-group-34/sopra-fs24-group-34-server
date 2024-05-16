@@ -1,8 +1,10 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
@@ -11,11 +13,10 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import java.util.Objects;
 
 
-@Component
+@Service
 public class WebSocketEventListener {
 
-    @Autowired
-    private WebSocketSessionService sessionService = new WebSocketSessionService();
+    private final WebSocketSessionService sessionService = WebSocketSessionService.getInstance();
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
@@ -37,7 +38,6 @@ public class WebSocketEventListener {
         System.out.println("Subscription formed. SessionId: " + sessionId + " | Destination: " + destination);
         Long destinationId = Long.valueOf(destination.split("/")[2]);
         sessionService.mapActiveSessionToLobbyOrGame(destinationId, sessionId);
-        //System.out.println("SessionsMap: ");
         sessionService.printSessionsMap();
         sessionService.printActiveSessions();
     }

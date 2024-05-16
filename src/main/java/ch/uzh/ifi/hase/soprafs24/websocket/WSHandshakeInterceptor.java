@@ -15,13 +15,7 @@ public class WSHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                    Map attributes) throws Exception {
         if (request instanceof ServletServerHttpRequest) {
-            /*
-            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-            HttpSession session = servletRequest.getServletRequest().getSession();
-            attributes.put("sessionId", session.getId());
-            WebSocketSessionService.addSession((WebSocketSession) session);
-
-             */
+            //nedim-j: for debug purposes
             //System.out.println("WSHANDLER before:"  + wsHandler);
         }
         return true;
