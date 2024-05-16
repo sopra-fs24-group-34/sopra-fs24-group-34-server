@@ -7,10 +7,9 @@ import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
@@ -35,11 +34,14 @@ public class GameService {
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
   private final AuthenticationService authenticationService;
-  private final WebSocketHandler webSocketHandler;
+  private final WebSocketMessenger webSocketMessenger;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService, WebSocketHandler webSocketHandler) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository,
+                     GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                     UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService,
+                     WebSocketMessenger webSocketMessenger) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
@@ -47,7 +49,7 @@ public class GameService {
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
     this.authenticationService = authenticationService;
-    this.webSocketHandler = webSocketHandler;
+    this.webSocketMessenger = webSocketMessenger;
     }
 
   public List<Game> getGames() {
@@ -392,22 +394,25 @@ public class GameService {
         }
     }
 
+    /*
     @Scheduled(fixedRate = 15000) // Check every 15 seconds
     public void checkGameTimeout() {
         //List<Game> activeGames = getActiveGames();
         System.out.println("Scheduled activity check ");
         for (Game game : gameRepository.findAll()) {
-            if (!webSocketHandler.isPlayerActive(game.getCreatorPlayerId())) {
+            if (!WebSocketMessenger.isPlayerActive(game.getCreatorPlayerId())) {
                 gameUserService.increaseGamesPlayed(game.getCreatorPlayerId());
                 handleWin(game.getInvitedPlayerId());
                 deleteGame(game);
-            } else if (!webSocketHandler.isPlayerActive(game.getInvitedPlayerId())) {
+            } else if (!WebSocketMessenger.isPlayerActive(game.getInvitedPlayerId())) {
                 gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
                 handleWin(game.getCreatorPlayerId());
                 deleteGame(game);
             }
         }
     }
+
+     */
 
 
 

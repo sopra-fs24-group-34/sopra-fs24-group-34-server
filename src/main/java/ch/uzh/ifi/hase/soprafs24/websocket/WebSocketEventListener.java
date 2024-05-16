@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
@@ -13,9 +14,12 @@ import java.util.Objects;
 @Component
 public class WebSocketEventListener {
 
+    @Autowired
+    private WebSocketSessionService sessionService = new WebSocketSessionService();
+
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
-        System.out.println("New WebSocket Connection has been formed");
+        //System.out.println("New WebSocket Connection has been formed");
         //event.getSource();
     }
 
@@ -31,5 +35,10 @@ public class WebSocketEventListener {
         String sessionId = Objects.requireNonNull(event.getMessage().getHeaders().get("simpSessionId")).toString();
         String destination = Objects.requireNonNull(event.getMessage().getHeaders().get("simpDestination")).toString();
         System.out.println("Subscription formed. SessionId: " + sessionId + " | Destination: " + destination);
+        Long destinationId = Long.valueOf(destination.split("/")[2]);
+        sessionService.mapActiveSessionToLobbyOrGame(destinationId, sessionId);
+        //System.out.println("SessionsMap: ");
+        sessionService.printSessionsMap();
+        sessionService.printActiveSessions();
     }
 }

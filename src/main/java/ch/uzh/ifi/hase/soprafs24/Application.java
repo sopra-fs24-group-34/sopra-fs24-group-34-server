@@ -44,6 +44,7 @@ public class Application {
                       .allowedMethods("*")
                       .allowCredentials(true)
                       .allowedHeaders("*");
+
           }
       };
       /*

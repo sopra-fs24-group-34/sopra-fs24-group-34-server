@@ -8,8 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
-import org.apache.catalina.Manager;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -30,14 +28,14 @@ public class LobbyService {
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
   private final UserRepository userRepository; // smailalijagic: needed to verify user
   private final AuthenticationService authenticationService;
-  private final WebSocketHandler webSocketHandler;
+  private final WebSocketMessenger webSocketMessenger;
 
     @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService, WebSocketHandler webSocketHandler) {
+  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService, WebSocketMessenger webSocketMessenger) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
     this.authenticationService = authenticationService;
-    this.webSocketHandler = webSocketHandler;
+    this.webSocketMessenger = webSocketMessenger;
     }
 
   public List<User> getUsers() {
@@ -107,7 +105,7 @@ public class LobbyService {
     lobbyRepository.flush();
 
     // Create a WebSocket session for the lobby
-    //webSocketHandler.createSession(newlobby.getLobbyid());
+    //WebSocketMessenger.createSession(newlobby.getLobbyid());
 
     User user = userRepository.findUserById(userId);
 

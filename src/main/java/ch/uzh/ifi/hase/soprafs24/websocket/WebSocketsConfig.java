@@ -4,10 +4,7 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -20,6 +17,7 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("ws://localhost:*", "wss://localhost:*", "http://localhost:*", "https://localhost:*",
                         "ws://sopra-fs24-group-34-*", "wss://sopra-fs24-group-34-*",
                         "http://sopra-fs24-group-34-*", "https://sopra-fs24-group-34-*")
+                .addInterceptors(new WSHandshakeInterceptor())
                 .withSockJS();
     }
 
@@ -29,4 +27,8 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
     }
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(handler -> new WebSocketCustomHandler(handler));
+    }
 }
