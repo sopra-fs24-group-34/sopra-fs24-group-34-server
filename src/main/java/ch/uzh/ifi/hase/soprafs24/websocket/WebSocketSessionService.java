@@ -2,12 +2,13 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,14 +31,22 @@ public class WebSocketSessionService {
         return instance;
     }
 
+    @Autowired
+    private LobbyService lobbyService;
 
+    //nedim-j: session handling
     private final Map<Long, List<WebSocketSession>> sessionsMap = new HashMap<>(); // Map to store WebSocket sessions to corresponding lobby/game
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
 
     public void addActiveSession(WebSocketSession session) {
         String sessionId = session.getId();
         activeSessions.put(sessionId, session);
-        System.out.println("Active session added: " + sessionId);
+        //System.out.println("Active session added: " + sessionId);
+    }
+    
+    public void addUserIdToActiveSession(String sessionId, String userId) {
+        WebSocketSession session = activeSessions.get(sessionId);
+        session.getAttributes().put("userId", userId);
     }
 
     public void mapActiveSessionToLobbyOrGame(Long lobbyOrGameId, String sessionId) {
@@ -45,6 +54,7 @@ public class WebSocketSessionService {
         if (activeSessions.containsKey(sessionId)) {
             // Step 2: Retrieve the session
             WebSocketSession session = activeSessions.get(sessionId);
+            session.getAttributes().put("lobbyOrGameId", lobbyOrGameId);
 
             // Step 3: Check if there is already a list of sessions for the given lobbyOrGameId
             List<WebSocketSession> sessionsList = sessionsMap.get(lobbyOrGameId);
@@ -64,6 +74,45 @@ public class WebSocketSessionService {
         }
     }
 
+    public void handleDisconnectedSession(WebSocketSession session) {
+        String sessionId = session.getId();
+        Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
+        Long lobbyOrGameId = Long.valueOf(session.getAttributes().get("lobbyOrGameId").toString());
+
+        List<WebSocketSession> sessions = sessionsMap.get(lobbyOrGameId);
+        sessions.remove(session);
+        sessionsMap.put(lobbyOrGameId, sessions);
+        lobbyService.removeUserFromLobby(lobbyOrGameId, userId);
+
+        System.out.println("-----");
+        printSessionsMap();
+
+        //inactiveSessions.put(sessionId, session);
+        //System.out.println("Active session added: " + sessionId);
+    }
+
+    public void closeSessionsOfLobbyOrGameId(Long lobbyOrGameId) {
+        List<WebSocketSession> sessions = sessionsMap.get(lobbyOrGameId);
+        for(WebSocketSession session : sessions) {
+            try {
+                session.close();
+                sessions.remove(session);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not close session " +
+                        session + " | "+ e);
+            }
+        }
+
+        sessionsMap.put(lobbyOrGameId, sessions);
+
+        if(sessionsMap.get(lobbyOrGameId) == null) {
+            sessionsMap.remove(lobbyOrGameId);
+            System.out.println("Closed sessions for ID: " + lobbyOrGameId);
+        } else {
+            System.out.println("Error in closing sessions for ID: " + lobbyOrGameId);
+        }
+    }
+
     public Map<Long, List<WebSocketSession>> getSessionsMap() {
         return sessionsMap;
     }
@@ -73,7 +122,10 @@ public class WebSocketSessionService {
 
 
 
-
+    public void printSessionAttributes(String sessionId) {
+        WebSocketSession session = activeSessions.get(sessionId);
+        System.out.println("Session attributes: " +session.getAttributes());
+    }
 
 
     //nedim-j: for debugging
@@ -85,8 +137,10 @@ public class WebSocketSessionService {
 
             System.out.println("  Lobby/Game ID: " + lobbyOrGameId + ":");
             for (WebSocketSession session : sessionsList) {
-                System.out.println("    Session ID: " + session.getId());
-                // You can print more details about the session if needed
+                System.out.println("    SessionID: " + session.getId() +
+                        " | UserID: " + session.getAttributes().get("userId")
+                        //+ " | LobbyOrGameId: " + session.getAttributes().get("lobbyOrGameId")
+                );
             }
             System.out.println();
         }
@@ -99,7 +153,7 @@ public class WebSocketSessionService {
                 String sessionId = entry.getKey();
                 WebSocketSession session = entry.getValue();
 
-                System.out.println("Session ID: " + sessionId);
+                System.out.println("  Session ID: " + sessionId);
                 // You can print more details about the session if needed
             }
         } else {

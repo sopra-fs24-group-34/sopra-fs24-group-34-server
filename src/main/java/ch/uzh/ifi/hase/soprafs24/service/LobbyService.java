@@ -9,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -30,7 +32,7 @@ public class LobbyService {
   private final AuthenticationService authenticationService;
   private final WebSocketMessenger webSocketMessenger;
 
-    @Autowired
+  @Autowired
   public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService, WebSocketMessenger webSocketMessenger) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
@@ -38,7 +40,7 @@ public class LobbyService {
     this.webSocketMessenger = webSocketMessenger;
     }
 
-  public List<User> getUsers() {
+    public List<User> getUsers() {
     return this.userRepository.findAll();
   }
 
@@ -141,5 +143,20 @@ public class LobbyService {
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
   }
+
+    public void removeUserFromLobby(Long lobbyId, Long userId) {
+        //Long userId = user.getId();
+        Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+
+        if(Objects.equals(lobby.getCreator_userid(), userId)) {
+            lobby.setCreator_userid(null);
+        } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
+            lobby.setInvited_userid(null);
+        }
+        lobbyRepository.save(lobby);
+        lobbyRepository.flush();
+    }
+
+
 
 }
