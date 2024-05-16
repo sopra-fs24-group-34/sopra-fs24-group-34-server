@@ -4,11 +4,16 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketSession;
 
+
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +23,24 @@ import java.util.Map;
 public class WebSocketSessionService {
 
     //nedim-j: ensure that there is only one instance of SessionService
+
+    @PostConstruct
+    public void init() {
+        System.out.println("WebSocketSessionService bean initialized.");
+        System.out.println("Sessionservice lobbyserv "+lobbyService.getClass());
+    }
+
     private static WebSocketSessionService instance;
 
-    private WebSocketSessionService() {
+    private static LobbyService lobbyService;
+
+
+    @Autowired
+    public void setLobbyService(LobbyService lobbyService) {
+        WebSocketSessionService.lobbyService = lobbyService;
+    }
+
+    public WebSocketSessionService() {
         // Private constructor to prevent instantiation
     }
 
@@ -31,19 +51,17 @@ public class WebSocketSessionService {
         return instance;
     }
 
-    @Autowired
-    private LobbyService lobbyService;
-
     //nedim-j: session handling
     private final Map<Long, List<WebSocketSession>> sessionsMap = new HashMap<>(); // Map to store WebSocket sessions to corresponding lobby/game
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
+
 
     public void addActiveSession(WebSocketSession session) {
         String sessionId = session.getId();
         activeSessions.put(sessionId, session);
         //System.out.println("Active session added: " + sessionId);
     }
-    
+
     public void addUserIdToActiveSession(String sessionId, String userId) {
         WebSocketSession session = activeSessions.get(sessionId);
         session.getAttributes().put("userId", userId);
@@ -82,7 +100,12 @@ public class WebSocketSessionService {
         List<WebSocketSession> sessions = sessionsMap.get(lobbyOrGameId);
         sessions.remove(session);
         sessionsMap.put(lobbyOrGameId, sessions);
-        lobbyService.removeUserFromLobby(lobbyOrGameId, userId);
+        try {
+            lobbyService.removeUserFromLobby(lobbyOrGameId, userId);
+        } catch(Exception e) {
+            System.out.println(lobbyService);
+            System.out.println(e);
+        }
 
         System.out.println("-----");
         printSessionsMap();

@@ -15,7 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 @RestController
 @SpringBootApplication
 @EnableWebMvc
-@ComponentScan("ch.uzh.ifi.hase.soprafs24")
+@ComponentScan(basePackages = {"ch.uzh.ifi.hase.soprafs24"})
 public class Application {
   public static void main(String[] args) {SpringApplication.run(Application.class, args);}
 

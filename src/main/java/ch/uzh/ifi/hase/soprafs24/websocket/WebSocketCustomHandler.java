@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
@@ -9,7 +10,7 @@ import org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator
 @Service
 public class WebSocketCustomHandler extends ExceptionWebSocketHandlerDecorator {
 
-    private final WebSocketSessionService sessionService = WebSocketSessionService.getInstance();
+    private WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
 
     public WebSocketCustomHandler(WebSocketHandler delegate) {
         super(delegate);
@@ -22,13 +23,13 @@ public class WebSocketCustomHandler extends ExceptionWebSocketHandlerDecorator {
         //System.out.println("CH Session attributes: " + session.getAttributes());
         //System.out.println("CH Session userId: " + session.getAttributes().get("userId"));
         //System.out.println("Session Handshake headers: " + session.get);
-        sessionService.addActiveSession(session);
+        webSocketSessionService.addActiveSession(session);
         super.afterConnectionEstablished(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        sessionService.handleDisconnectedSession(session);
+        webSocketSessionService.handleDisconnectedSession(session);
         super.afterConnectionClosed(session, status);
     }
 }

@@ -13,34 +13,37 @@ import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Service
+@Service("lobbyService")
 @Transactional
 public class LobbyService {
   private final Logger log = LoggerFactory.getLogger(LobbyService.class);
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
   private final UserRepository userRepository; // smailalijagic: needed to verify user
   private final AuthenticationService authenticationService;
-  private final WebSocketMessenger webSocketMessenger;
 
   @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService, WebSocketMessenger webSocketMessenger) {
+  public LobbyService(@Autowired @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                      @Autowired @Qualifier("userRepository") UserRepository userRepository,
+                      @Autowired AuthenticationService authenticationService) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
     this.authenticationService = authenticationService;
-    this.webSocketMessenger = webSocketMessenger;
     }
 
-    public List<User> getUsers() {
+  public List<User> getUsers() {
     return this.userRepository.findAll();
   }
 
