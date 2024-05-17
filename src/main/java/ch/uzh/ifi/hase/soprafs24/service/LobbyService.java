@@ -33,15 +33,17 @@ public class LobbyService {
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
   private final UserRepository userRepository; // smailalijagic: needed to verify user
   private final AuthenticationService authenticationService;
+  private final WebSocketMessenger webSocketMessenger;
 
   @Autowired
-  public LobbyService(@Autowired @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
-                      @Autowired @Qualifier("userRepository") UserRepository userRepository,
-                      @Autowired AuthenticationService authenticationService) {
+  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                      @Qualifier("userRepository") UserRepository userRepository,
+                      AuthenticationService authenticationService, WebSocketMessenger webSocketMessenger) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
     this.authenticationService = authenticationService;
-    }
+    this.webSocketMessenger = webSocketMessenger;
+  }
 
   public List<User> getUsers() {
     return this.userRepository.findAll();
@@ -150,11 +152,14 @@ public class LobbyService {
     public void removeUserFromLobby(Long lobbyId, Long userId) {
         //Long userId = user.getId();
         Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+        UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
 
         if(Objects.equals(lobby.getCreator_userid(), userId)) {
             lobby.setCreator_userid(null);
+            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
         } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
             lobby.setInvited_userid(null);
+            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
         }
         lobbyRepository.save(lobby);
         lobbyRepository.flush();
