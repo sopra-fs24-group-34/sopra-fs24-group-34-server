@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 
 public class Response {
 
@@ -8,6 +9,9 @@ public class Response {
     private Long playerId;
     private int strikes;
     private GameStatus gameStatus;
+
+    private RoundDTO roundDTO;
+
 
     public Boolean getGuess() {
         return guess;
@@ -40,4 +44,8 @@ public class Response {
     public void setRoundStatus(GameStatus gameStatus) {
         this.gameStatus = gameStatus;
     }
+
+    public RoundDTO getRoundDTO() {return roundDTO;}
+
+    public void setRoundDTO(RoundDTO roundDTO) {this.roundDTO = roundDTO;}
 }

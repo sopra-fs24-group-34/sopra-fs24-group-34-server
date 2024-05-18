@@ -88,14 +88,14 @@ public class GameController {
     //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Response response = gameService.chooseImage(guess);
-
-    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
-
+    RoundDTO roundDTO = gameService.chooseImage(guess);
+    if (gameService.bothPlayersChosen(guess.getGameId())) {
+        webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round0", roundDTO);
+    }
   }
 
   @MessageMapping("/guessImage")
-  public Response guessImage(String stringJsonRequest){
+  public void guessImage(String stringJsonRequest){
     Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
     GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
     //nedim-j: use for round-basis, authentication:
@@ -104,8 +104,10 @@ public class GameController {
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.guessImage(guess);
 
+    Game game = gameService.getGame(guessPostDTO.getGameid());
+
     webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
-    return response;
+
   }
 
     // Endpoints regarding game-specific images
