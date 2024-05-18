@@ -144,16 +144,6 @@ public class FriendService {
         if (creator.getStatus() != UserStatus.INLOBBY) {
             System.out.println("The User who invited you is not in the Lobby anymore");
         }
-        else if (lobbyInvitationPutDTO.getAnswer()){ //till: if answer is true invitedUser joins lobby and User Status is adjusted
-            Lobby lobby = lobbyRepository.findByLobbyid(lobbyInvitationPutDTO.getLobbyId());
-            lobby.setInvited_userid(lobbyInvitationPutDTO.getInvitedUserId());
-            lobbyRepository.save(lobby);
-            lobbyRepository.flush();
-
-            invitedUser.setStatus(UserStatus.INLOBBY); //Update the User Status
-            userRepository.save(invitedUser);
-            userRepository.flush();
-        }
         List<LobbyInvitation> lobbyInvitations = new ArrayList<>(invitedUser.getLobbyInvitations());
         for (LobbyInvitation lobbyInvitation : invitedUser.getLobbyInvitations()){
             if (lobbyInvitation.getCreatorId() == creator.getId()){
