@@ -20,14 +20,51 @@
 //import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 //
-//@WebMvcTest(ChatControllerWebSockets.class)
+//import ch.uzh.ifi.hase.soprafs24.controller.UserController;
+//import ch.uzh.ifi.hase.soprafs24.entity.User;
+//import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+//import ch.uzh.ifi.hase.soprafs24.service.UserService;
+//import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+//import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+//import ch.uzh.ifi.hase.soprafs24.service.ChatServiceWebSockets;
+//import ch.uzh.ifi.hase.soprafs24.service.FriendService;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.Mockito;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+//import org.springframework.boot.test.mock.mockito.MockBean;
+//import org.springframework.http.MediaType;
+//import org.springframework.test.context.junit.jupiter.SpringExtension;
+//import org.springframework.test.web.servlet.MockMvc;
+//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+//import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//import static org.hamcrest.Matchers.hasSize;
+//import static org.mockito.ArgumentMatchers.any;
+//import static org.mockito.ArgumentMatchers.anyLong;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+//import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+//
+//
+//@ExtendWith(MockitoExtension.class)
+////@WebMvcTest(ChatControllerWebSockets.class)
 //@AutoConfigureMockMvc
 //class ChatControllerWebSocketsTest {
 //
-//    @Autowired
+//    //@Autowired
 //    private MockMvc mockMvc;
 //
-//    @MockBean
+//    @Mock
 //    private ChatServiceWebSockets chatServiceWebSockets;
 //
 //    @Mock
@@ -36,6 +73,9 @@
 //    @Mock
 //    private Game game;
 //
+//    @InjectMocks
+//    private ChatControllerWebSockets chatControllerWebSockets;
+//
 //    @BeforeEach
 //    void setUp() {
 //        MockitoAnnotations.openMocks(this);
@@ -43,10 +83,6 @@
 //        when(chatServiceWebSockets.getGameByGameId(anyLong())).thenReturn(game);
 //    }
 //
-//    @AfterEach
-//    void tearDown() {
-//        // Nothing to tear down
-//    }
 //
 //    @Test
 //    void addMessage_ValidInput_Success() throws Exception {

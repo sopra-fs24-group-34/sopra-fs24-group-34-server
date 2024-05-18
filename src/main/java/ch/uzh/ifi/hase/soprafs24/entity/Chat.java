@@ -7,12 +7,8 @@ import java.util.List;
 
 public class Chat implements Serializable {
     private List<String> messages = new ArrayList<>();
-
-  //private List<String> messages;
-
-  private String lastmessage;
-
-  public static int MAX_MESSAGE_LENGTH = 250; // smailalijagic: allow max 250 char per message, issue #58
+    private String lastmessage;
+    public static int MAX_MESSAGE_LENGTH = 250; // smailalijagic: allow max 250 char per message, issue #58
 
     public List<String> getMessages() {
         return messages;
@@ -24,13 +20,10 @@ public class Chat implements Serializable {
         this.messages = temp;
         setLastmessage(message);
     }
-
-  public void setLastmessage(String lastmessage) {
-    this.lastmessage = lastmessage;
-  }
-
-  public String getLastmessage() {
-    return lastmessage;
-  }
-
+    public void setLastmessage(String lastmessage) {
+        this.lastmessage = lastmessage;
+    }
+    public String getLastmessage() {
+        return lastmessage;
+    }
 }
