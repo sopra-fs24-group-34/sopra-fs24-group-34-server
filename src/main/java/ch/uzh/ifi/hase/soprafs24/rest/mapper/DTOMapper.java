@@ -33,7 +33,7 @@ public interface DTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
@@ -43,11 +43,19 @@ public interface DTOMapper {
     @Mapping(source = "friendRequests", target = "friendRequests")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "profilePicture", target = "profilePicture")
+    @Mapping(source = "totalplayed", target = "totalplayed")
+    @Mapping(source = "totalwins", target = "totalwins")
+    UserStatsGetDTO convertEntityToUserStatsGetDTO(User user);
+
     @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
-    @Mapping(source = "usericon", target = "usericon")
+    @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "friendsList", target = "friendsList")
     @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
@@ -58,7 +66,11 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "token", target = "token")
-    AuthenticationResponseDTO convertEntityToAuthenticationResponseDTO(User user);
+    AuthenticationDTO convertEntityToAuthenticationDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "token", target = "token")
+    User convertAuthenticationDTOtoUser(AuthenticationDTO authenticationDTO);
 
 
     //@Mapping(source = "id", target = "id")
@@ -114,10 +126,15 @@ public interface DTOMapper {
   ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
 
 
-    @Mapping(source = "creator_userid", target = "creatorId")
+    @Mapping(source = "creator_userid", target = "creatorPlayerId")
     @Mapping(source = "invited_userid", target = "invitedPlayerId")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
+
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "id", target = "id")
+    User convertUserDeleteDTOtoEntity(UserDeleteDTO userDeleteDTO);
+    // smailalijagic: source = UserDeleteDTO, target = User
 
     @Mapping(source = "senderId", target = "senderId")
     @Mapping(source = "receiverUserName", target = "receiverUserName")
@@ -129,6 +146,6 @@ public interface DTOMapper {
 
     @Mapping(source = "id", target = "friendId")
     @Mapping(source = "username", target = "friendUsername")
-    @Mapping(source = "usericon", target = "friendIcon")
+    @Mapping(source = "profilePicture", target = "friendIcon")
     FriendGetDTO convertEntityToFriendGetDTO(User friend);
 }

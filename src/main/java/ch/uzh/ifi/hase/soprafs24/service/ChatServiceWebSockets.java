@@ -7,6 +7,8 @@ import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import java.util.List;
 
 @Service
 public class ChatServiceWebSockets {
+
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
+
     private final GameRepository gameRepository;
 
     private final UserRepository userRepository;
@@ -26,15 +31,10 @@ public class ChatServiceWebSockets {
         this.userRepository = userRepository;
     }
 
-    public MessageGetDTO addMessage(String message, Long userId, Long gameId) {
+    public Chat addMessage(String message, Long userId, Long gameId) {
         Game game = gameRepository.findByGameId(gameId);
-        Chat existingchat = game.getChat();
-        //if (game.getChat() != chat) {
-        //  throw new ResponseStatusException(HttpStatus.NOT_FOUND, "chat not found"); // smailalijagic: double check
-        //}
-
-        // smailalijagic: final update
-        //String message = chat.getLastmessage();
+        Chat chat = game.getChat();
+        Chat updated_chat = chat;
 
         User user = userRepository.findUserById(userId);
         //assert checkIfUserExists(user);
@@ -42,17 +42,17 @@ public class ChatServiceWebSockets {
             message = message.substring(0, Chat.MAX_MESSAGE_LENGTH); // smailalijagic: only return first 250 characters
         }
         String myMessage = user.getUsername() + ": " + message;
-        existingchat.addMessage(myMessage, userId);
+        updated_chat.setMessages(myMessage);
 
-        //chat.setLastmessage(message);
-
-        //game.setChat(existingchat);
-        //gameRepository.save(game);
-        //gameRepository.flush();
-
-        return DTOMapper.INSTANCE.convertEntityToMessageGetDTO(existingchat);
-
+        return updated_chat;
     }
+
+    public void updateGameChat(Game game, Chat chat) {
+        game.setChat(chat);
+        gameRepository.save(game);
+        gameRepository.flush();
+    }
+
 
     public Game getGameByGameId(Long gameid) {
         try {
@@ -66,11 +66,10 @@ public class ChatServiceWebSockets {
         }
     }
 
-//    public List<Chat> getAllChats() {
-//        return chatRepository.findAll();
-//    }
-//
-//    public Chat getChat(Long chatid) {
-//        return this.chatRepository.findChatById(chatid);
-//    }
+    public List<String> getAllMessages(Long gameId) {
+        Game game = this.gameRepository.findByGameId(gameId);
+        Chat chat = game.getChat();
+        return chat.getMessages();
+    }
+
 }

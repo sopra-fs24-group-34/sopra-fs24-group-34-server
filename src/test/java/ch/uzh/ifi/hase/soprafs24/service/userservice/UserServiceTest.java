@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.service.userservice;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationResponseDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +45,7 @@ public class UserServiceTest {
         });
 
         // When
-        AuthenticationResponseDTO responseDTO = userService.createUser(newUser);
+        AuthenticationDTO responseDTO = userService.createUser(newUser);
 
         // Then
         assertNotNull(responseDTO);
@@ -105,7 +105,7 @@ public class UserServiceTest {
         });
 
         // When
-        AuthenticationResponseDTO responseDTO = userService.createUser(newUser);
+        AuthenticationDTO responseDTO = userService.createUser(newUser);
 
 
 //        // Given
@@ -199,8 +199,170 @@ public class UserServiceTest {
         User notexistingUser = new User();
         notexistingUser.setUsername("NotExistingUser");
         notexistingUser.setPassword("existingUser");
-        userService.deleteGuestUser(notexistingUser.getId());
+        notexistingUser.setId(Long.valueOf(132412));
+        userRepository.save(notexistingUser);
+        userRepository.delete(notexistingUser);
 
+        // smailalijagic: When/Then
         assertThrows(ResponseStatusException.class, () -> userService.getUser(notexistingUser.getId()));
     }
+
+    @Test
+    public void testDeleteUser_GuestOffline_Success() {
+        // Initialize test users
+        User offlineGuestUser = new User();
+        offlineGuestUser.setId(1L);
+        offlineGuestUser.setUsername("GUESTUser");
+        offlineGuestUser.setStatus(UserStatus.OFFLINE);
+
+        // Arrange
+        Long userId = offlineGuestUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineGuestUser);
+
+        // Act
+        userService.deleteUser(userId);
+
+        // Assert
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_OnlineUser_Success() {
+        // Initialize test users
+        User onlineUser = new User();
+        onlineUser.setId(2L);
+        onlineUser.setUsername("RegularUser");
+        onlineUser.setStatus(UserStatus.ONLINE);
+
+        // Arrange
+        Long userId = onlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(onlineUser);
+
+        // Act
+        userService.deleteUser(userId);
+
+        // Assert
+        verify(userRepository, times(1)).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_GuestOnline_NoDelete() {
+        // Initialize test users
+        User onlineGuestUser = new User();
+        onlineGuestUser.setId(1L);
+        onlineGuestUser.setUsername("GUESTUser");
+        onlineGuestUser.setStatus(UserStatus.ONLINE);
+
+        // Arrange
+        Long userId = onlineGuestUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(onlineGuestUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_UserOffline_NoDelete() {
+        // Initialize test users
+        User offlineUser = new User();
+        offlineUser.setId(2L);
+        offlineUser.setUsername("RegularUser");
+        offlineUser.setStatus(UserStatus.OFFLINE);
+
+        // Arrange
+        Long userId = offlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_UserPlaying_NoDelete() {
+        // Initialize test users
+        User offlineUser = new User();
+        offlineUser.setId(2L);
+        offlineUser.setUsername("RegularUser");
+        offlineUser.setStatus(UserStatus.PLAYING);
+
+        // Arrange
+        Long userId = offlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_UserInLobby_NoDelete() {
+        // Initialize test users
+        User offlineUser = new User();
+        offlineUser.setId(2L);
+        offlineUser.setUsername("RegularUser");
+        offlineUser.setStatus(UserStatus.INLOBBY);
+
+        // Arrange
+        Long userId = offlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_UserInLobbyPreparing_NoDelete() {
+        // Initialize test users
+        User offlineUser = new User();
+        offlineUser.setId(2L);
+        offlineUser.setUsername("RegularUser");
+        offlineUser.setStatus(UserStatus.INLOBBY_PREPARING);
+
+        // Arrange
+        Long userId = offlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void testDeleteUser_UserInLobbyReady_NoDelete() {
+        // Initialize test users
+        User offlineUser = new User();
+        offlineUser.setId(2L);
+        offlineUser.setUsername("RegularUser");
+        offlineUser.setStatus(UserStatus.INLOBBY_READY);
+
+        // Arrange
+        Long userId = offlineUser.getId();
+        when(userRepository.findUserById(userId)).thenReturn(offlineUser);
+
+        // Act
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(userId));
+
+        // Assert
+        assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
+        verify(userRepository, never()).deleteById(userId);
+    }
+
 }

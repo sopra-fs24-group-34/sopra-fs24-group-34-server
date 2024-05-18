@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
-import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
+//import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
@@ -31,23 +31,6 @@ public class ChatControllerWebSockets {
         this.webSocketHandler = webSocketHandler;
     }
 
-//    @PostMapping("/game/{gameId}/chat/{userId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void addMessage(@RequestBody String message, @PathVariable("gameId") String gameId, @PathVariable("userId") String userId) {
-//        Long gameIdLong = Long.valueOf(gameId);
-//        Long userIdLong = Long.valueOf(userId);
-//
-//        MessagePostDTO messagePostDTO = new MessagePostDTO();
-//        messagePostDTO.setMessage(message);
-//
-//        Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
-//
-//        MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(chat, userIdLong, gameIdLong);
-//        String destination = "/topic/game/" + gameIdLong + "/chat/" + chat.getId(); // smailalijagic: search chat in here
-//        messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: message is sent
-//    }
-
-
     @MessageMapping("/sendMessage")
     public void addMessage(String stringJsonRequest) {
         try {
@@ -59,44 +42,29 @@ public class ChatControllerWebSockets {
             Long gameId = Long.parseLong(jsonObject.get("gameId").getAsString());
             Long userId = Long.parseLong(jsonObject.get("userId").getAsString());
 
-            //MessagePostDTO messagePostDTO = new MessagePostDTO();
-            //messagePostDTO.setMessage(message);
+            Game game = chatServiceWebSockets.getGameByGameId(gameId);
 
-        //Chat chat = DTOMapper.INSTANCE.convertMessagePostDTOtoEntity(messagePostDTO);
+            Chat chat = chatServiceWebSockets.addMessage(message, userId, gameId);
 
-            MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
+            MessageGetDTO messageGetDTO = DTOMapper.INSTANCE.convertEntityToMessageGetDTO(chat);
+
+            //MessageGetDTO messageGetDTO = chatServiceWebSockets.addMessage(message, userId, gameId);
 
             String destination = "/games/" + gameId + "/chat"; // smailalijagic: search chat in here
             //messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
             webSocketHandler.sendMessage(destination, "chat-message", messageGetDTO);
+
+            chatServiceWebSockets.updateGameChat(game, chat);
+
         } catch(Exception e) {
             System.out.println("Something went wrong with chat: "+e);
         }
     }
 
-    @GetMapping("/game/{gameId}/chat")
+    @GetMapping("/games/{gameId}/chat")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<ChatTuple> getAllMessages(@PathVariable("gameId") Long gameId) {
-        // smailalijagic: get Game --> get chat
-        Game game = chatServiceWebSockets.getGameByGameId(gameId);
-        // smailalijagic: get Chat
-        Chat chat = game.getChat();
-        // smailalijagic: return all messages
-        return chat.getMessages();
+    public List<String> getAllMessages(@PathVariable("gameId") Long gameId) {
+        return chatServiceWebSockets.getAllMessages(gameId);
     }
-
-
-//    @GetMapping("/chats")
-//    public List<Chat> getAllChats() {
-//        return chatServiceWebSockets.getAllChats();
-//    }
-//
-//    @GetMapping("chats/{chatId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    @ResponseBody
-//    public Chat getChat(@PathVariable("chatId") String id) {
-//        Long chatid = Long.valueOf(id);
-//        return chatServiceWebSockets.getChat(chatid);
-//    }
 }

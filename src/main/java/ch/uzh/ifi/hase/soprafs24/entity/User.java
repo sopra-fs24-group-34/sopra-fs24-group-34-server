@@ -1,14 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Internal User Representation
@@ -43,7 +40,7 @@ public class User implements Serializable {
   private UserStatus status;
 
   @Column()
-  private String usericon; // smailalijagic: added --> String datatype correct?
+  private String profilePicture; // smailalijagic: added --> String datatype correct?
 
   @ManyToMany
   @JoinTable(
@@ -119,12 +116,12 @@ public class User implements Serializable {
     this.status = status;
   }
 
-  public String getUsericon() {
-    return usericon;
+  public String getProfilePicture() {
+    return profilePicture;
   }
 
-  public void setUsericon(String usericon) {
-    this.usericon = usericon;
+  public void setProfilePicture(String profilePicture) {
+    this.profilePicture = profilePicture;
   }
 
   public List<Friend> getFriendsList() {

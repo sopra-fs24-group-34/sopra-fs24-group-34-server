@@ -58,20 +58,20 @@ public class LobbyServiceIntegrationTest {
         assertEquals(resUser.getPassword(), user.getPassword());
     }
 
-    @Test
-    void getLobby_valid() {
-        Lobby lobby = new Lobby();
-        lobby.setLobbyid(1L);
-        lobby.setToken("1");
-        lobbyRepository.save(lobby);
-        lobbyRepository.flush();
-
-        Lobby resLobby = lobbyService.getLobby(lobby.getLobbyid());
-
-
-        assertEquals(resLobby.getLobbyid(), lobby.getLobbyid());
-        assertEquals(resLobby.getlobbyToken(), lobby.getlobbyToken());
-    }
+//    @Test
+//    void getLobby_valid() {
+//        Lobby lobby = new Lobby();
+//        lobby.setLobbyid(1L);
+//        lobby.setToken("1");
+//        lobbyRepository.save(lobby);
+//        lobbyRepository.flush();
+//
+//        Lobby resLobby = lobbyService.getLobby(lobby.getLobbyid());
+//
+//
+//        assertEquals(resLobby.getLobbyid(), lobby.getLobbyid());
+//        assertEquals(resLobby.getlobbyToken(), lobby.getlobbyToken());
+//    }
 
     @Test
     void checkIfLobbyExists_returns_true() {

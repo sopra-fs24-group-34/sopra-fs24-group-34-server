@@ -26,11 +26,30 @@ public class Application {
 
   @Bean
   public WebMvcConfigurer corsConfigurer() {
+      return new WebMvcConfigurer() {
+          @Override
+          public void addCorsMappings(CorsRegistry registry) {
+              registry.addMapping("/**")
+                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/")
+                      .allowedMethods("*")
+                      .allowCredentials(true)
+                      .allowedHeaders("*");
+
+              // Allow WebSocket connections
+              registry.addMapping("/ws/**")
+                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/", "wss://sopra-fs24-group-34-client.oa.r.appspot.com", "ws://sopra-fs24-group-34-client.oa.r.appspot.com")
+                      .allowedMethods("*")
+                      .allowCredentials(true)
+                      .allowedHeaders("*");
+          }
+      };
+      /*
     return new WebMvcConfigurer() {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
       }
     };
+       */
   }
 }
