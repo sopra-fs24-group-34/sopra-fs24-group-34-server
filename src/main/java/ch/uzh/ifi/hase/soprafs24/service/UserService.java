@@ -94,6 +94,8 @@ public class UserService {
         }
         newGuestUser.setStatus(UserStatus.INLOBBY_PREPARING); // smailalijagic: created user waits per default in lobby
         newGuestUser.setToken(UUID.randomUUID().toString());
+        newGuestUser.setTotalplayed(0L); // smailalijagic: added stats in case guest becomes user
+        newGuestUser.setTotalwins(0L); // smailalijagic: added stats in case guest becomes user
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -140,6 +142,10 @@ public class UserService {
     }
 
     public User updateUser(User updatedUser, Long userId) {
+        if (updatedUser.getUsername().startsWith(" ") || updatedUser.getPassword().startsWith(" ")) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username and Password cannot start with empty space");
+        }
+
         //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
         User existingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 

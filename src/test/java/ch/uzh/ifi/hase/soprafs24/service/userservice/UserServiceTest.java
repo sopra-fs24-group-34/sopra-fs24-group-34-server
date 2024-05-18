@@ -30,6 +30,135 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
+    void createGuestUser_ValidUser_ReturnsAuthenticationResponseDTO() {
+        // Given
+        User newGuestUser = new User();
+        newGuestUser.setUsername("Guest");
+        newGuestUser.setPassword("12345");
+
+        when(userRepository.findByUsername(newGuestUser.getUsername())).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            savedUser.setId(1L);
+            savedUser.setToken(UUID.randomUUID().toString());
+            return savedUser;
+        });
+
+        // When
+        AuthenticationDTO responseDTO = userService.createGuestUser(newGuestUser);
+
+        // Then
+        assertNotNull(responseDTO);
+        assertNotNull(responseDTO.getId());
+        assertNotNull(responseDTO.getToken());
+        assertEquals(newGuestUser.getUsername(), "Guest1");
+    }
+
+    @Test
+    void updateUser_ValidInput_ReturnsUser() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+
+        User updateduser = new User();
+        updateduser.setUsername("testuser123");
+        updateduser.setPassword("testpassword");
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+
+        user = userService.updateUser(updateduser, 1L);
+
+        assertEquals(user.getUsername(), updateduser.getUsername());
+    }
+
+    @Test
+    void updateUser_InvalidInput_ReturnsUser() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+
+        User updateduser = new User();
+        updateduser.setUsername("");
+        updateduser.setPassword("12345678");
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+
+        user = userService.updateUser(updateduser, 1L);
+
+        assertEquals(user.getUsername(), "testuser");
+
+    }
+
+    @Test
+    void updateUser_InvalidInputExistingUsername_ThrowsResponseStatusException() {
+        User user1 = new User();
+        user1.setUsername("testuser");
+        user1.setPassword("testpassword");
+        user1.setId(1L);
+
+        User user2 = new User();
+        user2.setUsername("Hans");
+        user2.setPassword("12345678");
+        user2.setId(2L);
+
+        User updateduser = new User();
+        updateduser.setUsername("Hans");
+        updateduser.setPassword("12345678");
+
+        when(userRepository.findUserById(1L)).thenReturn(user1);
+        when(userRepository.findByUsername("Hans")).thenReturn(user2);
+
+        assertThrows(ResponseStatusException.class, () -> userService.updateUser(updateduser, 1L));
+    }
+
+    @Test
+    void updateUser_InvalidInputUsername_ThrowsResponseStatusException() {
+        User user1 = new User();
+        user1.setUsername("testuser");
+        user1.setPassword("testpassword");
+        user1.setId(1L);
+
+        User user2 = new User();
+        user2.setUsername(" ");
+        user2.setPassword("12345678");
+        user2.setId(2L);
+
+        User updateduser = new User();
+        updateduser.setUsername("Hans");
+        updateduser.setPassword("12345678");
+
+        when(userRepository.findUserById(1L)).thenReturn(user1);
+        when(userRepository.findByUsername("Hans")).thenReturn(user2);
+
+        assertThrows(ResponseStatusException.class, () -> userService.updateUser(updateduser, 1L));
+    }
+
+    @Test
+    void updateUser_InvalidInputPassword_ThrowsResponseStatusException() {
+        User user1 = new User();
+        user1.setUsername("testuser");
+        user1.setPassword("testpassword");
+        user1.setId(1L);
+
+        User user2 = new User();
+        user2.setUsername("testuser");
+        user2.setPassword(" 12345678");
+        user2.setId(2L);
+
+        User updateduser = new User();
+        updateduser.setUsername("Hans");
+        updateduser.setPassword("12345678");
+
+        when(userRepository.findUserById(1L)).thenReturn(user1);
+        when(userRepository.findByUsername("Hans")).thenReturn(user2);
+
+        assertThrows(ResponseStatusException.class, () -> userService.updateUser(updateduser, 1L));
+    }
+
+
+    @Test
     void createUser_ValidUser_ReturnsAuthenticationResponseDTO() {
         // Given
         User newUser = new User();
@@ -107,14 +236,6 @@ public class UserServiceTest {
         // When
         AuthenticationDTO responseDTO = userService.createUser(newUser);
 
-
-//        // Given
-//        User existingUser = new User();
-//        existingUser.setUsername("existingUser");
-//        existingUser.setPassword("password");
-//        userService.createUser(existingUser);
-//        //existingUser.setStatus(UserStatus.OFFLINE);
-
         when(userRepository.findByUsernameAndPassword(newUser.getUsername(), newUser.getPassword())).thenReturn(newUser);
 
         // When
@@ -180,6 +301,23 @@ public class UserServiceTest {
         // Then
         assertNotNull(foundUser);
         assertEquals(userId, foundUser.getId());
+    }
+
+    @Test
+    void getUser_ExistingUserName_ReturnsUser() {
+        Long userId = 1L;
+        String username = "testuser";
+        User user = new User();
+        user.setId(userId);
+        user.setUsername(username);
+
+        when(userRepository.findByUsername(username)).thenReturn(user);
+
+        User founduser = userService.getUserByUsername(username);
+
+        assertNotNull(founduser);
+        assertEquals(username, founduser.getUsername());
+
     }
 
     //smailalijagic: fails at the moment
