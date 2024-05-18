@@ -29,7 +29,7 @@ public interface DTOMapper {
     @Mapping(source = "id", target = "id")
     User convertUserGetDTOtoEntity(UserGetDTO userGetDTO);
 
-    @Mapping(source = "id", target = "id") // smailalijagic: id needed? Once set it never changes
+    @Mapping(source = "id", target = "id")
     @Mapping(source = "status", target = "status")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
@@ -105,7 +105,7 @@ public interface DTOMapper {
 
     @Mapping(source = "lobbyid", target = "id")
     @Mapping(source = "creator_userid", target = "creator_userid")
-    LobbyPostDTO covertEntityToLobbyPostDTO(Lobby lobby);
+    LobbyPostDTO convertEntityToLobbyPostDTO(Lobby lobby);
     // source = Lobby, target = LobbyGetDTO
 
 //  @Mapping(source = "id", target = "lobbyid")
@@ -120,10 +120,9 @@ public interface DTOMapper {
     Guess convertGuessPostDTOtoEntity(GuessPostDTO guessPostDTO);
 
 
-
-  @Mapping(source = "guess", target = "guess")
-  @Mapping(source = "strikes", target = "strikes")
-  ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
+    @Mapping(source = "guess", target = "guess")
+    @Mapping(source = "strikes", target = "strikes")
+    ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
 
 
     @Mapping(source = "creator_userid", target = "creatorPlayerId")
