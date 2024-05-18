@@ -179,6 +179,15 @@ public class GameUserService {
 
   }
 
+  public void returnToLobby(Long userId) {
+      User user = userRepository.findUserById(userId);
+      user.setStatus(UserStatus.INLOBBY);
+      userRepository.save(user);
+      userRepository.flush();
+  }
+
+
+
     //
     // check Functions
     //
@@ -200,4 +209,6 @@ public class GameUserService {
         // check if the player is in the game players list, returns true when in game and false when not
         return game.getCreatorPlayerId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
     }
+
+
 }
