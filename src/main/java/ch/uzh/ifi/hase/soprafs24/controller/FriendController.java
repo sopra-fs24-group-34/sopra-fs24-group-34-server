@@ -63,14 +63,16 @@ public class FriendController {
     public void lobbyInvite(@RequestBody LobbyInvitationPostDTO lobbyInvitationPostDTO) {
         System.out.println("DO LOBBY INVITE POST");
         Long userId = lobbyInvitationPostDTO.getCreatorId();
-        String invitedUsername = lobbyInvitationPostDTO.getInvitedUserId();
+        String invitedUsername = lobbyInvitationPostDTO.getInvitedUserName();
         Long lobbyId = lobbyInvitationPostDTO.getLobbyId();
+
+        System.out.println("1: " + invitedUsername);
 
         friendService.inviteFriendtoLobby(userId, invitedUsername, lobbyId);
     }
 
     // Handle lobby invitation
-    @PostMapping("/lobbies/invitation/answer")
+    @PutMapping("/lobbies/invitation/answer")
     @ResponseStatus(HttpStatus.OK)
     public void handleGameInvitation(@RequestBody LobbyInvitationPutDTO lobbyInvitationPutDTO){
         System.out.println("DO LOBBY ANSWER POST");
