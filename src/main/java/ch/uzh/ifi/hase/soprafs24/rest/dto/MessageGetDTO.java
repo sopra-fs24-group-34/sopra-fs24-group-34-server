@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
+//import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 
 import java.util.List;
 
