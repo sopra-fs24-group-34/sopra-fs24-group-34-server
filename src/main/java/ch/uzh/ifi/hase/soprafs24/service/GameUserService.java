@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -116,7 +117,7 @@ public class GameUserService {
         return GameStatus.GUESSING;
     }
 
-  public Response createResponse(Boolean guess, Long playerId, int strikes, GameStatus gameStatus) {
+  public Response createResponse(Boolean guess, Long playerId, int strikes, GameStatus gameStatus, RoundDTO roundDTO) {
       // creates a response that is send back to the frontend
       //Player player = playerRepository.findByPlayerId(playerId);
       Response response = new Response();
@@ -124,6 +125,7 @@ public class GameUserService {
       response.setPlayerId(playerId);
       response.setStrikes(strikes);
       response.setRoundStatus(gameStatus);
+      response.setRoundDTO(roundDTO);
       return response;
   }
 
@@ -179,6 +181,15 @@ public class GameUserService {
 
   }
 
+  public void returnToLobby(Long userId) {
+      User user = userRepository.findUserById(userId);
+      user.setStatus(UserStatus.INLOBBY);
+      userRepository.save(user);
+      userRepository.flush();
+  }
+
+
+
     //
     // check Functions
     //
@@ -200,4 +211,6 @@ public class GameUserService {
         // check if the player is in the game players list, returns true when in game and false when not
         return game.getCreatorPlayerId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
     }
+
+
 }

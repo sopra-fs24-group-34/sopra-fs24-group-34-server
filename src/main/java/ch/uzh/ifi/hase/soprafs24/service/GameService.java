@@ -5,12 +5,12 @@ import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
+
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,7 @@ public class GameService {
   private final ImageRepository imageRepository;
   private final GameUserService gameUserService;
   private final LobbyRepository lobbyRepository;
-  private final UnsplashService unsplashService; // Inject UnsplashService
+  private final UnsplashService unsplashService;
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
   private final AuthenticationService authenticationService;
@@ -54,8 +54,9 @@ public class GameService {
     return this.gameRepository.findByGameId(gameid);
   }
 
-  public Response chooseImage(Guess guess) {
+  public RoundDTO chooseImage(Guess guess) {
     checkIfImageExists(guess.getImageId());
+    Game game = gameRepository.findByGameId(guess.getGameId());
     Player player = gameUserService.getPlayer(guess.getPlayerId());
 
     if (player.getChosencharacter() == null) {
@@ -65,8 +66,40 @@ public class GameService {
       //throw new IllegalStateException("The player has already chosen a character.");
         throw new ResponseStatusException(HttpStatus.CONFLICT, "The player has already chosen a character");
     }
-    return gameUserService.createResponse(false, player.getPlayerId(), player.getStrikes(), gameUserService.determineStatus(guess.getGameId()));
-  }
+      if (bothPlayersChosen(guess.getGameId())) {
+          game.setCurrentTurnPlayerId(game.getInvitedPlayerId());
+          game.setCurrentRound(1);
+          gameRepository.save(game);
+      }
+
+      RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+
+      // response is probably unnecessary
+    return roundDTO;}
+
+    public boolean bothPlayersChosen(Long gameId) {
+        Game game = gameRepository.findByGameId(gameId);
+        Player player1 = gameUserService.getPlayer(game.getCreatorPlayerId());
+        Player player2 = gameUserService.getPlayer(game.getInvitedPlayerId());
+        return player1.getChosencharacter() != null && player2.getChosencharacter() != null;
+    }
+
+    public RoundDTO updateTurn(Long gameId) {
+
+        Game game = gameRepository.findByGameId(gameId);
+        Long currentTurnPlayerId = game.getCurrentTurnPlayerId();
+        Long nextTurnPlayerId = currentTurnPlayerId.equals(game.getCreatorPlayerId()) ? game.getInvitedPlayerId() : game.getCreatorPlayerId();
+        game.setCurrentTurnPlayerId(nextTurnPlayerId);
+
+        if (nextTurnPlayerId.equals(game.getInvitedPlayerId())) {
+            game.setCurrentRound(game.getCurrentRound() + 1);
+        }
+        gameRepository.save(game);
+        gameRepository.flush();
+
+        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+    }
+
 
   public Game createGame(Long lobbyId, Game game, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyId); // smailalijagic: get lobby object
@@ -103,6 +136,8 @@ public class GameService {
 
     game.setCreatorPlayerId(player1.getPlayerId());
     game.setInvitedPlayerId(player2.getPlayerId());
+    game.setCurrentRound(0);
+    game.setCurrentTurnPlayerId(null);
 
       // Check if there are already 200 images in the database
       databaseImageCheck();
@@ -136,7 +171,7 @@ public class GameService {
     Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
 
     if (oppChosenCharacter.equals(guess.getImageId())){
-      Response r = handleWin(playerId);
+      Response r = handleWin(playerId,game.getGameId());
       //handle opponents loss
       gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
       deleteGame(game);
@@ -146,13 +181,15 @@ public class GameService {
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikes(playerId);
             GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+
+            RoundDTO roundDTO = updateTurn(game.getGameId());
             if(gameStatus != GameStatus.END) {
-                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
+                return gameUserService.createResponse(false, playerId, strikes, gameStatus, roundDTO);
             }
             else {
-                Response r = handleLoss(playerId);
+                Response r = handleLoss(playerId, game.getGameId());
                 //handle opponents win
-                handleWin(gameUserService.getOpponentId(game, playerId)); //nedim-j: do we also send a websocket for the loss of opponent?
+                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId()); //nedim-j: do we also send a websocket for the loss of opponent?
                 deleteGame(game);
                 return r;
             }
@@ -160,20 +197,24 @@ public class GameService {
     }
 
 
-  public Response handleWin(Long playerId) {
+  public Response handleWin(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
+
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikes(playerId);
-    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
+    RoundDTO roundDTO = updateTurn(gameId);
+    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END, roundDTO);
   }
 
-  public Response handleLoss(Long playerId) {
+  public Response handleLoss(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
     gameUserService.increaseGamesPlayed(playerId);
      //nedim-j: mb increaseLoss? round-based games could be drawn as well
     int strikes = gameUserService.getStrikes(playerId);
-    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
+
+    RoundDTO roundDTO = updateTurn(gameId);
+    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END, roundDTO);
 }
 
   private void deleteGame(Game game) {

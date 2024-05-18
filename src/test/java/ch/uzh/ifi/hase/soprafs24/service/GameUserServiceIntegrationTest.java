@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -161,7 +162,11 @@ public class GameUserServiceIntegrationTest {
         response.setStrikes(0);
         response.setRoundStatus(GameStatus.GUESSING);
 
-        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, GameStatus.GUESSING);
+        RoundDTO roundDTO = new RoundDTO(1, 1L);
+        //roundDTO.setRoundNumber(1);
+        //roundDTO.setCurrentTurnPlayerId(1L);
+
+        Response result = gameUserService.createResponse(true, player.getPlayerId(), 0, GameStatus.GUESSING, roundDTO);
 
         assertEquals(result.getGuess(), response.getGuess());
         assertEquals(result.getStrikes(), response.getStrikes());
