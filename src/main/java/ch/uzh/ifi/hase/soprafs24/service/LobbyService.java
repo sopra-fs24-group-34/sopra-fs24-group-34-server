@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -9,19 +10,15 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -149,21 +146,36 @@ public class LobbyService {
     lobbyRepository.flush();
   }
 
-    public void removeUserFromLobby(Long lobbyId, Long userId) {
-        //Long userId = user.getId();
-        Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
-        UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
+  public void removeUserFromLobby(Long lobbyId, Long userId) {
+    //Long userId = user.getId();
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+    UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
 
-        if(Objects.equals(lobby.getCreator_userid(), userId)) {
-            lobby.setCreator_userid(null);
-            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
-        } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
-            lobby.setInvited_userid(null);
-            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
-        }
-        lobbyRepository.save(lobby);
-        lobbyRepository.flush();
+    if(Objects.equals(lobby.getCreator_userid(), userId)) {
+        lobby.setCreator_userid(null);
+        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+    } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
+        lobby.setInvited_userid(null);
+        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
     }
+    lobbyRepository.save(lobby);
+    lobbyRepository.flush();
+}
+
+public Long getGameIdFromLobbyId(Long lobbyId) {
+      return lobbyRepository.findByLobbyid(lobbyId).getGame().getGameId();
+}
+
+public void translateAddUserToLobby(Long lobbyId, Long userId) {
+      Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+      User user = userRepository.findUserById(userId);
+      if(!Objects.equals(userId, lobby.getCreator_userid()) &&
+              !Objects.equals(userId, lobby.getInvited_userid())) {
+          addUserToLobby(lobby, user);
+          webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", user);
+      }
+}
+
 
 
 

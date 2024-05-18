@@ -33,9 +33,7 @@ public class WebSocketEventListener {
         String sessionId = Objects.requireNonNull(event.getMessage().getHeaders().get("simpSessionId")).toString();
         String destination = Objects.requireNonNull(event.getMessage().getHeaders().get("simpDestination")).toString();
         System.out.println("Subscription formed. SessionId: " + sessionId + " | Destination: " + destination);
-        Long destinationId = Long.valueOf(destination.split("/")[2]);
-        webSocketSessionService.mapActiveSessionToLobbyOrGame(destinationId, sessionId);
-        webSocketSessionService.printSessionsMap();
-        webSocketSessionService.printActiveSessions();
+
+        webSocketSessionService.handleSubscription(destination, sessionId);
     }
 }
