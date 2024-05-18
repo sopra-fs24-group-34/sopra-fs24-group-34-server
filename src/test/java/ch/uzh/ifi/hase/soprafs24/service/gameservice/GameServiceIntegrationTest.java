@@ -209,6 +209,40 @@ public class GameServiceIntegrationTest {
 
 
     @Test
+    void handleWin_validInputs() {
+
+    }
+
+    @Test
+    void handleLoss_validInputs(){
+
+    }
+
+    @Test
+    void deleteGame_validInputs() {
+
+    }
+
+    @Test
+    void getGameHistory_validInputs() {
+        GameHistory gameHistory = new GameHistory();
+        gameHistory.setTotalwins(1L);
+        gameHistory.setTotalgamesplayed(1L);
+        gameHistory.setWinPercentage(1L);
+
+        when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
+        when(gameUserService.getUser(1L)).thenReturn(creator);
+        when(gameUserService.createGameHistory(creator)).thenReturn(gameHistory);
+
+        GameHistory result = gameservice.getGameHistory(createdgame.getGameId(), creator.getId());
+
+        assertEquals(result.getWinPercentage(), 1L);
+        assertEquals(result.getTotalgamesplayed(), 1L);
+        assertEquals(result.getWinPercentage(), 1L);
+    }
+
+
+    @Test
     void checkIfImageExists_validInputs(){
         Image image = new Image();
         image.setId(1L);
@@ -219,6 +253,8 @@ public class GameServiceIntegrationTest {
 
         assertTrue(result);
     }
+
+    // 8 more functions
 
     }
 

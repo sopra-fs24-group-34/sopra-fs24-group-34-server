@@ -221,12 +221,12 @@ public class GameService {
        */
   }
 
-    public GameHistory getGameHistory(Long gameId, Long userId) {
-        Game game = gameRepository.findByGameId(gameId);
-        assert(game.getCreatorPlayerId() == userId || game.getInvitedPlayerId() == userId);
-        User user = gameUserService.getUser(userId);
-        GameHistory userGameHistory = gameUserService.createGameHistory(user);
-        return userGameHistory;
+  public GameHistory getGameHistory(Long gameId, Long userId) {
+      Game game = gameRepository.findByGameId(gameId);
+      assert(game.getCreatorPlayerId() == userId || game.getInvitedPlayerId() == userId);
+      User user = gameUserService.getUser(userId);
+      GameHistory userGameHistory = gameUserService.createGameHistory(user);
+      return userGameHistory;
     }
 
 

@@ -82,7 +82,7 @@ public class FriendService {
         return false;
         }
 
-    private Friend createFriend(User user) {
+    public Friend createFriend(User user) {
         Friend friend = new Friend();
         friend.setFriendId(user.getId());
         friend.setFriendIcon(user.getProfilePicture());
