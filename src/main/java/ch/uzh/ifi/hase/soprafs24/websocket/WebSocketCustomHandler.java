@@ -10,7 +10,7 @@ import org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator
 @Service
 public class WebSocketCustomHandler extends ExceptionWebSocketHandlerDecorator {
 
-    private WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
+    WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
 
     public WebSocketCustomHandler(WebSocketHandler delegate) {
         super(delegate);

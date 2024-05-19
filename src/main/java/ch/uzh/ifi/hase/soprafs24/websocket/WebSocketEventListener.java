@@ -13,7 +13,7 @@ import java.util.Objects;
 @Component
 public class WebSocketEventListener {
 
-    private WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
+    WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {

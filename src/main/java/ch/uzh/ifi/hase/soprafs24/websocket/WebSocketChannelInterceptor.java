@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
-    private WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
+    WebSocketSessionService webSocketSessionService = WebSocketSessionService.getInstance();
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
