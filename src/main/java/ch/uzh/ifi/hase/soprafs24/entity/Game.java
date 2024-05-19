@@ -28,7 +28,13 @@ public class Game implements Serializable {
     @Column(length = 7000) // smailalijagic: 7000bytes --> 1750-7000 (=1000 words) chars max. possible = 65'535 bytes --> 16'383-65'535 chars
     private Chat chat = new Chat();
 
-    @ManyToMany
+    @Column
+    private int currentRound;
+
+    @Column
+    private Long currentTurnPlayerId;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "game_image",
             joinColumns = @JoinColumn(name = "game_id"), // column referencing Game
@@ -81,6 +87,22 @@ public class Game implements Serializable {
 
     public void setInvitedPlayerId(Long invitedplayerId) {
         this.invitedPlayerId = invitedplayerId;
+    }
+
+    public Long getCurrentTurnPlayerId() {
+        return currentTurnPlayerId;
+    }
+
+    public void setCurrentTurnPlayerId(Long currentTurnPlayerId) {
+        this.currentTurnPlayerId = currentTurnPlayerId;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
     }
 
     public List<Image> getGameImages() {

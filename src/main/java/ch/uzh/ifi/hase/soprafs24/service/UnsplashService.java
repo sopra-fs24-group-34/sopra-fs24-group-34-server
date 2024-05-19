@@ -31,22 +31,36 @@ public class UnsplashService {
   @Value("${unsplash.api.accessKey}")
   private String accessKey;
 
+  public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+  }
+
+
     public void saveRandomPortraitImagesToDatabase(int count) {
         try {
-            String url = "https://api.unsplash.com/photos/random?client_id=" + accessKey +
-                    "&orientation=portrait&count=" + count + "&query=people";
-            RestTemplate restTemplate = new RestTemplate();
-            Map<String, Object>[] responses = restTemplate.getForObject(url, Map[].class);
+            int page = 1;
+            int imagesFetched = 0;
+            while (imagesFetched < count) {
 
-            if (responses != null) {
-                for (Map<String, Object> response : responses) {
-                    Map<String, String> urls = (Map<String, String>) response.get("urls");
-                    String imageUrl = urls.get("regular");
 
-                    Image image = new Image();
-                    image.setUrl(imageUrl);
-                    imageRepository.save(image);
+                String url = "https://api.unsplash.com/photos/random?client_id=" + accessKey +
+                        "&orientation=portrait&count=" + (count - imagesFetched) + "&query=people&page=" + page;
+                RestTemplate restTemplate = new RestTemplate();
+                Map<String, Object>[] responses = restTemplate.getForObject(url, Map[].class);
+
+                if (responses != null) {
+                    for (Map<String, Object> response : responses) {
+                        Map<String, String> urls = (Map<String, String>) response.get("urls");
+                        String imageUrl = urls.get("regular");
+
+                        Image image = new Image();
+                        image.setUrl(imageUrl);
+                        imageRepository.save(image);
+                        imagesFetched++;
+
+                    }
                 }
+                page ++;
             }
         } catch (Exception e) {
             // Log any exceptions
@@ -61,8 +75,9 @@ public class UnsplashService {
           }
         }
      */
-    public List<ImageDTO> getImageUrlsFromDatabase(int count) {
+    public List<ImageDTO> getImageUrlsFromDatabase(int count, Optional<List<ImageDTO>> gameImages) {
         try {
+
             List<ImageDTO> imageUrls = new ArrayList<>();
             List<Image> images = imageRepository.findAll(); //add all images
             Collections.shuffle(images); // randomize order of images
@@ -75,37 +90,31 @@ public class UnsplashService {
                 boolean isDuplicate = false;
 
                 // Check if the URL already exists in the list of ImageDTO objects
+
                 for (ImageDTO object : imageUrls) {
                     if (imageUrl.equals(object.getUrl())) { // url of new image in array?
                         isDuplicate = true;
                         break;
                     }
                 }
+                if (gameImages.isPresent()) {
+                    List<ImageDTO> gameImagesList = gameImages.get();
+                    for (ImageDTO object : gameImagesList) {
+                        if (imageUrl.equals(object.getUrl())) { // url of new image in array?
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                }
                 if (!isDuplicate) { //add tuple of image and id to returned array
                     imageUrls.add(new ImageDTO(image.getId(), imageUrl));
                 }
             }
+
             return imageUrls;
-        } catch (Exception e) {
-            // Log any exceptions
-            logger.severe("Error while retrieving image URLs from database: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while retrieving image URLs from database");
-        }
-    }
-
-    public static void deleteImage(Long imageId, ImageRepository imageRepository) {
-        try {
-            Image image = imageRepository.findImageById(imageId); //Check if image in db
-            if (image == null) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found");
-            }
-
-            imageRepository.delete(image);
 
         } catch (Exception e) {
-            // Log any exceptions
-            logger.severe("Error while deleting image from database: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while deleting image from database");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Error while retrieving image URLs from database");
         }
     }
 }

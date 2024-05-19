@@ -6,7 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +19,15 @@ import com.google.gson.Gson;
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
-  private final WebSocketHandler webSocketHandler;
+  private final WebSocketMessenger webSocketMessenger;
   private final LobbyService lobbyService;
   private final Gson gson = new Gson();
 
-  GameController(GameService gameService, GameUserService gameUserService, WebSocketHandler webSocketHandler, LobbyService lobbyService) {
+  GameController(GameService gameService, GameUserService gameUserService, WebSocketMessenger webSocketMessenger, LobbyService lobbyService) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
-    this.webSocketHandler = webSocketHandler;
-        this.lobbyService = lobbyService;
+    this.webSocketMessenger = webSocketMessenger;
+    this.lobbyService = lobbyService;
     }
 
   @GetMapping("/games")
@@ -62,7 +62,7 @@ public class GameController {
 
     Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
 
-    webSocketHandler.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
+    webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
     return createdGame;
   }
@@ -88,14 +88,14 @@ public class GameController {
     //AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
-    Response response = gameService.chooseImage(guess);
-
-    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
-
+    RoundDTO roundDTO = gameService.chooseImage(guess);
+    if (gameService.bothPlayersChosen(guess.getGameId())) {
+        webSocketMessenger.sendMessage("/games/"+guess.getGameId(), "round0", roundDTO);
+    }
   }
 
   @MessageMapping("/guessImage")
-  public Response guessImage(String stringJsonRequest){
+  public void guessImage(String stringJsonRequest){
     Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
     GuessPostDTO guessPostDTO = gson.fromJson(gson.toJson(requestMap.get("guessPostDTO")), GuessPostDTO.class);
     //nedim-j: use for round-basis, authentication:
@@ -104,8 +104,10 @@ public class GameController {
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.guessImage(guess);
 
-    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
-    return response;
+    Game game = gameService.getGame(guessPostDTO.getGameid());
+
+    webSocketMessenger.sendMessage("/games/"+guess.getGameId(), "round-update", response);
+
   }
 
     // Endpoints regarding game-specific images
@@ -116,17 +118,29 @@ public class GameController {
 
         return gameService.getGameImages(gameId);
     }
-    @PostMapping("/games/{gameId}/images")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public void saveGameImages(@PathVariable Long gameId) {
-        gameService.saveGameImages(gameId, 20);
-    }
+
     @DeleteMapping("/games/{gameId}/images/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void deleteGameImage(@PathVariable Long gameId, @PathVariable Long imageId) {
       gameService.deleteGameImage(gameId, imageId);
     }
+
+
+    @PutMapping("/games/Lobbies/return/{userId}")
+    @ResponseStatus
+    @ResponseBody
+    public void returnToLobby(@PathVariable Long userId) {
+        gameUserService.returnToLobby(userId);
+    }
+
+    @GetMapping("/games/{gameId}/history/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameHistory getGameHistory(@PathVariable Long gameId, Long userId){
+      return gameService.getGameHistory(gameId, userId);
+
+    }
+
 
 }

@@ -45,6 +45,14 @@ public class FriendService {
         friendRequest.setReceiverId(receiver.getId());
 
         assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
+        List<FriendRequest> friendRequests = sender.getFriendRequests();
+        for (FriendRequest friendRequest1 : friendRequests){
+            if (friendRequest1.getReceiverId() == receiver.getId()){
+                return;
+            }
+        }
+
+
         sender.addFriendRequest(friendRequest);
         receiver.addFriendRequest(friendRequest);
         friendRequestRepository.save(friendRequest);
@@ -82,7 +90,7 @@ public class FriendService {
         return false;
         }
 
-    private Friend createFriend(User user) {
+    public Friend createFriend(User user) {
         Friend friend = new Friend();
         friend.setFriendId(user.getId());
         friend.setFriendIcon(user.getProfilePicture());
@@ -126,32 +134,33 @@ public class FriendService {
         if (invitedUser.getStatus() != UserStatus.ONLINE) {
             System.out.println("The invited Friend cannot be invited to a Lobby right now.");
         }
-        if (creator.getStatus() != UserStatus.INLOBBY){
+        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING){
             System.out.println("The user cannot send a lobby invitation right now.");
         }
         LobbyInvitation invitation = new LobbyInvitation();
         invitation.setCreatorUsername(creator.getUsername());
         invitation.setLobbyId(lobbyId);
+        invitation.setCreatorId(creatorId);
+        invitation.setCreatorIcon(creator.getProfilePicture());
         invitedUser.addLobbyInvitation(invitation);
     }
 
     public void answerLobbyInvitation(LobbyInvitationPutDTO lobbyInvitationPutDTO) {
         User creator = userRepository.findUserById(lobbyInvitationPutDTO.getCreatorId());
         User invitedUser = userRepository.findUserById(lobbyInvitationPutDTO.getInvitedUserId());
-
-        if (creator.getStatus() != UserStatus.INLOBBY) {
+        System.out.println(creator.getStatus());
+        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING) {
             System.out.println("The User who invited you is not in the Lobby anymore");
         }
-        else if (lobbyInvitationPutDTO.getAnswer()){ //till: if answer is true invitedUser joins lobby and User Status is adjusted
-            Lobby lobby = lobbyRepository.findByLobbyid(lobbyInvitationPutDTO.getLobbyId());
-            lobby.setInvited_userid(lobbyInvitationPutDTO.getInvitedUserId());
-            lobbyRepository.save(lobby);
-            lobbyRepository.flush();
-
-            invitedUser.setStatus(UserStatus.INLOBBY); //Update the User Status
-            userRepository.save(invitedUser);
-            userRepository.flush();
+        List<LobbyInvitation> lobbyInvitations = new ArrayList<>(invitedUser.getLobbyInvitations());
+        for (LobbyInvitation lobbyInvitation : invitedUser.getLobbyInvitations()){
+            if (lobbyInvitation.getCreatorId() == creator.getId()){
+                lobbyInvitations.remove(lobbyInvitation);
+            }
         }
+        invitedUser.setLobbyInvitations(lobbyInvitations);
+        userRepository.save(invitedUser);
+        userRepository.flush();
     }
 
     public void deleteFriend(User user, Long friendId) {

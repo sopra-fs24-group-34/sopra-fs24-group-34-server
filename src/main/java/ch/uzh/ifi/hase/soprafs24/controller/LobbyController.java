@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +23,13 @@ import java.util.Map;
 public class LobbyController {
 
     private final LobbyService lobbyService;
-    private final WebSocketHandler webSocketHandler;
+    private final WebSocketMessenger webSocketMessenger;
     private final GameUserService gameUserService;
     private final Gson gson = new Gson();
 
-    LobbyController(LobbyService lobbyService, WebSocketHandler webSocketHandler, GameUserService gameUserService) {
+    LobbyController(LobbyService lobbyService, WebSocketMessenger webSocketMessenger, GameUserService gameUserService) {
         this.lobbyService = lobbyService;
-        this.webSocketHandler = webSocketHandler;
+        this.webSocketMessenger = webSocketMessenger;
         this.gameUserService = gameUserService;
     }
 
@@ -117,7 +117,7 @@ public class LobbyController {
 
             UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
-            webSocketHandler.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
+            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
 
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
@@ -141,7 +141,7 @@ public class LobbyController {
 
             String destination = "/lobbies/" + lobbyId;
 
-            webSocketHandler.sendMessage(destination, "user-statusUpdate", userGetDTO);
+            webSocketMessenger.sendMessage(destination, "user-statusUpdate", userGetDTO);
         } catch(Exception e) {
             System.out.println("Something went wrong with ready status: "+e);
         }
@@ -160,7 +160,7 @@ public class LobbyController {
 
             String destination = "/lobbies/" + lobbyId;
 
-            webSocketHandler.sendMessage(destination, "lobby-closed", "Lobby has been closed");
+            webSocketMessenger.sendMessage(destination, "lobby-closed", "Lobby has been closed");
         } catch(Exception e) {
             System.out.println("Something went wrong with Lobby closing: "+e);
         }
