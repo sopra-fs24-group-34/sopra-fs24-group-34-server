@@ -73,8 +73,7 @@ public class WebSocketSessionService {
         if(destinationSplit[1].equals("lobbies")) {
             mapActiveSessionToLobby(destinationId, sessionId);
         } else if(destinationSplit[1].equals("games")){
-            mapReconnectingSessionToLobby(sessionId);
-            webSocketMessenger.sendMessage(destination, "update-game-state", gameService.getGame(destinationId));
+            mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
         printSessionsMap();
         printActiveSessions();
@@ -91,7 +90,7 @@ public class WebSocketSessionService {
         session.getAttributes().put("userId", Long.valueOf(userId));
     }
 
-    public void mapReconnectingSessionToLobby(String sessionId) {
+    public void mapReconnectingSessionToLobby(String sessionId, String destination, Long destinationId) {
 
         if (activeSessions.containsKey(sessionId)) {
 
@@ -109,6 +108,7 @@ public class WebSocketSessionService {
             System.out.println("User " + userId + " reconnected!");
             activeSessions.remove(sessionId);
             disconnectedSessions.remove(userId);
+            webSocketMessenger.sendMessage(destination, "update-game-state", gameService.getGame(destinationId));
         }
     }
 
@@ -213,6 +213,13 @@ public class WebSocketSessionService {
                 // Your function to execute
                 System.out.println("User disconnected!");
                 webSocketMessenger.sendMessage("/games/"+gameId, "user-disconnected", timeoutThreshold);
+
+                try {
+                    Thread.sleep(2 * 1000); // Convert seconds to milliseconds
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                
                 closeSessionsOfLobbyId(lobbyId);
             }
         }, timeoutThreshold * 1000L); // Convert seconds to milliseconds
