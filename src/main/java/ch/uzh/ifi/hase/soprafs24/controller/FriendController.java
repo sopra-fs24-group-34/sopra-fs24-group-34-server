@@ -61,7 +61,6 @@ public class FriendController {
         Long userId = lobbyInvitationPostDTO.getCreatorId();
         String invitedUsername = lobbyInvitationPostDTO.getInvitedUserName();
         Long lobbyId = lobbyInvitationPostDTO.getLobbyId();
-
         System.out.println("1: " + invitedUsername);
 
         friendService.inviteFriendtoLobby(userId, invitedUsername, lobbyId);
