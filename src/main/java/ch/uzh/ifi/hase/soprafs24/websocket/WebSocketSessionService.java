@@ -6,21 +6,12 @@ import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketSession;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import java.util.*;
 
 @Service
 public class WebSocketSessionService {
@@ -35,6 +26,7 @@ public class WebSocketSessionService {
     private static final int timeoutThreshold = 10; //nedim-j: how long a users session can be disconnected until lobby/game is closed
     private static final int lobbyTimeoutThreshold = 3;
     private static final int timeoutPollDelay = 1;
+    private static final int closeSessionsDelay = 2;
 
     @Autowired
     public void setLobbyService(LobbyService lobbyService) {
@@ -72,7 +64,7 @@ public class WebSocketSessionService {
         Long destinationId = Long.valueOf(destinationSplit[2]);
         if(destinationSplit[1].equals("lobbies")) {
             mapActiveSessionToLobby(destinationId, sessionId);
-        } else if(destinationSplit[1].equals("games")){
+        } else if(destinationSplit[1].equals("games") && (destinationSplit.length < 4)/*!destinationSplit[3].equals("chat")*/){
             mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
         printSessionsMap();
@@ -108,7 +100,17 @@ public class WebSocketSessionService {
             System.out.println("User " + userId + " reconnected!");
             activeSessions.remove(sessionId);
             disconnectedSessions.remove(userId);
-            webSocketMessenger.sendMessage(destination, "update-game-state", gameService.getGame(destinationId));
+
+            try {
+                // Pause the execution of the loop for the specified interval
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            
+            //System.out.println("Sending message to: " + destination);
+            //System.out.println("Game: " + gameService.getGameState(destinationId));
+            webSocketMessenger.sendMessage("/games/"+destinationId, "update-game-state", gameService.getGameState(destinationId));
         }
     }
 
@@ -215,7 +217,7 @@ public class WebSocketSessionService {
                 webSocketMessenger.sendMessage("/games/"+gameId, "user-disconnected", timeoutThreshold);
 
                 try {
-                    Thread.sleep(2 * 1000); // Convert seconds to milliseconds
+                    Thread.sleep(closeSessionsDelay * 1000); // Convert seconds to milliseconds
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -372,6 +374,9 @@ public class WebSocketSessionService {
         if(sessionsMap.get(lobbyId) == null) {
             sessionsMap.remove(lobbyId);
             System.out.println("Closed sessions for ID: " + lobbyId);
+
+            //nedim-j: delete lobby
+
         } else {
             System.out.println("Error in closing sessions for ID: " + lobbyId);
         }
