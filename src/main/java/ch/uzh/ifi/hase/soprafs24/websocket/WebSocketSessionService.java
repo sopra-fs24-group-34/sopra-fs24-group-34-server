@@ -65,11 +65,11 @@ public class WebSocketSessionService {
         Long destinationId = Long.valueOf(destinationSplit[2]);
         if(destinationSplit[1].equals("lobbies")) {
             mapActiveSessionToLobby(destinationId, sessionId);
-            printSessionsMap();
-            printActiveSessions();
         } else if(destinationSplit[1].equals("games")){
             mapReconnectingSessionToLobby(sessionId);
         }
+        printSessionsMap();
+        printActiveSessions();
         //nedim-j: handling gameIds not necessary i think. there's no games without a lobby and games are already assigned to a lobby entity.
     }
 
@@ -135,7 +135,9 @@ public class WebSocketSessionService {
         String sessionId = session.getId();
         Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
         Long lobbyId = Long.valueOf(session.getAttributes().get("lobbyId").toString());
-        disconnectedSessions.put(userId, lobbyId);
+        if(!disconnectedSessions.containsKey(userId)) {
+            disconnectedSessions.put(userId, lobbyId);
+        }
 
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
         sessions.remove(session);
@@ -155,6 +157,7 @@ public class WebSocketSessionService {
 
         System.out.println("-----");
         printSessionsMap();
+        printActiveSessions();
     }
 
 
