@@ -6,7 +6,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
@@ -19,15 +19,15 @@ import com.google.gson.Gson;
 public class GameController {
   private final GameService gameService;
   private final GameUserService gameUserService;
-  private final WebSocketHandler webSocketHandler;
+  private final WebSocketMessenger webSocketMessenger;
   private final LobbyService lobbyService;
   private final Gson gson = new Gson();
 
-  GameController(GameService gameService, GameUserService gameUserService, WebSocketHandler webSocketHandler, LobbyService lobbyService) {
+  GameController(GameService gameService, GameUserService gameUserService, WebSocketMessenger webSocketMessenger, LobbyService lobbyService) {
     this.gameService = gameService;
     this.gameUserService = gameUserService;
-    this.webSocketHandler = webSocketHandler;
-        this.lobbyService = lobbyService;
+    this.webSocketMessenger = webSocketMessenger;
+    this.lobbyService = lobbyService;
     }
 
   @GetMapping("/games")
@@ -62,7 +62,7 @@ public class GameController {
 
     Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
 
-    webSocketHandler.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
+    webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
     return createdGame;
   }
@@ -90,7 +90,7 @@ public class GameController {
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     RoundDTO roundDTO = gameService.chooseImage(guess);
     if (gameService.bothPlayersChosen(guess.getGameId())) {
-        webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round0", roundDTO);
+        webSocketMessenger.sendMessage("/games/"+guess.getGameId(), "round0", roundDTO);
     }
   }
 
@@ -106,7 +106,7 @@ public class GameController {
 
     Game game = gameService.getGame(guessPostDTO.getGameid());
 
-    webSocketHandler.sendMessage("/games/"+guess.getGameId(), "round-update", response);
+    webSocketMessenger.sendMessage("/games/"+guess.getGameId(), "round-update", response);
 
   }
 

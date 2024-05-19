@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -33,10 +34,14 @@ public class GameService {
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
   private final AuthenticationService authenticationService;
+  private final WebSocketMessenger webSocketMessenger;
 
 
     @Autowired
-  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository, GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService) {
+  public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository,
+                     GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                     UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService,
+                     WebSocketMessenger webSocketMessenger) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
@@ -44,6 +49,7 @@ public class GameService {
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
     this.authenticationService = authenticationService;
+    this.webSocketMessenger = webSocketMessenger;
     }
 
   public List<Game> getGames() {
@@ -420,6 +426,29 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while deleting image from your game", e);
         }
     }
+
+    /*
+    @Scheduled(fixedRate = 15000) // Check every 15 seconds
+    public void checkGameTimeout() {
+        //List<Game> activeGames = getActiveGames();
+        System.out.println("Scheduled activity check ");
+        for (Game game : gameRepository.findAll()) {
+            if (!WebSocketMessenger.isPlayerActive(game.getCreatorPlayerId())) {
+                gameUserService.increaseGamesPlayed(game.getCreatorPlayerId());
+                handleWin(game.getInvitedPlayerId());
+                deleteGame(game);
+            } else if (!WebSocketMessenger.isPlayerActive(game.getInvitedPlayerId())) {
+                gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
+                handleWin(game.getCreatorPlayerId());
+                deleteGame(game);
+            }
+        }
+    }
+
+     */
+
+
+
 }
 
 

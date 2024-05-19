@@ -4,16 +4,12 @@ import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.LobbyInvitation;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,7 +22,7 @@ public class FriendController {
     private final FriendService friendService;
     private final UserService userService;
 
-    private WebSocketHandler webSocketHandler;
+    private WebSocketMessenger webSocketMessenger;
 
     @Autowired
     FriendController(FriendService friendService, UserService userService) {

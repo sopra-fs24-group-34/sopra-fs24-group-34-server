@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -8,6 +9,7 @@ import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +23,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Service
+@Service("lobbyService")
 @Transactional
 public class LobbyService {
   private final Logger log = LoggerFactory.getLogger(LobbyService.class);
   private final LobbyRepository lobbyRepository; // smailalijagic: needed to verify lobbies
   private final UserRepository userRepository; // smailalijagic: needed to verify user
   private final AuthenticationService authenticationService;
+  private final WebSocketMessenger webSocketMessenger;
 
   @Autowired
-  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("userRepository") UserRepository userRepository, AuthenticationService authenticationService) {
+  public LobbyService(@Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
+                      @Qualifier("userRepository") UserRepository userRepository,
+                      AuthenticationService authenticationService, WebSocketMessenger webSocketMessenger) {
     this.lobbyRepository = lobbyRepository;
     this.userRepository = userRepository;
-      this.authenticationService = authenticationService;
+    this.authenticationService = authenticationService;
+    this.webSocketMessenger = webSocketMessenger;
   }
 
   public List<User> getUsers() {
@@ -102,13 +108,11 @@ public class LobbyService {
     newlobby = lobbyRepository.save(newlobby);
     lobbyRepository.flush();
 
+    // Create a WebSocket session for the lobby
+    //WebSocketMessenger.createSession(newlobby.getLobbyid());
+
     User user = userRepository.findUserById(userId);
 
-    /*
-    List<Lobby> lobbyList = user.getUsergamelobbylist();
-    lobbyList.add(newlobby);
-    user.setUsergamelobbylist(lobbyList);
-     */
     user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);
     userRepository.flush();
@@ -141,5 +145,38 @@ public class LobbyService {
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
   }
+
+  public void removeUserFromLobby(Long lobbyId, Long userId) {
+    //Long userId = user.getId();
+    Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+    UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
+
+    if(Objects.equals(lobby.getCreator_userid(), userId)) {
+        lobby.setCreator_userid(null);
+        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+    } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
+        lobby.setInvited_userid(null);
+        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+    }
+    lobbyRepository.save(lobby);
+    lobbyRepository.flush();
+}
+
+public Long getGameIdFromLobbyId(Long lobbyId) {
+      return lobbyRepository.findByLobbyid(lobbyId).getGame().getGameId();
+}
+
+public void translateAddUserToLobby(Long lobbyId, Long userId) {
+      Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+      User user = userRepository.findUserById(userId);
+      if(!Objects.equals(userId, lobby.getCreator_userid()) &&
+              !Objects.equals(userId, lobby.getInvited_userid())) {
+          addUserToLobby(lobby, user);
+          webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", user);
+      }
+}
+
+
+
 
 }
