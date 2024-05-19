@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.websocket;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class WebSocketSessionService {
     //nedim-j: ensure that there is only one instance of SessionService
     private static WebSocketSessionService instance;
     private static LobbyService lobbyService;
+    private static GameService gameService;
     private static WebSocketMessenger webSocketMessenger;
 
 
@@ -37,6 +39,11 @@ public class WebSocketSessionService {
     @Autowired
     public void setLobbyService(LobbyService lobbyService) {
         WebSocketSessionService.lobbyService = lobbyService;
+    }
+
+    @Autowired
+    public void setGameService(GameService gameService) {
+        WebSocketSessionService.gameService = gameService;
     }
 
     @Autowired
@@ -67,6 +74,7 @@ public class WebSocketSessionService {
             mapActiveSessionToLobby(destinationId, sessionId);
         } else if(destinationSplit[1].equals("games")){
             mapReconnectingSessionToLobby(sessionId);
+            webSocketMessenger.sendMessage(destination, "update-game-state", gameService.getGame(destinationId));
         }
         printSessionsMap();
         printActiveSessions();
