@@ -23,7 +23,6 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             String sessionId = accessor.getSessionId();
 
             webSocketSessionService.addUserIdToActiveSession(sessionId, userId);
-            //sessionService.printSessionAttributes(sessionId);
         }
 
         return message;

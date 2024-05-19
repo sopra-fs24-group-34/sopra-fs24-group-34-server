@@ -58,6 +58,7 @@ public class WebSocketSessionService {
     //nedim-j: session handling
     private final Map<Long, List<WebSocketSession>> sessionsMap = new HashMap<>(); // Map to store WebSocket sessions to corresponding lobby/game
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
+    private final Map<Long, Long> disconnectedSessions = new HashMap<>(); //userid, lobbyid
 
     public void handleSubscription(String destination, String sessionId) {
         String[] destinationSplit = destination.split("/");
@@ -66,6 +67,8 @@ public class WebSocketSessionService {
             mapActiveSessionToLobby(destinationId, sessionId);
             printSessionsMap();
             printActiveSessions();
+        } else if(destinationSplit[1].equals("games")){
+            mapReconnectingSessionToLobby(sessionId);
         }
         //nedim-j: handling gameIds not necessary i think. there's no games without a lobby and games are already assigned to a lobby entity.
     }
@@ -77,11 +80,28 @@ public class WebSocketSessionService {
 
     public void addUserIdToActiveSession(String sessionId, String userId) {
         WebSocketSession session = activeSessions.get(sessionId);
-        session.getAttributes().put("userId", userId);
+        session.getAttributes().put("userId", Long.valueOf(userId));
     }
 
-    public void mapReconnectingSessionToLobby() {
+    public void mapReconnectingSessionToLobby(String sessionId) {
 
+        if (activeSessions.containsKey(sessionId)) {
+
+            WebSocketSession session = activeSessions.get(sessionId);
+            Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
+            Long lobbyId = disconnectedSessions.get(userId);
+            session.getAttributes().put("lobbyId", lobbyId);
+
+            List<WebSocketSession> sessionsList = sessionsMap.get(lobbyId);
+
+            if (sessionsList != null) {
+                sessionsList.add(session);
+            }
+
+            System.out.println("User " + userId + " reconnected!");
+            activeSessions.remove(sessionId);
+            disconnectedSessions.remove(userId);
+        }
     }
 
     public void mapActiveSessionToLobby(Long lobbyId, String sessionId) {
@@ -115,6 +135,7 @@ public class WebSocketSessionService {
         String sessionId = session.getId();
         Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
         Long lobbyId = Long.valueOf(session.getAttributes().get("lobbyId").toString());
+        disconnectedSessions.put(userId, lobbyId);
 
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
         sessions.remove(session);
