@@ -1,4 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
+
+//import ch.uzh.ifi.hase.soprafs24.constant.RoundStatus;
+
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
@@ -128,6 +131,13 @@ public class GameService {
     player2.setUserId(inviteduser.getId());
     inviteduser.setStatus(UserStatus.PLAYING);
 
+    // till: change userStatus
+    creator.setStatus(UserStatus.PLAYING);
+    inviteduser.setStatus(UserStatus.PLAYING);
+    gameUserService.saveuserchanges(creator);
+    gameUserService.saveuserchanges(inviteduser);
+
+
     // till: Save the changes
     gameUserService.savePlayerChanges(player1);
     gameUserService.savePlayerChanges(player2);
@@ -238,11 +248,25 @@ public class GameService {
       gameUserService.increaseGamesPlayed(game.getCreatorId());
       gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
 
+      user.setStatus(UserStatus.ONLINE);  // till: probably needs to be changed when players go back to the lobby
+      invitedUser.setStatus(UserStatus.ONLINE);
+      gameUserService.saveuserchanges(user); // saves Status change
+      gameUserService.saveuserchanges(invitedUser);
+
       //delete the game
       gameRepository.delete(game);
 
        */
   }
+
+  public GameHistory getGameHistory(Long gameId, Long userId) {
+      Game game = gameRepository.findByGameId(gameId);
+      assert(game.getCreatorPlayerId() == userId || game.getInvitedPlayerId() == userId);
+      User user = gameUserService.getUser(userId);
+      GameHistory userGameHistory = gameUserService.createGameHistory(user);
+      return userGameHistory;
+    }
+
 
   public Boolean checkIfGameExists(Long gameId) {
     try {
@@ -265,6 +289,8 @@ public class GameService {
       return false;
     }
   }
+
+
 
     public class ImageNotFoundException extends Exception {
     public ImageNotFoundException(String message) {

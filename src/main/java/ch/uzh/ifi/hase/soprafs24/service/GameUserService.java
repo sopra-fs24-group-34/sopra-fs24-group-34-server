@@ -69,6 +69,12 @@ public class GameUserService {
       playerRepository.save(player);
       playerRepository.flush();
   }
+  public void saveuserchanges(User user){
+      userRepository.save(user);
+      userRepository.flush();
+  }
+
+
 
   public void saveUserChanges(User user){
       userRepository.save(user);
@@ -188,6 +194,16 @@ public class GameUserService {
       userRepository.flush();
   }
 
+
+
+
+  public GameHistory createGameHistory(User user) {
+        GameHistory gameHistory = new GameHistory();
+        gameHistory.setTotalgamesplayed(user.getTotalplayed());
+        gameHistory.setTotalwins(user.getTotalwins());
+        gameHistory.setWinPercentage(user.getTotalwins()/user.getTotalplayed());
+        return gameHistory;
+  }
 
 
     //

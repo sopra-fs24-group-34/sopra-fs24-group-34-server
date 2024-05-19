@@ -108,6 +108,11 @@ public class LobbyService {
     List<Lobby> lobbyList = user.getUsergamelobbylist();
     lobbyList.add(newlobby);
     user.setUsergamelobbylist(lobbyList);
+<<<<<<< HEAD
+    user.setStatus(UserStatus.INLOBBY);
+    userRepository.save(user);
+    userRepository.flush();
+=======
      */
     user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);
@@ -140,6 +145,9 @@ public class LobbyService {
     lobby.setInvited_userid(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
+    user.setStatus(UserStatus.INLOBBY);
+    userRepository.save(user);
+    userRepository.flush();
   }
 
 }
