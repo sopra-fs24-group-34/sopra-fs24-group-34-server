@@ -1,17 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
-//import ch.uzh.ifi.hase.soprafs24.entity.ChatTuple;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.MessageGetDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.MessagePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.ChatServiceWebSockets;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketHandler;
-import org.springframework.beans.factory.annotation.Autowired;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import com.google.gson.*;
 
@@ -20,16 +16,14 @@ import java.util.List;
 @RestController
 public class ChatControllerWebSockets {
     private final ChatServiceWebSockets chatServiceWebSockets;
-    private final SimpMessagingTemplate messagingTemplate;
     private final Gson gson = new Gson();
-    private WebSocketHandler webSocketHandler;
+    private final WebSocketMessenger webSocketMessenger;
 
-    @Autowired
-    public ChatControllerWebSockets(ChatServiceWebSockets chatServiceWebSockets, SimpMessagingTemplate messagingTemplate, WebSocketHandler webSocketHandler) {
+    public ChatControllerWebSockets(ChatServiceWebSockets chatServiceWebSockets, WebSocketMessenger webSocketMessenger) {
         this.chatServiceWebSockets = chatServiceWebSockets;
-        this.messagingTemplate = messagingTemplate;
-        this.webSocketHandler = webSocketHandler;
+        this.webSocketMessenger = webSocketMessenger;
     }
+
 
     @MessageMapping("/sendMessage")
     public void addMessage(String stringJsonRequest) {
@@ -52,7 +46,7 @@ public class ChatControllerWebSockets {
 
             String destination = "/games/" + gameId + "/chat"; // smailalijagic: search chat in here
             //messagingTemplate.convertAndSend(destination, messageGetDTO); // smailalijagic: last message is sent
-            webSocketHandler.sendMessage(destination, "chat-message", messageGetDTO);
+            webSocketMessenger.sendMessage(destination, "chat-message", messageGetDTO);
 
             chatServiceWebSockets.updateGameChat(game, chat);
 

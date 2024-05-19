@@ -42,7 +42,7 @@ websockets an additional messaging protocol called STOMP is used.
 
 ## Authors and Acknowledgment
 
-SoPra Group 34 2024 consists of [Smail Aligajic](https://github.com/smailalijagic), 
+SoPra Group 34 2024 consists of [Smail Alijagic](https://github.com/smailalijagic), 
 [Dario Giuliani](https://github.com/DarioTheCoder), [Nedim Jukic](https://github.com/nedim-j), 
 [Liam Kontopulos](https://github.com/LiamK21) and [Till Sollberger](https://github.com/Tillsollberger).
 

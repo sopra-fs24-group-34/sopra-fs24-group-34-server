@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.Entity;
 
-@Entity
+
 public class GameHistory {
 
     private Long totalgamesplayed;
