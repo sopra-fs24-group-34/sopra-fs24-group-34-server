@@ -30,7 +30,7 @@ public class Application {
           @Override
           public void addCorsMappings(CorsRegistry registry) {
               registry.addMapping("/**")
-                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com/")
+                      .allowedOrigins("http://localhost:3000", "https://sopra-fs24-group-34-client.oa.r.appspot.com")
                       .allowedMethods("*")
                       .allowCredentials(true)
                       .allowedHeaders("*");
