@@ -187,7 +187,8 @@ public class UserService {
                         if (updatedUser.getUsername() != null) {
                             friendsFriend.setFriendUsername(updatedUser.getUsername());
                         }
-                        if (updatedUser.getProfilePicture() != null) {
+                        if (!Objects.equals(updatedUser.getProfilePicture(), "undefined")) {
+                            System.out.println(updatedUser.getProfilePicture());
                             friendsFriend.setFriendIcon(updatedUser.getProfilePicture());
                         }
                     }

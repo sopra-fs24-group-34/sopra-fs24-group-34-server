@@ -285,6 +285,25 @@ public class GameServiceIntegrationTest {
 
     // 8 more functions
 
+    @Test
+    void deleteGameImage_validInputs() {
+        Image image = new Image();
+        image.setId(1L);
+        Image image2 = new Image();
+        image2.setId(2L);
+        List<Image> imageList = new ArrayList<Image>();
+        imageList.add(image);
+        imageList.add(image2);
+        createdgame.setGameImages(imageList);
+
+
+
+
+
+
+    }
+
+
     }
 
 

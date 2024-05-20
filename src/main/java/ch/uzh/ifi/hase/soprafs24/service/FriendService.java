@@ -140,6 +140,13 @@ public class FriendService {
         if (creator.getStatus() != UserStatus.INLOBBY_PREPARING){
             System.out.println("The user cannot send a lobby invitation right now.");
         }
+        //till: prevents sending multiple lobby Invitations to the same friend
+        List<LobbyInvitation> lobbyInvitations = invitedUser.getLobbyInvitations();
+        for (LobbyInvitation lobbyInvitation : lobbyInvitations){
+            if (lobbyInvitation.getCreatorId().equals(creator.getId())){
+                return;
+            }
+        }
         LobbyInvitation invitation = new LobbyInvitation();
         invitation.setCreatorUsername(creator.getUsername());
         invitation.setLobbyId(lobbyId);

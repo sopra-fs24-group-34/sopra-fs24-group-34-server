@@ -190,27 +190,30 @@ public class FriendServiceTest {
     }
 
     //smailalijagic: fails because Status is never changed and lobby seems to be empty?
-//    @Test
-//    public void answerLobbyInvitation_validInputs() {
-//        creator.setStatus(UserStatus.INLOBBY);
-//        Lobby lobby = new Lobby();
-//        lobby.setLobbyid(3L);
-//        lobby.setCreator_userid(1L);
-//        LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
-//        lobbyInvitationPutDTO.setAnswer(true);
-//        lobbyInvitationPutDTO.setLobbyId(3L);
-//        lobbyInvitationPutDTO.setInvitedUserId(2L);
-//        lobbyInvitationPutDTO.setCreatorId(1L);
-//
-//        when(userRepository.findUserById(1L)).thenReturn(creator);
-//        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
-//        when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
-//
-//        friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
-//
-//        assertEquals(2L, lobby.getInvited_userid());
-//        assertEquals(UserStatus.INLOBBY, invitedUser.getStatus());
-//    }
+    @Test
+    public void answerLobbyInvitation_validInputs() {
+        creator.setStatus(UserStatus.INLOBBY_PREPARING);
+        Lobby lobby = new Lobby();
+        lobby.setLobbyid(3L);
+        lobby.setCreator_userid(1L);
+        LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
+        lobbyInvitationPutDTO.setAnswer(true);
+        lobbyInvitationPutDTO.setLobbyId(3L);
+        lobbyInvitationPutDTO.setInvitedUserId(2L);
+        lobbyInvitationPutDTO.setCreatorId(1L);
+        LobbyInvitation lobbyInvitation = new LobbyInvitation();
+        lobbyInvitation.setCreatorUsername("creator");
+        lobbyInvitation.setLobbyId(3L);
+        lobbyInvitation.setCreatorId(1L);
+        invitedUser.addLobbyInvitation(lobbyInvitation);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
+
+        friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
+
+        assert (!invitedUser.getLobbyInvitations().contains(lobbyInvitation));
+    }
 
     @Test
     public void deleteFriend_validInputs() {
