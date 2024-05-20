@@ -9,8 +9,8 @@ env_variables:
   UNSPLASH_API_secretKey: "zZ602hyHh-uc_4uKq4CS7IoYWfZz7itzl14In2ttD9Y"
 
 resources:
-  cpu: 8
-  memory_gb: 4
+  cpu: 4
+  memory_gb: 8
   disk_size_gb: 10
 
 automatic_scaling:
