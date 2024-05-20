@@ -29,5 +29,4 @@ public class WebSocketMessenger {
         String message = gson.toJson(messageJson);
         messagingTemplate.convertAndSend(destination, message);
     }
-
 }

@@ -34,7 +34,7 @@ public class Game implements Serializable {
     @Column
     private Long currentTurnPlayerId;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "game_image",
             joinColumns = @JoinColumn(name = "game_id"), // column referencing Game

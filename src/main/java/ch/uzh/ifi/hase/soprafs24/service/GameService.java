@@ -212,6 +212,10 @@ public class GameService {
         }
     }
 
+  public RoundDTO getGameState(Long gameId) {
+        Game game = getGame(gameId);
+        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+  }
 
   public Response handleWin(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
