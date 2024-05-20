@@ -155,8 +155,9 @@ public class GameService {
     game.setCurrentRound(0);
     game.setCurrentTurnPlayerId(null);
 
-      // Check if there are already 200 images in the database
-      databaseImageCheck();
+    try {
+    databaseImageCheck();}
+    catch (ResponseStatusException e) {throw e;}
 
       // save changes to game
       gameRepository.save(game);
@@ -310,10 +311,28 @@ public class GameService {
 
   private void databaseImageCheck() {
       int imageCount = imageRepository.countAllImages();
-      if (imageCount < 200) {
-          // If there are less than 200 images, fetch and save more
-          int count = 225 - imageCount;
-          unsplashService.saveRandomPortraitImagesToDatabase(count);
+      logger.severe(String.valueOf(imageCount));
+
+      if (imageCount < 150) {
+          // ff there are less than 150 images, fetch and save more
+          int count = 175 - imageCount;
+          int i = 0;
+          int keysAmount = 3; // change to amount of keys!!
+          //the following is to try every api key and then throw an error in case
+          while (i < keysAmount) {
+              try {
+                  unsplashService.saveRandomPortraitImagesToDatabase(count);
+                  break;
+              }
+              catch (ResponseStatusException e) {
+                  i++;
+                  if (i == keysAmount) {
+                      String additionalMessage = "Failed to fetch images from Unsplash after 4 attempts - rate exceeded: WAIT AN HOUR AND RETRY ";
+                      logger.severe(additionalMessage);
+                      throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, additionalMessage);
+                  }
+              }
+          }
       }
   }
 

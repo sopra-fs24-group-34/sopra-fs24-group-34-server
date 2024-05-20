@@ -18,33 +18,58 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
 
-
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 
 
 @Service
+@Transactional
 public class UnsplashService {
     private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
+
 
   @Autowired
   private ImageRepository imageRepository;
 
-  @Value("${unsplash.api.accessKey}")
-  private String accessKey;
+    private int page = 1;
+    // global page variable to maintain state across calls
 
-  public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-  }
+    @Value("${unsplash.api.accessKey}")
+  private String accessKeysString;
+
+    private List<String> accessKeys;
+    private int currentKeyIndex = 0;
+    private int requestsMade = 0;
+    private static final int REQUEST_LIMIT = 50;
+
+    @PostConstruct
+    public void init() {
+        accessKeys = List.of(accessKeysString.split(","));
+    }
+    private void switchToNextKey() {
+        currentKeyIndex = (currentKeyIndex + 1) % accessKeys.size();
+        requestsMade = 0;
+    }
+
+    // Method to get the current access key
+    private String getCurrentAccessKey() {
+        if (requestsMade >= REQUEST_LIMIT) {
+            switchToNextKey();
+        }
+        return accessKeys.get(currentKeyIndex);
+    }
 
 
     public void saveRandomPortraitImagesToDatabase(int count) {
         try {
-            int page = 1;
             int imagesFetched = 0;
             while (imagesFetched < count) {
 
-
-                String url = "https://api.unsplash.com/photos/random?client_id=" + accessKey +
+                String url = "https://api.unsplash.com/photos/random?client_id=" + getCurrentAccessKey() +
                         "&orientation=portrait&count=" + (count - imagesFetched) + "&query=people&page=" + page;
+                requestsMade++;
+                logger.info("Fetching images from: " + url); // Add logging
+
                 RestTemplate restTemplate = new RestTemplate();
                 Map<String, Object>[] responses = restTemplate.getForObject(url, Map[].class);
 
@@ -52,20 +77,34 @@ public class UnsplashService {
                     for (Map<String, Object> response : responses) {
                         Map<String, String> urls = (Map<String, String>) response.get("urls");
                         String imageUrl = urls.get("regular");
+                        String normalizedUrl = normalizeUrl(imageUrl); // Normalize the URL
 
-                        Image image = new Image();
-                        image.setUrl(imageUrl);
-                        imageRepository.save(image);
-                        imagesFetched++;
-
+                        if (!imageRepository.existsByNormalizedUrl(normalizedUrl)) { // Check by normalized URL
+                                    Image image = new Image();
+                                    image.setUrl(imageUrl);
+                                    image.setNormalizedUrl(normalizedUrl);
+                                    imageRepository.save(image);
+                                    imageRepository.flush();
+                                    imagesFetched++;
+                                }
+                        }
                     }
                 }
                 page ++;
-            }
         } catch (Exception e) {
             // Log any exceptions
             logger.severe("Error while saving images to database: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error while saving images to database");}
+            switchToNextKey();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error while saving images to database - RATE EXCEEDED");}
+    }
+
+    private String normalizeUrl(String url) {
+        // Find the index of the parameter to ignore
+        int index = url.indexOf("&ixid=");
+        if (index != -1) {
+            return url.substring(0, index).trim().toLowerCase();
+        }
+        return url.trim().toLowerCase();
     }
 
     /* call the following function like:

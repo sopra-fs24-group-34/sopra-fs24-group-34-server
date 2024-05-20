@@ -6,8 +6,6 @@ runtime: custom
 env: flex
 
 env_variables:
-  UNSPLASH_API_accessKey: "PWHJuYQL8bteX-4JFPeu_Io6DfznbwLiA9ze5tWRTlI"
-  UNSPLASH_API_secretKey: "zZ602hyHh-uc_4uKq4CS7IoYWfZz7itzl14In2ttD9Y"
 
 resources:
   cpu: 4
