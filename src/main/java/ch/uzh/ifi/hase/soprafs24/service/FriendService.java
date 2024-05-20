@@ -37,6 +37,9 @@ public class FriendService {
         User sender = userRepository.findUserById(friendRequestPostDTO.getSenderId());
         User receiver = userRepository.findByUsername(friendRequestPostDTO.getReceiverUserName());
 
+        if (receiver == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user does not exist");
+        }
         assert sender != receiver: "You cannot send a friend request to yourself";
 
         friendRequest.setSenderUserName(sender.getUsername());
