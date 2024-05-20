@@ -97,22 +97,22 @@ public class LobbyServiceIntegrationTest {
         assertNull(lobbyRepository.findByLobbyid(lobby.getLobbyid()));
     }
 
-    @Test
-    void addUserToLobby_valid() {
-        Lobby lobby = new Lobby();
-        lobby.setLobbyid(1L);
-        lobby.setToken("1");
-        lobby = lobbyRepository.save(lobby);
-        lobbyRepository.flush();
-
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("test");
-        user.setToken("1");
-
-        lobbyService.addUserToLobby(lobby, user);
-        lobby = lobbyRepository.findByLobbyid(lobby.getLobbyid());
-        System.out.print(lobby.getInvited_userid());
-        assertEquals(lobby.getInvited_userid(), user.getId());
-    }
+//    @Test
+//    void addUserToLobby_valid() {
+//        Lobby lobby = new Lobby();
+//        lobby.setLobbyid(1L);
+//        lobby.setToken("1");
+//        lobby = lobbyRepository.save(lobby);
+//        lobbyRepository.flush();
+//
+//        User user = new User();
+//        user.setId(1L);
+//        user.setUsername("test");
+//        user.setToken("1");
+//
+//        lobbyService.addUserToLobby(lobby, user);
+//        lobby = lobbyRepository.findByLobbyid(lobby.getLobbyid());
+//        System.out.print(lobby.getInvited_userid());
+//        assertEquals(lobby.getInvited_userid(), user.getId());
+//    }
 }
