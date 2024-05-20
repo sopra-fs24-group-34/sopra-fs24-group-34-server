@@ -170,7 +170,9 @@ public class UserService {
         }
         // existingUser.setFriendsList(updatedUser.getFriendsList()); // smailalijagic: update friendlist
         existingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
-        existingUser.setProfilePicture(updatedUser.getProfilePicture());
+        if (!Objects.equals(updatedUser.getProfilePicture(), "undefined")) {
+            existingUser.setProfilePicture(updatedUser.getProfilePicture());
+        }
 
         //update the username and usericon in the friendslist of all the friends
         List<Friend> friendslist = existingUser.getFriendsList();
@@ -214,6 +216,7 @@ public class UserService {
         } else if (user.getStatus().equals(UserStatus.ONLINE) && !username.startsWith("GUEST")) {
             // smailalijagic: user
             this.userRepository.deleteById(id); // smailalijagic: user can only be deleted if online
+            deleteUserFromFriendsList(user);
         } else {
             if (username.startsWith("GUEST")) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deletion denied: Guest is deleted when offline");
@@ -221,5 +224,28 @@ public class UserService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Deletion denied: User can only be deleted when online");
             }
         }
+    }
+
+    private void deleteUserFromFriendsList(User userToBeDeleted) {
+        List<Friend> friendslist = userToBeDeleted.getFriendsList();
+        System.out.println("friends list: " + friendslist);
+        if (friendslist != null) {
+            for (Friend friend : friendslist) {
+                User user = userRepository.findUserById(friend.getFriendId());
+                List<Friend> friendsFriendlist = user.getFriendsList();
+
+                List<Friend> updatedFriendsFriendlist = new ArrayList<>();
+
+                for (Friend friendsFriend : friendsFriendlist) {
+                    if (!friendsFriend.getFriendId().equals(userToBeDeleted.getId())) {
+                        updatedFriendsFriendlist.add(friendsFriend);
+                    }
+                }
+                user.setFriendsList(updatedFriendsFriendlist);
+
+                userRepository.save(user);
+            }
+        }
+
     }
 }
