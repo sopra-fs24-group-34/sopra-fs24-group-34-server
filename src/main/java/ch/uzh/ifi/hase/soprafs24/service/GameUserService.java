@@ -75,7 +75,6 @@ public class GameUserService {
   }
 
 
-
   public void saveUserChanges(User user){
       userRepository.save(user);
       userRepository.flush();
@@ -186,15 +185,6 @@ public class GameUserService {
       }
 
   }
-
-  public void returnToLobby(Long userId) {
-      User user = userRepository.findUserById(userId);
-      user.setStatus(UserStatus.INLOBBY);
-      userRepository.save(user);
-      userRepository.flush();
-  }
-
-
 
 
   public GameHistory createGameHistory(User user) {

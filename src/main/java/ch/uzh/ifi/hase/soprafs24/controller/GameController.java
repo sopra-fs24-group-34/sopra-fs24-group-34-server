@@ -126,14 +126,6 @@ public class GameController {
       gameService.deleteGameImage(gameId, imageId);
     }
 
-
-    @PutMapping("/games/Lobbies/return/{userId}")
-    @ResponseStatus
-    @ResponseBody
-    public void returnToLobby(@PathVariable Long userId) {
-        gameUserService.returnToLobby(userId);
-    }
-
     @GetMapping("/games/{gameId}/history/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -142,5 +134,4 @@ public class GameController {
 
     }
 
-
-}
+  }

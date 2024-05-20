@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service.GameUserServiceTest;
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
@@ -260,6 +261,49 @@ public class GameUserServiceTest {
         assertEquals(result.getTotalwins(), 0L);
         assertEquals(result.getTotalgamesplayed(), 2L);
         assertEquals(result.getWinPercentage(), 0L);
+
+    }
+
+    @Test
+    void checkIfUserOnline_isOnline() {
+        User user = new User();
+        user.setId(1L);
+        user.setStatus(UserStatus.ONLINE);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+
+        Boolean result = gameUserService.checkIfUserOnline(1L);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkIfUserExists_UserExists() {
+        User user = new User();
+        user.setId(1L);
+        user.setStatus(UserStatus.ONLINE);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+
+        Boolean result = gameUserService.checkIfUserExists(1L);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkIfPlayerInGame_isInGame() {
+        Player invitedplayer = new Player();
+        invitedplayer.setPlayerId(2L);
+        Game game = new Game();
+        game.setInvitedPlayerId(2L);
+        game.setCreatorPlayerId(1L);
+
+        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
+
+        Boolean result = gameUserService.checkIfPlayerinGame(game, 1L);
+
+        assertTrue(result);
+
 
     }
 
