@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
@@ -63,6 +64,8 @@ public class GameServiceIntegrationTest {
 
     private Game createdgame;
 
+    private GamePostDTO gamePostDTO;
+
 
     @BeforeEach
     public void setup() {
@@ -87,9 +90,17 @@ public class GameServiceIntegrationTest {
         createdgame.setGameId(4L);
         createdgame.setCreatorPlayerId(1L);
         createdgame.setInvitedPlayerId(2L);
+        createdgame.setMaxStrikes(3);
+        createdgame.setTimePerRound(30);
 
         gamerepository.save(createdgame);
         gamerepository.flush();
+
+        gamePostDTO = new GamePostDTO();
+        gamePostDTO.setMaxStrikes(3);
+        gamePostDTO.setTimePerRound(30);
+        gamePostDTO.setCreator_userid(1L);
+        gamePostDTO.setInvited_userid(2L);
     }
 
     @AfterEach
@@ -141,23 +152,20 @@ public class GameServiceIntegrationTest {
         Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
         Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
         doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
-        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.ofNullable(createdgame));
 
-        Game newgame = new Game();
-        newgame.setGameId(4L);
-        newgame.setCreatorPlayerId(5L);
-        newgame.setInvitedPlayerId(5L);
-        gamerepository.save(newgame);
-        gamerepository.flush();
+        GamePostDTO newGamePostDTO = new GamePostDTO();
+        newGamePostDTO.setMaxStrikes(3);
+        newGamePostDTO.setTimePerRound(30);
+        newGamePostDTO.setCreator_userid(1L);
+        newGamePostDTO.setInvited_userid(2L);
 
+        Game result = gameservice.createGame(3L, newGamePostDTO, authenticationDTO);
 
-        Game result = gameservice.createGame(3L, createdgame, authenticationDTO);
-
-        assertEquals(result.getCreatorPlayerId(), newgame.getCreatorPlayerId());
-        assertEquals(result.getInvitedPlayerId(), newgame.getInvitedPlayerId());
-        System.out.println(result.getCreatorPlayerId());
-        // assertEquals(playerrepository.findByPlayerId(result.getCreatorId()).getUser(), playerrepository.findByPlayerId(newgame.getCreatorId()).getUser());
-
+        // Assert that the game was created with the correct properties
+        assertEquals(result.getCreatorPlayerId(), newGamePostDTO.getCreator_userid());
+        assertEquals(result.getInvitedPlayerId(), newGamePostDTO.getInvited_userid());
+        assertEquals(result.getMaxStrikes(), newGamePostDTO.getMaxStrikes());
+        assertEquals(result.getTimePerRound(), newGamePostDTO.getTimePerRound());
     }
 
     @Test

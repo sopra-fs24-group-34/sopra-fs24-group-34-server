@@ -15,9 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -123,15 +120,6 @@ public class GameUserServiceTest {
     // Test for save User and save player changes?
 
     @Test
-    void checkStrikes_validInput() {
-        when(gameUserService.getPlayer(1L)).thenReturn(player);
-
-        Boolean result = gameUserService.checkStrikes(player.getPlayerId());
-
-        assertTrue(result);
-    }
-
-    @Test
     void getStrikes_validInput(){
         when(gameUserService.getPlayer(1L)).thenReturn(player);
 
@@ -166,7 +154,7 @@ public class GameUserServiceTest {
         when(playerrepository.findByPlayerId(1L)).thenReturn(player);
         when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
 
-        GameStatus result = gameUserService.determineStatus(1L);
+        GameStatus result = gameUserService.determineGameStatus(1L);
 
         assertEquals(result, GameStatus.CHOOSING);
     }
@@ -224,28 +212,6 @@ public class GameUserServiceTest {
     }
 
     @Test
-    void updategamelobbylist_validInputs() {
-        Game game = new Game();
-        game.setGameId(1L);
-        Lobby lobby = new Lobby();
-        lobby.setLobbyid(1L);
-        lobby.setGame(game);
-        List<Lobby> list = new ArrayList<>();
-        list.add(lobby);
-        User user = new User();
-        user.setId(1L);
-        user.setUsergamelobbylist(list);
-
-        List<Lobby> lobbylist = user.getUsergamelobbylist();
-
-        assertNotNull(lobby.getGame());
-
-        gameUserService.updategamelobbylist(user);
-
-        assertNull(lobby.getGame());
-    }
-
-    @Test
     void createGameHistory_validInputs() {
         User user = new User();
         user.setTotalwins(0L);
@@ -288,23 +254,6 @@ public class GameUserServiceTest {
         Boolean result = gameUserService.checkIfUserExists(1L);
 
         assertTrue(result);
-    }
-
-    @Test
-    void checkIfPlayerInGame_isInGame() {
-        Player invitedplayer = new Player();
-        invitedplayer.setPlayerId(2L);
-        Game game = new Game();
-        game.setInvitedPlayerId(2L);
-        game.setCreatorPlayerId(1L);
-
-        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
-
-        Boolean result = gameUserService.checkIfPlayerinGame(game, 1L);
-
-        assertTrue(result);
-
-
     }
 
 }

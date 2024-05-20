@@ -4,11 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
@@ -445,12 +443,16 @@ public class DTOMapperTest {
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setCreator_userid(1L);
         gamePostDTO.setInvited_userid(2L);
+        gamePostDTO.setMaxStrikes(3);
+        gamePostDTO.setTimePerRound(30);
 
         Game game = dtoMapper.convertGamePostDTOtoEntity(gamePostDTO);
 
         assertNotNull(game);
         assertEquals(1L, game.getCreatorPlayerId());
         assertEquals(2L, game.getInvitedPlayerId());
+        assertEquals(3, game.getMaxStrikes());
+        assertEquals(30, game.getTimePerRound());
     }
 
     @Test
@@ -458,12 +460,16 @@ public class DTOMapperTest {
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setCreator_userid(null);
         gamePostDTO.setInvited_userid(null);
+        gamePostDTO.setMaxStrikes(0);
+        gamePostDTO.setTimePerRound(0);
 
         Game game = dtoMapper.convertGamePostDTOtoEntity(gamePostDTO);
 
         assertNotNull(game);
         assertNull(game.getCreatorPlayerId());
         assertNull(game.getInvitedPlayerId());
+        assertEquals(0, game.getMaxStrikes());
+        assertEquals(0, game.getTimePerRound());
     }
 
     @Test
@@ -832,6 +838,8 @@ public class DTOMapperTest {
         GamePostDTO gamePostDTO = new GamePostDTO();
         gamePostDTO.setCreator_userid(123L);
         gamePostDTO.setInvited_userid(456L);
+        gamePostDTO.setMaxStrikes(3);
+        gamePostDTO.setTimePerRound(30);
 
         // When
         Game game = dtoMapper.convertGamePostDTOtoEntity(gamePostDTO);
@@ -840,5 +848,7 @@ public class DTOMapperTest {
         assertNotNull(game);
         assertEquals(123L, game.getCreatorPlayerId());
         assertEquals(456L, game.getInvitedPlayerId());
+        assertEquals(3, game.getMaxStrikes());
+        assertEquals(30, game.getTimePerRound());
     }
 }

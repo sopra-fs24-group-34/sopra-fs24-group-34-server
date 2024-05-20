@@ -8,16 +8,16 @@ import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,23 +36,18 @@ public class GameService {
   private final UnsplashService unsplashService;
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
-  private final AuthenticationService authenticationService;
-  private final WebSocketMessenger webSocketMessenger;
 
 
     @Autowired
   public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository,
                      GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
-                     UnsplashService unsplashService, LobbyService lobbyService, AuthenticationService authenticationService,
-                     WebSocketMessenger webSocketMessenger) {
+                     UnsplashService unsplashService, LobbyService lobbyService) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
-    this.authenticationService = authenticationService;
-    this.webSocketMessenger = webSocketMessenger;
     }
 
   public List<Game> getGames() {
@@ -110,8 +105,9 @@ public class GameService {
     }
 
 
-  public Game createGame(Long lobbyId, Game game, AuthenticationDTO authenticationDTO) {
+  public Game createGame(Long lobbyId, GamePostDTO gamePostDTO, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyId); // smailalijagic: get lobby object
+    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
     // till: check if both players exist
     //gameUserService.checkIfUserExists(game.getCreatorId());
@@ -140,9 +136,6 @@ public class GameService {
     // till: change userStatus
     creator.setStatus(UserStatus.PLAYING);
     inviteduser.setStatus(UserStatus.PLAYING);
-    gameUserService.saveuserchanges(creator);
-    gameUserService.saveuserchanges(inviteduser);
-
 
     // till: Save the changes
     gameUserService.savePlayerChanges(player1);
@@ -174,12 +167,7 @@ public class GameService {
     //till: check if Imageid exists
     // checkIfImageExists(guess.getImageId());
     //till: check if player is in the game
-    Game game = new Game();
-    try {
-        game = gameRepository.findByGameId(guess.getGameId());
-    } catch(Exception e) {
-        System.out.println("Game is null in GameService.guessImage");
-    }
+    Game game = gameRepository.findByGameId(guess.getGameId());
     Long playerId = guess.getPlayerId();
     //gameUserService.checkIfPlayerinGame(game, playerId);
 
@@ -196,7 +184,7 @@ public class GameService {
         //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikes(playerId);
-            GameStatus gameStatus = gameUserService.determineStatus(game.getGameId());
+            GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId());
 
             RoundDTO roundDTO = updateTurn(game.getGameId());
             if(gameStatus != GameStatus.END) {

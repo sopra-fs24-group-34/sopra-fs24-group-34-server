@@ -58,9 +58,7 @@ public class GameController {
     GamePostDTO gamePostDTO = gson.fromJson(gson.toJson(requestMap.get("gamePostDTO")), GamePostDTO.class);
     AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
-    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
-
-    Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
+    Game createdGame = gameService.createGame(lobbyId, gamePostDTO, authenticationDTO);
 
     webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
