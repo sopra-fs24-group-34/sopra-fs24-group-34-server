@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 //
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -145,8 +147,7 @@ public class UserService {
         if (updatedUser.getUsername().startsWith(" ") || updatedUser.getPassword().startsWith(" ")) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username and Password cannot start with empty space");
         }
-
-        //checkIfUserExistsUpdate(updatedUser, userId); // smailalijagic: commented for the moment, but probably can be deleted
+        System.out.println("still works");
         User existingUser = userRepository.findUserById(userId); // smailalijagic: null or User...
 
         // smailalijagic: check that new username is not empty && check that new username is not already used -> unique username
@@ -167,11 +168,36 @@ public class UserService {
         if (!Objects.equals(updatedUser.getPassword(), "") && !Objects.equals(existingUser.getPassword(), updatedUser.getPassword())) {
             existingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
         }
-        existingUser.setFriendsList(updatedUser.getFriendsList()); // smailalijagic: update friendlist
+        // existingUser.setFriendsList(updatedUser.getFriendsList()); // smailalijagic: update friendlist
         existingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
         existingUser.setProfilePicture(updatedUser.getProfilePicture());
 
+        //update the username and usericon in the friendslist of all the friends
+        List<Friend> friendslist = existingUser.getFriendsList();
+        System.out.println("friends list: " + friendslist);
+        if (friendslist != null) {
+            for (Friend friend : friendslist) {
+                User user = userRepository.findUserById(friend.getFriendId());
+                List<Friend> friendsFriendlist = user.getFriendsList();
 
+                List<Friend> updatedFriendsFriendlist = new ArrayList<>();
+
+                for (Friend friendsFriend : friendsFriendlist) {
+                    if (friendsFriend.getFriendId().equals(existingUser.getId())) {
+                        if (updatedUser.getUsername() != null) {
+                            friendsFriend.setFriendUsername(updatedUser.getUsername());
+                        }
+                        if (updatedUser.getProfilePicture() != null) {
+                            friendsFriend.setFriendIcon(updatedUser.getProfilePicture());
+                        }
+                    }
+                    updatedFriendsFriendlist.add(friendsFriend);
+                }
+                user.setFriendsList(updatedFriendsFriendlist);
+
+                userRepository.save(user);
+            }
+        }
         userRepository.save(existingUser);
         userRepository.flush();
 

@@ -86,7 +86,7 @@ public class FriendService {
         receiver.removeFriendRequest(friendRequest);
         friendRequestRepository.delete(friendRequest);
         if (friendRequestPutDTO.isAnswer()) {
-            sender.addFriend(createFriend(receiver)); //till: create Friend and add id as value for a friend
+            sender.addFriend(createFriend(receiver)); //till: create Friend and add id, icon, username as values for a friend
             receiver.addFriend(createFriend(sender)); //same
             return true;
             }
