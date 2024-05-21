@@ -125,9 +125,17 @@ public class FriendService {
 
     public List<Friend> getFriends(User user) {
         List<Friend> friends = user.getFriendsList();
-        /**List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
-        for (UserGetDTO friend : friends) friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));*/
-        return friends;
+        List<Friend> invitablefriends = new ArrayList<>();
+        for (Friend friend : friends){
+            User user1 = userRepository.findUserById(friend.getFriendId());
+            if (user1 == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist anymore");
+            }
+            if (user1.getStatus().equals(UserStatus.ONLINE)){
+                invitablefriends.add(friend);
+            }
+        }
+        return invitablefriends;
     }
 
     public FriendGetDTO convertFriendRequestToFriend(FriendRequest friendRequest) {
@@ -170,9 +178,10 @@ public class FriendService {
     public void answerLobbyInvitation(LobbyInvitationPutDTO lobbyInvitationPutDTO) {
         User creator = userRepository.findUserById(lobbyInvitationPutDTO.getCreatorId());
         User invitedUser = userRepository.findUserById(lobbyInvitationPutDTO.getInvitedUserId());
-        System.out.println(creator.getStatus());
+        System.out.println("answer lobby invitation" + creator.getStatus());
         if (creator.getStatus() != UserStatus.INLOBBY_PREPARING) {
-            System.out.println("The User who invited you is not in the Lobby anymore");
+            System.out.println("entered exception");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The User who invited you is not in the lobby anymore");
         }
         List<LobbyInvitation> lobbyInvitations = new ArrayList<>(invitedUser.getLobbyInvitations());
         for (LobbyInvitation lobbyInvitation : invitedUser.getLobbyInvitations()){

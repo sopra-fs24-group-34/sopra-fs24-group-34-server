@@ -150,7 +150,7 @@ public class LobbyService {
     lobby.setInvited_userid(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
-    user.setStatus(UserStatus.INLOBBY);
+    user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);
     userRepository.flush();
   }
