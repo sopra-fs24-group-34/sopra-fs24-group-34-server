@@ -43,7 +43,7 @@ public class WebSocketSessionService {
         WebSocketSessionService.webSocketMessenger = webSocketMessenger;
     }
 
-    public WebSocketSessionService() {
+    private WebSocketSessionService() {
         // Private constructor to prevent instantiation
     }
 
@@ -67,8 +67,8 @@ public class WebSocketSessionService {
         } else if(destinationSplit[1].equals("games") && (destinationSplit.length < 4)/*!destinationSplit[3].equals("chat")*/){
             mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
-        printSessionsMap();
-        printActiveSessions();
+        //printSessionsMap();
+        //printActiveSessions();
         //nedim-j: handling gameIds not necessary i think. there's no games without a lobby and games are already assigned to a lobby entity.
     }
 

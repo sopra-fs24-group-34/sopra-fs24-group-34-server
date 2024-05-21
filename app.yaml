@@ -1,20 +1,19 @@
 # https://cloud.google.com/appengine/docs/the-appengine-environments#comparing_high-level_features
 # https://cloud.google.com/appengine/docs/standard
 
-runtime: java17
-instance_class: F2
+service: v2service
+runtime: custom
+env: flex
+
 env_variables:
   UNSPLASH_API_accessKey: "PWHJuYQL8bteX-4JFPeu_Io6DfznbwLiA9ze5tWRTlI"
   UNSPLASH_API_secretKey: "zZ602hyHh-uc_4uKq4CS7IoYWfZz7itzl14In2ttD9Y"
 
 resources:
-  cpu: 8
-  memory_gb: 4
-  volumes:
-    - name: ramdisk1
-      volume_type: tmpfs
-      size_gb: 0.5
+  cpu: 4
+  memory_gb: 8
+  disk_size_gb: 10
 
 automatic_scaling:
-  min_instances: 1
-  max_instances: 1
+  min_num_instances: 1
+  max_num_instances: 1

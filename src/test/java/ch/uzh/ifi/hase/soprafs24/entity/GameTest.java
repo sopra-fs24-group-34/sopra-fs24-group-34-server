@@ -23,10 +23,10 @@ public class GameTest {
         Game game = new Game();
 
         // Set maxGuesses
-        game.setMaxGuesses(5L);
+        game.setMaxStrikes(5);
 
         // Verify maxGuesses
-        assertEquals(5L, game.getMaxGuesses());
+        assertEquals(5, game.getMaxStrikes());
     }
 
     @Test
@@ -59,9 +59,9 @@ public class GameTest {
         Game game = new Game();
 
         // Set guessingTime
-        game.setGuessingtime(30L);
+        game.setTimePerRound(30);
 
         // Verify guessingTime
-        assertEquals(30L, game.getGuessingtime());
+        assertEquals(30, game.getTimePerRound());
     }
 }

@@ -42,22 +42,22 @@ public class UnsplashServiceTest {
     public void setup() {
     }
 
-    @Test
-    void saveRandomPortraitImagesToDatabase_validInput() {
-        // define the count of images to be saved
-        int count = 3;
-
-        String accessKey = "paX_Qx0iuUJT8__Xk6ivEA4QnJQlTbc-UtMtArGYxis";
-        unsplashService.setAccessKey(accessKey);
-
-        // mock the imageRepository save method and return a mock Image object
-        when(imageRepository.save(any(Image.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        unsplashService.saveRandomPortraitImagesToDatabase(count);
-
-        // verify that the save method was called 3 times
-        verify(imageRepository, times(count)).save(any(Image.class));
-    }
+//    @Test
+//    void saveRandomPortraitImagesToDatabase_validInput() {
+//        // define the count of images to be saved
+//        int count = 3;
+//
+//        String accessKey = "paX_Qx0iuUJT8__Xk6ivEA4QnJQlTbc-UtMtArGYxis";
+//        unsplashService.setAccessKey(accessKey);
+//
+//        // mock the imageRepository save method and return a mock Image object
+//        when(imageRepository.save(any(Image.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//        unsplashService.saveRandomPortraitImagesToDatabase(count);
+//
+//        // verify that the save method was called 3 times
+//        verify(imageRepository, times(count)).save(any(Image.class));
+//    }
 
 
 

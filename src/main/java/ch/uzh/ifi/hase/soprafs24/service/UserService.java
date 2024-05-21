@@ -169,7 +169,6 @@ public class UserService {
             existingUser.setPassword(updatedUser.getPassword()); // smailalijagic: update password
         }
         // existingUser.setFriendsList(updatedUser.getFriendsList()); // smailalijagic: update friendlist
-        existingUser.setUsergamelobbylist(updatedUser.getUsergamelobbylist()); // smailalijagic: update with all active gamelobbies
         if (!Objects.equals(updatedUser.getProfilePicture(), "undefined")) {
             existingUser.setProfilePicture(updatedUser.getProfilePicture());
         }

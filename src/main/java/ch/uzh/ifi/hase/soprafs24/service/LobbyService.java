@@ -111,20 +111,12 @@ public class LobbyService {
     newlobby = lobbyRepository.save(newlobby);
     lobbyRepository.flush();
 
-    // Create a WebSocket session for the lobby
-    //WebSocketMessenger.createSession(newlobby.getLobbyid());
-
     User user = userRepository.findUserById(userId);
 
     /*
     List<Lobby> lobbyList = user.getUsergamelobbylist();
     lobbyList.add(newlobby);
     user.setUsergamelobbylist(lobbyList);
-<<<<<<< HEAD
-    user.setStatus(UserStatus.INLOBBY);
-    userRepository.save(user);
-    userRepository.flush();
-=======
      */
 
     user.setStatus(UserStatus.INLOBBY_PREPARING);
@@ -170,7 +162,9 @@ public class LobbyService {
 
     if(Objects.equals(lobby.getCreator_userid(), userId)) {
         lobby.setCreator_userid(null);
-        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+        lobby.setInvited_userid(null);
+        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "lobby-closed", "");
+        deleteLobby(lobby);
     } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
         lobby.setInvited_userid(null);
         webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);

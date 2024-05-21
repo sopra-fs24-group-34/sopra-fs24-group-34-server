@@ -35,7 +35,6 @@ public interface DTOMapper {
     @Mapping(source = "password", target = "password")
     @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "friendsList", target = "friendsList")
-    @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
     @Mapping(source = "totalwins", target = "totalwins")
@@ -57,7 +56,6 @@ public interface DTOMapper {
     @Mapping(source = "password", target = "password")
     @Mapping(source = "profilePicture", target = "profilePicture")
     @Mapping(source = "friendsList", target = "friendsList")
-    @Mapping(source = "usergamelobbylist", target = "usergamelobbylist")
     @Mapping(source = "token", target = "token")
     @Mapping(source = "totalplayed", target = "totalplayed")
     @Mapping(source = "totalwins", target = "totalwins")
@@ -127,6 +125,8 @@ public interface DTOMapper {
 
     @Mapping(source = "creator_userid", target = "creatorPlayerId")
     @Mapping(source = "invited_userid", target = "invitedPlayerId")
+    @Mapping(source = "maxStrikes", target = "maxStrikes")
+    @Mapping(source = "timePerRound", target = "timePerRound")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 

@@ -1,11 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
-import java.util.List;
-
 public class GamePostDTO {
 
     private Long creator_userid;
     private Long invited_userid;
+    private int maxStrikes;
+    private int timePerRound;
 
 
     public Long getCreator_userid(){
@@ -23,4 +23,21 @@ public class GamePostDTO {
     public void setInvited_userid(Long invited_userid) {
         this.invited_userid = invited_userid;
     }
+
+    public void setMaxStrikes(int maxStrikes) {
+        this.maxStrikes = maxStrikes;
+    }
+
+    public int getMaxStrikes() {
+        return maxStrikes;
+    }
+
+    public void setTimePerRound(int timePerRound) {
+        this.timePerRound = timePerRound;
+    }
+
+    public int getTimePerRound() {
+        return timePerRound;
+    }
+
 }
