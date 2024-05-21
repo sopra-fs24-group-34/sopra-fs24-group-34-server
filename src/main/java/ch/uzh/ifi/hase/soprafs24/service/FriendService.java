@@ -48,13 +48,19 @@ public class FriendService {
         friendRequest.setReceiverId(receiver.getId());
 
         assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
+        //if send request was already sent it catches them and there is not send a second one
         List<FriendRequest> friendRequests = sender.getFriendRequests();
         for (FriendRequest friendRequest1 : friendRequests){
             if (friendRequest1.getReceiverId() == receiver.getId()){
-                return;
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You already sent a friend request to this User.");
             }
         }
-
+        List<Friend> friends = sender.getFriendsList();
+        for (Friend friend : friends){
+            if (friend.getFriendId().equals(receiver.getId())){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "The friend is already in your friendlist. Maybe you need to refresh the page");
+            }
+        }
 
         sender.addFriendRequest(friendRequest);
         receiver.addFriendRequest(friendRequest);

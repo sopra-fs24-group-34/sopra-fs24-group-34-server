@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service.userservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
@@ -88,6 +89,45 @@ public class UserServiceTest {
         user = userService.updateUser(updateduser, 1L);
 
         assertEquals(user.getUsername(), "testuser");
+
+    }
+
+    @Test
+    void updateUser_UserHasFriends_UpdatesFriendListOfFriends() {
+        //create 2 Users and Friend version of them to add each other and ultimately check if the User is updated in the friends list
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+        Friend userFriend = new Friend();
+        userFriend.setFriendId(1L);
+        userFriend.setFriendUsername("testuser");
+        //2nd user and Friend version of it
+        User invited = new User();
+        invited.setUsername("invited");
+        invited.setPassword("testpassword");
+        invited.setId(2L);
+        Friend invitedFriend = new Friend();
+        invitedFriend.setFriendId(2L);
+        invitedFriend.setFriendUsername("invited");
+        //add each other as friends
+        user.addFriend(invitedFriend);
+        invited.addFriend(userFriend);
+
+        //New values for User
+        User updateduser = new User();
+        updateduser.setUsername("testuser123");
+        updateduser.setPassword("testpassword");
+        updateduser.setId(2L);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+        when(userRepository.findUserById(2L)).thenReturn(invited);
+
+        userService.updateUser(updateduser, 1L);
+
+        Friend friend = invited.getFriendsList().get(0);
+        assertEquals(friend.getFriendUsername(), "testuser123");
+
 
     }
 
@@ -501,6 +541,41 @@ public class UserServiceTest {
         // Assert
         assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
         verify(userRepository, never()).deleteById(userId);
+    }
+
+    @Test
+    public void deleteUser_UserHasFriends_DeletesUserFromFriendsList() {
+        //create 2 Users and Friend version of them to add each other and ultimately check if the User is updated in the friends list
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+        user.setStatus(UserStatus.ONLINE);
+        Friend userFriend = new Friend();
+        userFriend.setFriendId(1L);
+        userFriend.setFriendUsername("testuser");
+        //2nd user and Friend version of it
+        User invited = new User();
+        invited.setUsername("invited");
+        invited.setPassword("testpassword");
+        invited.setId(2L);
+        Friend invitedFriend = new Friend();
+        invitedFriend.setFriendId(2L);
+        invitedFriend.setFriendUsername("invited");
+        //add each other as friends
+        user.addFriend(invitedFriend);
+        invited.addFriend(userFriend);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+        when(userRepository.findUserById(2L)).thenReturn(invited);
+
+
+        assert !invited.getFriendsList().isEmpty();
+
+        userService.deleteUser(1L);
+
+        assert invited.getFriendsList().isEmpty();
+
     }
 
 }
