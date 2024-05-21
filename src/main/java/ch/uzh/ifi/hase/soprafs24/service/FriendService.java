@@ -54,6 +54,9 @@ public class FriendService {
             if (friendRequest1.getReceiverId() == receiver.getId()){
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You already sent a friend request to this User.");
             }
+            if (friendRequest1.getSenderId() == receiver.getId()){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have a friend request from this User");
+            }
         }
         List<Friend> friends = sender.getFriendsList();
         for (Friend friend : friends){
@@ -139,17 +142,20 @@ public class FriendService {
     public void inviteFriendtoLobby(Long creatorId, String invitedUserName, Long lobbyId) {
         User creator = userRepository.findUserById(creatorId);
         User invitedUser = userRepository.findByUsername(invitedUserName);
+        if (invitedUser == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The User was not found. Please refresh the page");
+        }
 
         if (invitedUser.getStatus() != UserStatus.ONLINE) {
             System.out.println("The invited Friend cannot be invited to a Lobby right now.");
         }
-        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING){
+        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING) {
             System.out.println("The user cannot send a lobby invitation right now.");
         }
         //till: prevents sending multiple lobby Invitations to the same friend
         List<LobbyInvitation> lobbyInvitations = invitedUser.getLobbyInvitations();
-        for (LobbyInvitation lobbyInvitation : lobbyInvitations){
-            if (lobbyInvitation.getCreatorId().equals(creator.getId())){
+        for (LobbyInvitation lobbyInvitation : lobbyInvitations) {
+            if (lobbyInvitation.getCreatorId().equals(creator.getId())) {
                 return;
             }
         }
