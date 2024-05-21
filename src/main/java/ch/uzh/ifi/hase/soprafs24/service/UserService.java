@@ -206,6 +206,12 @@ public class UserService {
         return existingUser;
     }
 
+    public void deleteUserIfGuest(Long userId) {
+        if(userRepository.findUserById(userId).getUsername().toUpperCase().startsWith("GUEST")) {
+            userRepository.deleteById(userId);
+        }
+    }
+
     public void deleteUser(Long id) {
         User user = userRepository.findUserById(id);
         String username = user.getUsername().toUpperCase();
