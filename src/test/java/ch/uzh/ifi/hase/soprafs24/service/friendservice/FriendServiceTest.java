@@ -174,7 +174,7 @@ public class FriendServiceTest {
         lobby.setLobbyid(3L);
         lobby.setCreator_userid(1L);
 
-        creator.setStatus(UserStatus.INLOBBY);
+        creator.setStatus(UserStatus.INLOBBY_PREPARING);
         invitedUser.setStatus(UserStatus.ONLINE);
 
         when(userRepository.findUserById(1L)).thenReturn(creator);

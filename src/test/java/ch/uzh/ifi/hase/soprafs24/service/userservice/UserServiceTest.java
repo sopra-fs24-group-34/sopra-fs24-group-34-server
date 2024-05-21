@@ -489,7 +489,7 @@ public class UserServiceTest {
         User offlineUser = new User();
         offlineUser.setId(2L);
         offlineUser.setUsername("RegularUser");
-        offlineUser.setStatus(UserStatus.INLOBBY);
+        offlineUser.setStatus(UserStatus.INLOBBY_PREPARING);
 
         // Arrange
         Long userId = offlineUser.getId();
