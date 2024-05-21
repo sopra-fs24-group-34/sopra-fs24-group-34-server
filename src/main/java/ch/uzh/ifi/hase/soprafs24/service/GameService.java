@@ -301,9 +301,11 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      if (imageCount < 150) {
+      int desiredImageNr = 120; // don't go higher or it will not work because of limited images on unsplash
+
+      if (imageCount < desiredImageNr) {
           // ff there are less than 150 images, fetch and save more
-          int count = 175 - imageCount;
+          int count = desiredImageNr - imageCount;
           int i = 0;
           int keysAmount = 3; // change to amount of keys!!
           //the following is to try every api key and then throw an error in case
@@ -314,6 +316,8 @@ public class GameService {
               }
               catch (ResponseStatusException e) {
                   i++;
+                  imageCount = imageRepository.countAllImages();
+                  count = desiredImageNr - imageCount;
                   if (i == keysAmount) {
                       String additionalMessage = "Failed to fetch images from Unsplash after 4 attempts - rate exceeded: WAIT AN HOUR AND RETRY ";
                       logger.severe(additionalMessage);

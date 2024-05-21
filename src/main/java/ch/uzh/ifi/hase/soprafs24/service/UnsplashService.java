@@ -77,20 +77,26 @@ public class UnsplashService {
                     for (Map<String, Object> response : responses) {
                         Map<String, String> urls = (Map<String, String>) response.get("urls");
                         String imageUrl = urls.get("regular");
-                        String normalizedUrl = normalizeUrl(imageUrl); // Normalize the URL
+                        String normalizedUrl = normalizeUrl(imageUrl); // normalize the URL
 
-                        if (!imageRepository.existsByNormalizedUrl(normalizedUrl)) { // Check by normalized URL
-                                    Image image = new Image();
-                                    image.setUrl(imageUrl);
-                                    image.setNormalizedUrl(normalizedUrl);
-                                    imageRepository.save(image);
-                                    imageRepository.flush();
-                                    imagesFetched++;
-                                }
+                        if (!imageRepository.existsByNormalizedUrl(normalizedUrl)) { // check by normalized URL
+                            Image image = new Image();
+                            image.setUrl(imageUrl);
+                            image.setNormalizedUrl(normalizedUrl);
+                            imageRepository.save(image);
+                            imageRepository.flush();
+                            imagesFetched++;
+                            logger.info("Image saved to database. Total images fetched: " + imagesFetched);
+                        }
+                        else {
+                            logger.info("Image already exists in the database: " + normalizedUrl); // Add logging
                         }
                     }
+
                 }
-                page ++;
+                Random random = new Random();
+                page = random.nextInt(20) + 1;
+            }
         } catch (Exception e) {
             // Log any exceptions
             logger.severe("Error while saving images to database: " + e.getMessage());
