@@ -206,6 +206,12 @@ public class UserService {
         return existingUser;
     }
 
+    public void deleteUserIfGuest(Long userId) {
+        if(userRepository.findUserById(userId).getUsername().toUpperCase().startsWith("GUEST")) {
+            userRepository.deleteById(userId);
+        }
+    }
+
     public void deleteUser(Long id) {
         User user = userRepository.findUserById(id);
         String username = user.getUsername().toUpperCase();
@@ -245,6 +251,27 @@ public class UserService {
                 userRepository.save(user);
             }
         }
-
     }
+
+    public void changeUserStatus(Long userId, String changedStatus) {
+        System.out.println("Entered changeUserStatus function with status: " + changedStatus);
+        try {
+            String cleanedStatus = changedStatus.trim().replaceAll("^\"|\"$", "").toUpperCase();
+            UserStatus newStatus = UserStatus.valueOf(cleanedStatus);
+            System.out.println("Parsed new User Status: " + newStatus);
+            User user = userRepository.findUserById(userId);
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
+            }
+            user.setStatus(newStatus);
+            userRepository.save(user);
+            userRepository.flush();
+            System.out.println("User status updated successfully to: " + newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid status value: " + changedStatus);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"An error occurred while changing user status: " + e.getMessage() );
+        }
+    }
+
 }

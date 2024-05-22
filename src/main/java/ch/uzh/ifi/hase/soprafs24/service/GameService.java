@@ -226,7 +226,7 @@ public class GameService {
     return gameUserService.createResponse(false, playerId, strikes, GameStatus.END, roundDTO);
 }
 
-  private void deleteGame(Game game) {
+  public void deleteGame(Game game) {
 
       //Get the users
       Player creator = gameUserService.getPlayer(game.getCreatorPlayerId());

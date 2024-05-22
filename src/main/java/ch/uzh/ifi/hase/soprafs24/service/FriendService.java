@@ -48,13 +48,22 @@ public class FriendService {
         friendRequest.setReceiverId(receiver.getId());
 
         assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
+        //if send request was already sent it catches them and there is not send a second one
         List<FriendRequest> friendRequests = sender.getFriendRequests();
         for (FriendRequest friendRequest1 : friendRequests){
             if (friendRequest1.getReceiverId() == receiver.getId()){
-                return;
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You already sent a friend request to this User.");
+            }
+            if (friendRequest1.getSenderId() == receiver.getId()){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "You already have a friend request from this User");
             }
         }
-
+        List<Friend> friends = sender.getFriendsList();
+        for (Friend friend : friends){
+            if (friend.getFriendId().equals(receiver.getId())){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "The friend is already in your friendlist. Maybe you need to refresh the page");
+            }
+        }
 
         sender.addFriendRequest(friendRequest);
         receiver.addFriendRequest(friendRequest);
@@ -116,9 +125,17 @@ public class FriendService {
 
     public List<Friend> getFriends(User user) {
         List<Friend> friends = user.getFriendsList();
-        /**List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
-        for (UserGetDTO friend : friends) friendGetDTOs.add(DTOMapper.INSTANCE.convertEntityToFriendGetDTO(friend));*/
-        return friends;
+        List<Friend> invitablefriends = new ArrayList<>();
+        for (Friend friend : friends){
+            User user1 = userRepository.findUserById(friend.getFriendId());
+            if (user1 == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This User does not exist anymore");
+            }
+            if (user1.getStatus().equals(UserStatus.ONLINE)){
+                invitablefriends.add(friend);
+            }
+        }
+        return invitablefriends;
     }
 
     public FriendGetDTO convertFriendRequestToFriend(FriendRequest friendRequest) {
@@ -133,17 +150,20 @@ public class FriendService {
     public void inviteFriendtoLobby(Long creatorId, String invitedUserName, Long lobbyId) {
         User creator = userRepository.findUserById(creatorId);
         User invitedUser = userRepository.findByUsername(invitedUserName);
+        if (invitedUser == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The User was not found. Please refresh the page");
+        }
 
         if (invitedUser.getStatus() != UserStatus.ONLINE) {
             System.out.println("The invited Friend cannot be invited to a Lobby right now.");
         }
-        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING){
+        if (creator.getStatus() != UserStatus.INLOBBY_PREPARING) {
             System.out.println("The user cannot send a lobby invitation right now.");
         }
         //till: prevents sending multiple lobby Invitations to the same friend
         List<LobbyInvitation> lobbyInvitations = invitedUser.getLobbyInvitations();
-        for (LobbyInvitation lobbyInvitation : lobbyInvitations){
-            if (lobbyInvitation.getCreatorId().equals(creator.getId())){
+        for (LobbyInvitation lobbyInvitation : lobbyInvitations) {
+            if (lobbyInvitation.getCreatorId().equals(creator.getId())) {
                 return;
             }
         }
@@ -158,9 +178,10 @@ public class FriendService {
     public void answerLobbyInvitation(LobbyInvitationPutDTO lobbyInvitationPutDTO) {
         User creator = userRepository.findUserById(lobbyInvitationPutDTO.getCreatorId());
         User invitedUser = userRepository.findUserById(lobbyInvitationPutDTO.getInvitedUserId());
-        System.out.println(creator.getStatus());
+        System.out.println("answer lobby invitation" + creator.getStatus());
         if (creator.getStatus() != UserStatus.INLOBBY_PREPARING) {
-            System.out.println("The User who invited you is not in the Lobby anymore");
+            System.out.println("entered exception");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The User who invited you is not in the lobby anymore");
         }
         List<LobbyInvitation> lobbyInvitations = new ArrayList<>(invitedUser.getLobbyInvitations());
         for (LobbyInvitation lobbyInvitation : invitedUser.getLobbyInvitations()){

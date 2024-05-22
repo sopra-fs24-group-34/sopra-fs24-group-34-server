@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
@@ -252,12 +253,42 @@ public class GameServiceIntegrationTest {
 
     @Test
     void handleLoss_validInputs(){
+        Player creatorPlayer = new Player();
+        creatorPlayer.setPlayerId(1L);
+        creatorPlayer.setUserId(1L);
+        Player invitedPlayer = new Player();
+        invitedPlayer.setPlayerId(2L);
+        invitedPlayer.setUserId(2L);
+
+
+        // doNothing().when(gameUserService.increaseGamesPlayed(2L));
+
+
+
 
     }
 
     @Test
     void deleteGame_validInputs() {
+        Player creatorPlayer = new Player();
+        creatorPlayer.setPlayerId(1L);
+        creatorPlayer.setUserId(1L);
+        Player invitedPlayer = new Player();
+        invitedPlayer.setPlayerId(2L);
+        invitedPlayer.setUserId(2L);
 
+        invited.setStatus(UserStatus.PLAYING);
+        creator.setStatus(UserStatus.PLAYING);
+
+        when(gameUserService.getPlayer(1L)).thenReturn(creatorPlayer);
+        when(gameUserService.getPlayer(2L)).thenReturn(invitedPlayer);
+        when(gameUserService.getUser(1L)).thenReturn(creator);
+        when(gameUserService.getUser(2L)).thenReturn(invited);
+
+        gameservice.deleteGame(createdgame);
+
+        assert creator.getStatus().equals(UserStatus.ONLINE);
+        assert invited.getStatus().equals(UserStatus.ONLINE);
     }
 
     @Test

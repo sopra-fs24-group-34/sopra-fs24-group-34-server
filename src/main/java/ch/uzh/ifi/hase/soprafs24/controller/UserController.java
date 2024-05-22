@@ -116,4 +116,15 @@ public class UserController {
     //}
     userService.deleteUser(userId);
   }
+
+  @PostMapping("users/{userId}/status/change")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public void changeUserStatus(@PathVariable("userId") Long userId, @RequestBody String changedStatus) {
+      System.out.println("Changed Status: " + changedStatus);
+      userService.changeUserStatus(userId, changedStatus);
+  }
+
+
+
 }

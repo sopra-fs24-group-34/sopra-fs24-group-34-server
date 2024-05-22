@@ -150,27 +150,43 @@ public class LobbyService {
     lobby.setInvited_userid(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
-    user.setStatus(UserStatus.INLOBBY);
+    user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);
     userRepository.flush();
   }
 
   public void removeUserFromLobby(Long lobbyId, Long userId) {
     //Long userId = user.getId();
-    Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
-    UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
+    try {
+        Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
+        UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
 
-    if(Objects.equals(lobby.getCreator_userid(), userId)) {
-        lobby.setCreator_userid(null);
-        lobby.setInvited_userid(null);
-        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "lobby-closed", "");
-        deleteLobby(lobby);
-    } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
-        lobby.setInvited_userid(null);
-        webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+        if(Objects.equals(lobby.getCreator_userid(), userId)) {
+            User host = userRepository.findUserById(userId);
+            host.setStatus(UserStatus.ONLINE);
+            userRepository.save(host);
+            try {
+                User guest = userRepository.findUserById(lobby.getInvited_userid());
+                guest.setStatus(UserStatus.ONLINE);
+                userRepository.save(guest);
+            } catch (Exception e) {
+                log.debug("No guest in lobby");
+            }
+            userRepository.flush();
+            lobby.setCreator_userid(null);
+            lobby.setInvited_userid(null);
+            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "lobby-closed", "");
+            deleteLobby(lobby);
+        } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
+            lobby.setInvited_userid(null);
+            userRepository.findUserById(userId).setStatus(UserStatus.ONLINE);
+            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
+        }
+
+        lobbyRepository.save(lobby);
+        lobbyRepository.flush();
+    } catch(Exception ignored) {
     }
-    lobbyRepository.save(lobby);
-    lobbyRepository.flush();
 }
 
 public Long getGameIdFromLobbyId(Long lobbyId) {
