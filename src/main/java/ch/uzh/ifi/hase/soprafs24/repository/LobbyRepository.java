@@ -7,5 +7,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository("lobbyRepository")
 public interface LobbyRepository extends JpaRepository<Lobby, Long> {
-  Lobby findByLobbyid(Long id); // smailalijagic: case sensitive --> magically creates sql query (see JPA video on Olat)
+    Lobby findByLobbyid(Long id); // smailalijagic: case sensitive --> magically creates sql query (see JPA video on Olat)
+
+    Boolean existsByLobbyid(Long id);
+
 }
