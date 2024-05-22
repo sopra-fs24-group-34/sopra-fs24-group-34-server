@@ -1,4 +1,4 @@
-/**package ch.uzh.ifi.hase.soprafs24.controller;
+package ch.uzh.ifi.hase.soprafs24.controller;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 import ch.uzh.ifi.hase.soprafs24.entity.Game;
@@ -95,7 +95,7 @@ class ChatControllerWebSocketsTest {
     }
 }
 
-
+/*
 <<<<<<< Updated upstream
 //
 //import ch.uzh.ifi.hase.soprafs24.entity.Chat;

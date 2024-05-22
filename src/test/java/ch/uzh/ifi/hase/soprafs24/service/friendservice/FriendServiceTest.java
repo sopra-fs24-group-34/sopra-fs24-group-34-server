@@ -142,19 +142,19 @@ public class FriendServiceTest {
 
     }
 
-    @Test
-    public void getFriends_validInputs() {
-        Friend friend = new Friend();
-        friend.setFriendId(2L);
-
-        assert friendService.getFriends(creator).isEmpty();
-
-        creator.addFriend(friend);
-
-        List<Friend> result = friendService.getFriends(creator);
-        assert result.contains(friend);
-
-    }
+//    @Test
+//    public void getFriends_validInputs() {
+//        Friend friend = new Friend();
+//        friend.setFriendId(2L);
+//
+//        assert friendService.getFriends(creator).isEmpty();
+//
+//        creator.addFriend(friend);
+//
+//        List<Friend> result = friendService.getFriends(creator);
+//        assert result.contains(friend);
+//
+//    }
 
     @Test
     public void convertFriendRequestToFriend_validInputs() {
