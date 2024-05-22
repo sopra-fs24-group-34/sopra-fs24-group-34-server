@@ -33,9 +33,9 @@ public class LobbyPutDTO {
     this.invited_userid = invited_userid;
   }
 
-  public String getLobbyToken() {
-    return lobbyToken;
-  }
+//  public String getLobbyToken() {
+//    return lobbyToken;
+//  }
 
   public void setLobbyToken(String lobbyToken) {
     this.lobbyToken = lobbyToken;

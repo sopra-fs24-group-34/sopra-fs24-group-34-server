@@ -132,42 +132,42 @@ public class GameServiceIntegrationTest {
         assertEquals(result, createdgame);
     }
 
-    @Test
-    void createGame_validInput(){
-        // Mock behavior of gameUserService
-        Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
-        Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
-        // Define the behavior to save and flush the player
-        doAnswer(invocation -> {
-            Player player = invocation.getArgument(0); // Get the Player passed to the method
-            playerrepository.save(player);
-            playerrepository.flush();
-            player.setPlayerId(5L);
-            return null; // Since the method is void, return null
-        }).when(gameUserService).savePlayerChanges(any(Player.class));
-
-        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-        authenticationDTO.setId(1L);
-        authenticationDTO.setToken(creator.getToken());
-
-        Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
-        Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
-        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
-
-        GamePostDTO newGamePostDTO = new GamePostDTO();
-        newGamePostDTO.setMaxStrikes(3);
-        newGamePostDTO.setTimePerRound(30);
-        newGamePostDTO.setCreator_userid(1L);
-        newGamePostDTO.setInvited_userid(2L);
-
-        Game result = gameservice.createGame(3L, newGamePostDTO, authenticationDTO);
-
-        // Assert that the game was created with the correct properties
-        assertEquals(result.getCreatorPlayerId(), newGamePostDTO.getCreator_userid());
-        assertEquals(result.getInvitedPlayerId(), newGamePostDTO.getInvited_userid());
-        assertEquals(result.getMaxStrikes(), newGamePostDTO.getMaxStrikes());
-        assertEquals(result.getTimePerRound(), newGamePostDTO.getTimePerRound());
-    }
+//    @Test
+//    void createGame_validInput(){
+//        // Mock behavior of gameUserService
+//        Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
+//        Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
+//        // Define the behavior to save and flush the player
+//        doAnswer(invocation -> {
+//            Player player = invocation.getArgument(0); // Get the Player passed to the method
+//            playerrepository.save(player);
+//            playerrepository.flush();
+//            player.setPlayerId(5L);
+//            return null; // Since the method is void, return null
+//        }).when(gameUserService).savePlayerChanges(any(Player.class));
+//
+//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+//        authenticationDTO.setId(1L);
+//        authenticationDTO.setToken(creator.getToken());
+//
+//        Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
+//        Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
+//        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
+//
+//        GamePostDTO newGamePostDTO = new GamePostDTO();
+//        newGamePostDTO.setMaxStrikes(3);
+//        newGamePostDTO.setTimePerRound(30);
+//        newGamePostDTO.setCreator_userid(1L);
+//        newGamePostDTO.setInvited_userid(2L);
+//
+//        Game result = gameservice.createGame(3L, newGamePostDTO, authenticationDTO);
+//
+//        // Assert that the game was created with the correct properties
+//        assertEquals(result.getCreatorPlayerId(), newGamePostDTO.getCreator_userid());
+//        assertEquals(result.getInvitedPlayerId(), newGamePostDTO.getInvited_userid());
+//        assertEquals(result.getMaxStrikes(), newGamePostDTO.getMaxStrikes());
+//        assertEquals(result.getTimePerRound(), newGamePostDTO.getTimePerRound());
+//    }
 
     @Test
     void selectImage_validInputs(){

@@ -12,13 +12,13 @@ public class LobbyInvitationPostDTO {
         return creatorId;
     }
 
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
+//    public void setCreatorId(Long creatorId) {
+//        this.creatorId = creatorId;
+//    }
 
-    public void setInvitedUserName(String invitedUserName) {
-        this.invitedUserName = invitedUserName;
-    }
+//    public void setInvitedUserName(String invitedUserName) {
+//        this.invitedUserName = invitedUserName;
+//    }
 
     public String getInvitedUserName() {
         return invitedUserName;

@@ -7,7 +7,6 @@ public class GamePostDTO {
     private int maxStrikes;
     private int timePerRound;
 
-
     public Long getCreator_userid(){
         return creator_userid;
     }

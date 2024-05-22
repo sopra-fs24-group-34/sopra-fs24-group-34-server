@@ -11,78 +11,78 @@ import java.util.List;
 import java.util.Set;
 
 public class UserGetDTO {
-  // smailalijagic: all updatable data
-  private String password;
+    // smailalijagic: all updatable data
+    private String password;
 
-  private String username;
+    private String username;
 
-  private UserStatus status;
+    private UserStatus status;
 
-  private String profilePicture;
+    private String profilePicture;
 
-  private String token;
+    private String token;
 
-  private Long id;
+    private Long id;
 
-  private List<FriendRequest> friendRequests = new ArrayList<>();
+    private List<FriendRequest> friendRequests = new ArrayList<>();
 
-  private Set<FriendGetDTO> friendsList; // smailalijagic: adding and removing friends from friendlist
+    private Set<FriendGetDTO> friendsList; // smailalijagic: adding and removing friends from friendlist
 
-  private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
+    private List<Lobby> usergamelobbylist; // smailalijagic: adding lobbyId when creating a game to array
 
-  private Long totalplayed; // smailalijagic: natural number in range [0, n)
+    private Long totalplayed; // smailalijagic: natural number in range [0, n)
 
-  private Long totalwins; // smailalijagic: natural number in range [0, n)
+    private Long totalwins; // smailalijagic: natural number in range [0, n)
 
-  private List<LobbyInvitation> lobbyinvitations;
+    private List<LobbyInvitation> lobbyinvitations;
 
-  public String getPassword() {
-    return password;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-  public String getProfilePicture() {
-    return profilePicture;
-  }
+    public String getProfilePicture() {
+        return profilePicture;
+    }
 
-  public void setProfilePicture(String profilePicture) {
-    this.profilePicture = profilePicture;
-  }
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
 
-  public String getToken() {
-    return token;
-  }
+    public String getToken() {
+        return token;
+    }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setToken(String token) {
+        this.token = token;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public UserStatus getStatus() {
-    return status;
-  }
+    public UserStatus getStatus() {
+        return status;
+    }
 
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
 
     public void setFriendRequests(List<FriendRequest> friendRequests) {
         this.friendRequests = friendRequests;
@@ -93,40 +93,40 @@ public class UserGetDTO {
     }
 
     public Set<FriendGetDTO> getFriendsList() {
-    return friendsList;
-  }
-
-  public void setFriendsList(Set<FriendGetDTO> userfriendlist) {
-    this.friendsList = userfriendlist;
-  }
-
-  public List<Lobby> getUsergamelobbylist() {
-    return usergamelobbylist;
-  }
-
-  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
-    this.usergamelobbylist = usergamelobbylist;
-  }
-
-  public Long getTotalplayed() {
-    return totalplayed;
-  }
-
-  public void setTotalplayed(Long totalplayed) {
-    this.totalplayed = totalplayed;
-  }
-
-  public Long getTotalwins() {
-    return totalwins;
-  }
-
-  public void setTotalwins(Long totalwins) {
-    this.totalwins = totalwins;
-  }
-
-    public List<LobbyInvitation> getLobbyinvitations() {
-        return lobbyinvitations;
+        return friendsList;
     }
+
+    public void setFriendsList(Set<FriendGetDTO> userfriendlist) {
+        this.friendsList = userfriendlist;
+    }
+
+//    public List<Lobby> getUsergamelobbylist() {
+//        return usergamelobbylist;
+//    }
+
+//    public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
+//        this.usergamelobbylist = usergamelobbylist;
+//    }
+
+    public Long getTotalplayed() {
+        return totalplayed;
+    }
+
+    public void setTotalplayed(Long totalplayed) {
+        this.totalplayed = totalplayed;
+    }
+
+    public Long getTotalwins() {
+        return totalwins;
+    }
+
+    public void setTotalwins(Long totalwins) {
+        this.totalwins = totalwins;
+    }
+
+//    public List<LobbyInvitation> getLobbyinvitations() {
+//        return lobbyinvitations;
+//    }
 
     public void setLobbyinvitations(List<LobbyInvitation> Lobbyinvitations) {
         lobbyinvitations = Lobbyinvitations;

@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @SpringBootTest
 public class DTOMapperTest {
 
@@ -162,6 +167,8 @@ public class DTOMapperTest {
         userPutDTO.setId(1L);
         userPutDTO.setUsername("testUser");
         userPutDTO.setPassword("testPassword");
+        Set<User> friendlist = new HashSet<>();
+        userPutDTO.setFriendsList(friendlist);
 
         User user = dtoMapper.convertUserPutDTOtoEntity(userPutDTO);
 
