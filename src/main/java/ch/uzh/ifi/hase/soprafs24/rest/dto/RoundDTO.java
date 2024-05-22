@@ -5,9 +5,12 @@ public class RoundDTO {
     private int roundNumber;
     private Long currentTurnPlayerId;
 
-    public RoundDTO(int roundNumber, Long currentTurnPlayerId) {
+    private String event;
+
+    public RoundDTO(int roundNumber, Long currentTurnPlayerId, String event) {
         this.roundNumber = roundNumber;
         this.currentTurnPlayerId = currentTurnPlayerId;
+        this.event = event;
     }
 
     public int getRoundNumber() {
@@ -25,4 +28,9 @@ public class RoundDTO {
 //    public void setCurrentTurnPlayerId(Long currentTurnPlayerId) {
 //        this.currentTurnPlayerId = currentTurnPlayerId;
 //    }
+
+    public String getEvent() {
+        return event;
+    }
+
 }

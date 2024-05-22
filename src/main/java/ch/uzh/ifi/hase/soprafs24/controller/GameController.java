@@ -115,12 +115,29 @@ public class GameController {
     Response response = gameService.guessImage(guess);
 
     Game game = gameService.getGame(guessPostDTO.getGameid());
+    webSocketMessenger.sendMessage("/games/"+guess.getGameId(),"guess-result", response);
 
-    webSocketMessenger.sendMessage("/games/"+guess.getGameId(), "round-update", response);
+    RoundDTO roundDTO = gameService.updateTurn(guess.getGameId());
+
+    webSocketMessenger.sendMessage("/games/" + guess.getGameId(), roundDTO.getEvent(), roundDTO);
 
   }
 
-    // Endpoints regarding game-specific images
+    @MessageMapping("/switchTurn")
+    public void switchTurn(String stringJsonRequest) {
+        Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+        Long gameId = gson.fromJson(gson.toJson(requestMap.get("gameId")), Long.class);
+
+        RoundDTO roundDTO = gameService.updateTurn(gameId);
+
+        webSocketMessenger.sendMessage("/games/" + gameId, roundDTO.getEvent(), roundDTO);
+
+    }
+
+
+
+
+        // Endpoints regarding game-specific images
     @GetMapping("/games/{gameId}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
