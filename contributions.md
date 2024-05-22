@@ -85,7 +85,7 @@
 | Date | Name | Links to Github Issues | Comments |
 | ---- | ---- | ---------------------- | -------- |
 |      |      |                        |          |
-|      |      |                        |          |
+| 22.05.2024 | Dario Giuliani |                        | Bugfix [#136](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/136) Only host can replace images + new set of images is actually saved and used further|
 |      |      |                        |          |
 |      |      |                        |          |
 |      |      |                        |          |
