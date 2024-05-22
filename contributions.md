@@ -85,7 +85,7 @@
 | Date | Name | Links to Github Issues | Comments |
 | ---- | ---- | ---------------------- | -------- |
 |      | Smail Alijagic | [#180](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/180) | Finalizing tests, cleaning up code |
-| 22.05.2024 | Dario Giuliani |[#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184)                        | Bugfix [#136](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/136) Only host can replace images + new set of images is actually saved and used further, Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135)|
+| 22.05.2024 | Dario Giuliani |[#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184)                        | Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135)|
 |      |      |                        |          |
 |      |      |                        |          |
 |      |      |                        |          |
