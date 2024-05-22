@@ -42,6 +42,11 @@ public class Game implements Serializable {
     )
     private List<Image> gameImages; // images associated to a game
 
+    @Column
+    private boolean charactersAccepted;
+
+    public void setCharactersAccepted(boolean charactersAccepted) {this.charactersAccepted = charactersAccepted;}
+
     //@OneToOne(cascade = CascadeType.ALL)
     public Chat getChat() {
         return chat;

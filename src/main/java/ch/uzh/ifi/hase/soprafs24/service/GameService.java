@@ -162,6 +162,12 @@ public class GameService {
       return game;
   }
 
+    public void acceptCharacters(Long gameId) {
+        Game game = gameRepository.findByGameId(gameId);
+        game.setCharactersAccepted(true);
+        gameRepository.save(game);
+        gameRepository.flush();
+    }
   public Response guessImage(Guess guess){
     //till: check if game exists
     // checkIfGameExists(guess.getGameId());

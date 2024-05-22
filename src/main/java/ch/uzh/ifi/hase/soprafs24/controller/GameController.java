@@ -108,6 +108,15 @@ public class GameController {
 
   }
 
+    @MessageMapping("/acceptCharacters")
+    public void acceptCharacters(String stringJsonRequest) {
+        Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+        Long gameId = Long.parseLong((String) requestMap.get("gameId"));
+
+        gameService.acceptCharacters(gameId);
+        webSocketMessenger.sendMessage("/games/"+gameId, "acceptCharacters", true);
+    }
+
     // Endpoints regarding game-specific images
     @GetMapping("/games/{gameId}/images")
     @ResponseStatus(HttpStatus.OK)
