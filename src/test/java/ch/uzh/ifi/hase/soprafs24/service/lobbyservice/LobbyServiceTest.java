@@ -1,52 +1,238 @@
 package ch.uzh.ifi.hase.soprafs24.service.lobbyservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.AuthenticationService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
-
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-class LobbyServiceTest {
+@SpringBootTest
+public class LobbyServiceTest {
 
-    @Mock
-    private LobbyRepository lobbyRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private AuthenticationService authenticationService;
-
-    @Mock
-    private WebSocketMessenger webSocketMessenger;
-
-    @InjectMocks
+    @Autowired
     private LobbyService lobbyService;
 
+    @MockBean
+    private LobbyRepository lobbyRepository;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private AuthenticationService authenticationService;
+
+    @MockBean
+    private WebSocketMessenger webSocketMessenger;
+
+    private User testUser;
+    private Lobby testLobby;
+    private AuthenticationDTO authenticationDTO;
+
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    public void setup() {
+        testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+
+        testLobby = new Lobby();
+        testLobby.setLobbyid(1L);
+        testLobby.setCreatorUserId(1L);
+
+        authenticationDTO = new AuthenticationDTO();
+    }
+
+    @Test
+    public void testGetUsersSuccess() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(testUser));
+        List<User> users = lobbyService.getUsers();
+        assertEquals(1, users.size());
+        assertEquals(testUser.getUsername(), users.get(0).getUsername());
+    }
+
+    @Test
+    public void testGetUserSuccess() {
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        User user = lobbyService.getUser(1L);
+        assertEquals(testUser.getUsername(), user.getUsername());
+    }
+
+//    @Test
+//    public void testGetUserFailure() {
+//        when(userRepository.findUserById(1L)).thenReturn(null);
+//        assertThrows(ResponseStatusException.class, () -> {
+//            lobbyService.getUser(1L);
+//        });
+//    }
+
+    @Test
+    public void testCheckIfUserExistsTrue() {
+        when(userRepository.findByUsername(anyString())).thenReturn(testUser);
+        assertTrue(lobbyService.checkIfUserExists(testUser));
+    }
+
+    @Test
+    public void testCheckIfUserExistsFalse() {
+        when(userRepository.findByUsername(anyString())).thenReturn(null);
+        assertFalse(lobbyService.checkIfUserExists(testUser));
+    }
+
+    @Test
+    public void testGetLobbiesSuccess() {
+        when(lobbyRepository.findAll()).thenReturn(Arrays.asList(testLobby));
+        List<Lobby> lobbies = lobbyService.getLobbies();
+        assertEquals(1, lobbies.size());
+        assertEquals(testLobby.getLobbyid(), lobbies.get(0).getLobbyid());
+    }
+
+    @Test
+    public void testGetLobbySuccess() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        Lobby lobby = lobbyService.getLobby(1L);
+        assertEquals(testLobby.getLobbyid(), lobby.getLobbyid());
+    }
+
+//    @Test
+//    public void testGetLobbyFailure() {
+//        when(lobbyRepository.findByLobbyid(1L)).thenReturn(null);
+//        assertThrows(ResponseStatusException.class, () -> {
+//            lobbyService.getLobby(1L);
+//        });
+//    }
+
+    @Test
+    public void testCheckIfLobbyExistsTrue() {
+        when(lobbyRepository.existsByLobbyid(1L)).thenReturn(true);
+        assertTrue(lobbyService.checkIfLobbyExists(1L));
+    }
+
+    @Test
+    public void testCheckIfLobbyExistsFalse() {
+        when(lobbyRepository.existsByLobbyid(1L)).thenReturn(false);
+        assertFalse(lobbyService.checkIfLobbyExists(1L));
+    }
+
+    @Test
+    public void testIsLobbyOwnerTrue() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        when(authenticationService.isAuthenticated(any(User.class), any(AuthenticationDTO.class))).thenReturn(true);
+        assertTrue(lobbyService.isLobbyOwner(1L, authenticationDTO));
+    }
+
+    @Test
+    public void testIsLobbyOwnerFalse() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        when(authenticationService.isAuthenticated(any(User.class), any(AuthenticationDTO.class))).thenReturn(false);
+        assertFalse(lobbyService.isLobbyOwner(1L, authenticationDTO));
+    }
+
+    @Test
+    public void testCloseLobbySuccess() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        when(authenticationService.isAuthenticated(any(User.class), any(AuthenticationDTO.class))).thenReturn(true);
+        doNothing().when(lobbyRepository).delete(any(Lobby.class));
+        lobbyService.closeLobby(1L, authenticationDTO);
+        verify(lobbyRepository, times(1)).delete(any(Lobby.class));
+    }
+
+    @Test
+    public void testCloseLobbyFailure() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        when(authenticationService.isAuthenticated(any(User.class), any(AuthenticationDTO.class))).thenReturn(false);
+        lobbyService.closeLobby(1L, authenticationDTO);
+        verify(lobbyRepository, times(0)).delete(any(Lobby.class));
+    }
+
+    @Test
+    public void testCreateLobbySuccess() {
+        when(lobbyRepository.save(any(Lobby.class))).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        Long lobbyId = lobbyService.createLobby(1L);
+        assertEquals(testLobby.getLobbyid(), lobbyId);
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    public void testUpdateReadyStatusSuccess() {
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+        UserGetDTO userGetDTO = lobbyService.updateReadyStatus(1L, "INLOBBY_READY");
+        assertEquals(UserStatus.INLOBBY_READY, userGetDTO.getStatus());
+    }
+
+    @Test
+    public void testUpdateReadyStatusFailure() {
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        assertThrows(ResponseStatusException.class, () -> {
+            lobbyService.updateReadyStatus(1L, "INVALID_STATUS");
+        });
+    }
+
+    @Test
+    public void testAddUserToLobbySuccess() {
+        when(lobbyRepository.save(any(Lobby.class))).thenReturn(testLobby);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+        lobbyService.addUserToLobby(testLobby, testUser);
+        assertEquals(testUser.getId(), testLobby.getInvitedUserId());
+        verify(lobbyRepository, times(1)).save(any(Lobby.class));
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    public void testRemoveUserFromLobbySuccess() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        lobbyService.removeUserFromLobby(1L, 1L);
+        verify(lobbyRepository, times(1)).delete(any(Lobby.class));
+    }
+
+    @Test
+    public void testGetGameIdFromLobbyIdSuccess() {
+        Game testGame = new Game();
+        testGame.setGameId(1L);
+        testLobby.setGame(testGame);
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        Long gameId = lobbyService.getGameIdFromLobbyId(1L);
+        assertEquals(1L, gameId);
+    }
+
+    @Test
+    public void testTranslateAddUserToLobbySuccess() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(2L)).thenReturn(testUser);
+        lobbyService.translateAddUserToLobby(1L, 2L);
+        verify(webSocketMessenger, times(1)).sendMessage(anyString(), anyString(), any(User.class));
+    }
+
+    @Test
+    public void testTranslateAddUserToLobbyFailure() {
+        when(lobbyRepository.findByLobbyid(1L)).thenReturn(testLobby);
+        when(userRepository.findUserById(1L)).thenReturn(testUser);
+        lobbyService.translateAddUserToLobby(1L, 1L);
+        verify(webSocketMessenger, times(0)).sendMessage(anyString(), anyString(), any(User.class));
     }
 
     @Test
@@ -150,34 +336,6 @@ class LobbyServiceTest {
         assertFalse(isOwner);
     }
 
-
-//    @Test
-//    void testCloseLobby_WhenAuthenticatedAsOwner() {
-//        // Mock data
-//        Long lobbyId = 1L;
-//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//        when(authenticationService.isAuthenticated(any(), any())).thenReturn(true);
-//        when(lobbyRepository.findByLobbyid(lobbyId)).thenReturn(new Lobby());
-//
-//        // Call the method
-//        lobbyService.closeLobby(lobbyId, authenticationDTO);
-//
-//        // Verify the method calls
-//        verify(lobbyRepository).delete(any());
-//        verify(webSocketMessenger).sendMessage(anyString(), anyString(), any());
-//    }
-
-//    @Test
-//    void testCloseLobby_WhenNotAuthenticatedAsOwner() {
-//        // Mock data
-//        Long lobbyId = 1L;
-//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//        when(authenticationService.isAuthenticated(any(), any())).thenReturn(false);
-//
-//        // Call the method
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.closeLobby(lobbyId, authenticationDTO));
-//    }
-
     @Test
     void getLobby_throwsResponseStatusException_whenLobbyNotFound() {
         Long lobbyId = 1L;
@@ -266,16 +424,6 @@ class LobbyServiceTest {
         assertEquals(user, result);
     }
 
-//    @Test
-//    void testGetUser_WhenUserNotFound() {
-//        // Mock data
-//        Long userId = 1L;
-//        when(userRepository.findUserById(userId)).thenReturn(null);
-//
-//        // Call the method and verify exception
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.getUser(userId));
-//    }
-
     @Test
     void testCheckIfUserExists_WhenUserExists() {
         // Mock data
@@ -317,16 +465,6 @@ class LobbyServiceTest {
         assertEquals(lobby, result);
     }
 
-//    @Test
-//    void testGetLobby_WhenLobbyNotFound() {
-//        // Mock data
-//        Long lobbyId = 1L;
-//        when(lobbyRepository.findByLobbyid(lobbyId)).thenReturn(null);
-//
-//        // Call the method and verify exception
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.getLobby(lobbyId));
-//    }
-
     @Test
     void testGetUsers2() {
         // Given
@@ -354,27 +492,6 @@ class LobbyServiceTest {
         // Then
         assertEquals(user, retrievedUser);
     }
-
-//    @Test
-//    void testGetUser_UserNotFound() {
-//        // Given no user with ID 1
-//        when(userRepository.findUserById(1L)).thenReturn(null);
-//
-//        // When / Then
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.getUser(1L));
-//    }
-
-//    @Test
-//    void testCheckIfUserExists2() {
-//        // Given a user exists with the username
-//        when(userRepository.findByUsername("test")).thenReturn(new User());
-//
-//        // When
-//        boolean exists = lobbyService.checkIfUserExists(new User());
-//
-//        // Then
-//        assertTrue(exists);
-//    }
 
     @Test
     void testCheckIfUserExists_UserDoesNotExist() {
@@ -415,15 +532,6 @@ class LobbyServiceTest {
         // Then
         assertEquals(lobby, retrievedLobby);
     }
-
-//    @Test
-//    void testGetLobby_LobbyNotFound() {
-//        // Given no lobby with ID 1
-//        when(lobbyRepository.findByLobbyid(1L)).thenReturn(null);
-//
-//        // When / Then
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.getLobby(1L));
-//    }
 
     @Test
     void testCheckIfLobbyExists2() {
@@ -466,39 +574,4 @@ class LobbyServiceTest {
         // Then
         assertTrue(isOwner);
     }
-
-//    @Test
-//    void testCloseLobby_AsOwner() {
-//        // Given
-//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//        authenticationDTO.setId(1L);
-//        Lobby lobby = new Lobby();
-//        lobby.setLobbyid(1L);
-//        lobby.setCreator_userid(1L);
-//        when(lobbyRepository.findByLobbyid(1L)).thenReturn(lobby);
-//        doNothing().when(lobbyRepository).delete(lobby);
-//
-//        // When
-//        lobbyService.closeLobby(1L, authenticationDTO);
-//
-//        // Then
-//        verify(lobbyRepository, times(1)).delete(lobby);
-//    }
-
-//    @Test
-//    void testCloseLobby_AsNonOwner() {
-//        // Given
-//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//        authenticationDTO.setId(2L); // Not the owner
-//        Lobby lobby = new Lobby();
-//        lobby.setLobbyid(1L);
-//        lobby.setCreator_userid(1L);
-//        when(lobbyRepository.findByLobbyid(1L)).thenReturn(lobby);
-//
-//        // When / Then
-//        assertThrows(ResponseStatusException.class, () -> lobbyService.closeLobby(1L, authenticationDTO));
-//        verify(lobbyRepository, never()).delete(any());
-//    }
-
-
 }
