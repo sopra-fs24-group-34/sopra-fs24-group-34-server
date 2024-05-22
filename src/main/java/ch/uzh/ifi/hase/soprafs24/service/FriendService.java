@@ -124,6 +124,9 @@ public class FriendService {
     }
 
     public List<Friend> getFriends(User user) {
+        return user.getFriendsList();
+    }
+    public List<Friend> getOnlineFriends(User user) {
         List<Friend> friends = user.getFriendsList();
         List<Friend> invitablefriends = new ArrayList<>();
         for (Friend friend : friends){
@@ -166,6 +169,10 @@ public class FriendService {
             if (lobbyInvitation.getCreatorId().equals(creator.getId())) {
                 return;
             }
+        }
+        //till: check if invited User is null
+        if (lobbyRepository.findByLobbyid(lobbyId).getInvited_userid() != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The lobby is already full");
         }
         LobbyInvitation invitation = new LobbyInvitation();
         invitation.setCreatorUsername(creator.getUsername());

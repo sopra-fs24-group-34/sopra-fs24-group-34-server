@@ -88,6 +88,16 @@ public class FriendController {
         return friendService.getFriends(user);
     }
 
+    @GetMapping("/users/{userId}/friends/online")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<Friend> getAllOnlineFriends(@PathVariable Long userId) {
+        User user = userService.getUser(userId);
+        return friendService.getOnlineFriends(user);
+    }
+
+
+
     // Get all friend requests
     @GetMapping("/users/{userId}/friends/requests")
     @ResponseStatus(HttpStatus.OK)
