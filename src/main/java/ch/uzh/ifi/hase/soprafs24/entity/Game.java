@@ -25,9 +25,6 @@ public class Game implements Serializable {
     @Column(nullable = true)
     private int maxStrikes; // smailalijagic: handle guesses for each player in frontend
 
-    @Column(nullable = true)
-    private int timePerRound; // smailalijagic:
-
     @Column
     private int currentRound;
 
@@ -63,14 +60,6 @@ public class Game implements Serializable {
 
     public void setMaxStrikes(int maxguesses) {
         this.maxStrikes = maxguesses;
-    }
-
-    public int getTimePerRound() {
-        return timePerRound;
-    }
-
-    public void setTimePerRound(int timePerRound) {
-        this.timePerRound = timePerRound;
     }
 
     public Long getCreatorPlayerId() {

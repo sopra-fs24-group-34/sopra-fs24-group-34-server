@@ -126,7 +126,6 @@ public interface DTOMapper {
     @Mapping(source = "creator_userid", target = "creatorPlayerId")
     @Mapping(source = "invited_userid", target = "invitedPlayerId")
     @Mapping(source = "maxStrikes", target = "maxStrikes")
-    @Mapping(source = "timePerRound", target = "timePerRound")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
 

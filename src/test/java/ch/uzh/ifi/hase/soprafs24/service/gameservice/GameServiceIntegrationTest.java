@@ -92,14 +92,12 @@ public class GameServiceIntegrationTest {
         createdgame.setCreatorPlayerId(1L);
         createdgame.setInvitedPlayerId(2L);
         createdgame.setMaxStrikes(3);
-        createdgame.setTimePerRound(30);
 
         gamerepository.save(createdgame);
         gamerepository.flush();
 
         gamePostDTO = new GamePostDTO();
         gamePostDTO.setMaxStrikes(3);
-        gamePostDTO.setTimePerRound(30);
         gamePostDTO.setCreator_userid(1L);
         gamePostDTO.setInvited_userid(2L);
     }

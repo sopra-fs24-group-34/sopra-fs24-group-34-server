@@ -53,15 +53,4 @@ public class GameTest {
         assertEquals(20L, game.getInvitedPlayerId());
     }
 
-    @Test
-    public void testSetGuessingTimeSuccess() {
-        // Create a Game instance
-        Game game = new Game();
-
-        // Set guessingTime
-        game.setTimePerRound(30);
-
-        // Verify guessingTime
-        assertEquals(30, game.getTimePerRound());
-    }
 }
