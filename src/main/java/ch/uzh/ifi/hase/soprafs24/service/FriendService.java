@@ -6,7 +6,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -171,7 +170,7 @@ public class FriendService {
             }
         }
         //till: check if invited User is null
-        if (lobbyRepository.findByLobbyid(lobbyId).getInvited_userid() != null){
+        if (lobbyRepository.findByLobbyid(lobbyId).getInvitedUserId() != null){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The lobby is already full");
         }
         LobbyInvitation invitation = new LobbyInvitation();

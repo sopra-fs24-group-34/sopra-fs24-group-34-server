@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Table(name = "LOBBY")
@@ -14,9 +13,9 @@ public class Lobby implements Serializable {
     private Long lobbyid;
 
     //@ManyToOne(cascade = CascadeType.ALL)
-    private Long creator_userid; // smailalijagic: every lobby belongs to exactly one user
+    private Long creatorUserId; // smailalijagic: every lobby belongs to exactly one user
 
-    private Long invited_userid; // smailalijagic: every lobby can hold two players
+    private Long invitedUserId; // smailalijagic: every lobby can hold two players
 
     private String lobbyToken;
 
@@ -31,12 +30,12 @@ public class Lobby implements Serializable {
         this.lobbyid = lobbyid;
     }
 
-    public Long getCreator_userid() {
-        return creator_userid;
+    public Long getCreatorUserId() {
+        return creatorUserId;
     }
 
-    public void setCreator_userid(Long creator_userid) {
-        this.creator_userid = creator_userid;
+    public void setCreatorUserId(Long creator_userid) {
+        this.creatorUserId = creator_userid;
     }
 
     public String getlobbyToken(){
@@ -47,12 +46,12 @@ public class Lobby implements Serializable {
         this.lobbyToken = lobbyToken;
     }
 
-    public Long getInvited_userid() {
-        return invited_userid;
+    public Long getInvitedUserId() {
+        return invitedUserId;
     }
 
-    public void setInvited_userid(Long invited_userid) {
-        this.invited_userid = invited_userid;
+    public void setInvitedUserId(Long invited_userid) {
+        this.invitedUserId = invited_userid;
     }
 
     public Game getGame() {

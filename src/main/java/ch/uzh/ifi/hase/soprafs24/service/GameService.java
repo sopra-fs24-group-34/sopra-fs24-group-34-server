@@ -76,7 +76,7 @@ public class GameService {
           gameRepository.save(game);
       }
 
-      RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+      RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), "");
 
       // response is probably unnecessary
     return roundDTO;}
@@ -95,13 +95,15 @@ public class GameService {
         Long nextTurnPlayerId = currentTurnPlayerId.equals(game.getCreatorPlayerId()) ? game.getInvitedPlayerId() : game.getCreatorPlayerId();
         game.setCurrentTurnPlayerId(nextTurnPlayerId);
 
+        String event;
         if (nextTurnPlayerId.equals(game.getInvitedPlayerId())) {
+            event = "round-update";
             game.setCurrentRound(game.getCurrentRound() + 1);
-        }
+        } else {event = "turn-update";}
         gameRepository.save(game);
         gameRepository.flush();
 
-        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), event);
     }
 
 
@@ -187,9 +189,8 @@ public class GameService {
             int strikes = gameUserService.getStrikes(playerId);
             GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId());
 
-            RoundDTO roundDTO = updateTurn(game.getGameId());
             if(gameStatus != GameStatus.END) {
-                return gameUserService.createResponse(false, playerId, strikes, gameStatus, roundDTO);
+                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
             }
             else {
                 Response r = handleLoss(playerId, game.getGameId());
@@ -203,7 +204,7 @@ public class GameService {
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
-        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId());
+        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(),"");
   }
 
   public Response handleWin(Long playerId, Long gameId) {
@@ -213,7 +214,7 @@ public class GameService {
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikes(playerId);
     RoundDTO roundDTO = updateTurn(gameId);
-    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END, roundDTO);
+    return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
 
   public Response handleLoss(Long playerId, Long gameId) {
@@ -223,7 +224,7 @@ public class GameService {
     int strikes = gameUserService.getStrikes(playerId);
 
     RoundDTO roundDTO = updateTurn(gameId);
-    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END, roundDTO);
+    return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
 }
 
   public void deleteGame(Game game) {

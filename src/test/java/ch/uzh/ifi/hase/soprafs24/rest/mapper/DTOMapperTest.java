@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @SpringBootTest
@@ -315,46 +313,46 @@ public class DTOMapperTest {
     public void testConvertEntityToLobbyGetDTOSuccess() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(1L);
-        lobby.setCreator_userid(2L);
-        lobby.setInvited_userid(3L);
+        lobby.setCreatorUserId(2L);
+        lobby.setInvitedUserId(3L);
 
         LobbyGetDTO lobbyGetDTO = dtoMapper.convertEntityToLobbyGetDTO(lobby);
 
         assertNotNull(lobbyGetDTO);
         assertEquals(1L, lobbyGetDTO.getId());
-        assertEquals(2L, lobbyGetDTO.getCreator_userid());
-        assertEquals(3L, lobbyGetDTO.getInvited_userid());
+        assertEquals(2L, lobbyGetDTO.getCreatorUserId());
+        assertEquals(3L, lobbyGetDTO.getInvitedUserId());
     }
 
     @Test
     public void testConvertEntityToLobbyGetDTOFailure() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(null);
-        lobby.setCreator_userid(null);
-        lobby.setInvited_userid(null);
+        lobby.setCreatorUserId(null);
+        lobby.setInvitedUserId(null);
 
         LobbyGetDTO lobbyGetDTO = dtoMapper.convertEntityToLobbyGetDTO(lobby);
 
         assertNotNull(lobbyGetDTO);
         assertNull(lobbyGetDTO.getId());
-        assertNull(lobbyGetDTO.getCreator_userid());
-        assertNull(lobbyGetDTO.getInvited_userid());
+        assertNull(lobbyGetDTO.getCreatorUserId());
+        assertNull(lobbyGetDTO.getInvitedUserId());
     }
 
     @Test
     public void testConvertEntityToLobbyPutDTOSuccess() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(1L);
-        lobby.setCreator_userid(2L);
-        lobby.setInvited_userid(3L);
+        lobby.setCreatorUserId(2L);
+        lobby.setInvitedUserId(3L);
         //lobby.setLobbyToken("lobbyToken123");
 
         LobbyPutDTO lobbyPutDTO = dtoMapper.convertEntityToLobbyPutDTO(lobby);
 
         assertNotNull(lobbyPutDTO);
         assertEquals(1L, lobbyPutDTO.getId());
-        assertEquals(2L, lobbyPutDTO.getCreator_userid());
-        assertEquals(3L, lobbyPutDTO.getInvited_userid());
+        assertEquals(2L, lobbyPutDTO.getCreatorUserId());
+        assertEquals(3L, lobbyPutDTO.getInvitedUserId());
         //assertEquals("lobbyToken123", lobbyPutDTO.getLobbyToken());
     }
 
@@ -362,16 +360,16 @@ public class DTOMapperTest {
     public void testConvertEntityToLobbyPutDTOFailure() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(null);
-        lobby.setCreator_userid(null);
-        lobby.setInvited_userid(null);
+        lobby.setCreatorUserId(null);
+        lobby.setInvitedUserId(null);
         //lobby.setLobbyToken(null);
 
         LobbyPutDTO lobbyPutDTO = dtoMapper.convertEntityToLobbyPutDTO(lobby);
 
         assertNotNull(lobbyPutDTO);
         assertNull(lobbyPutDTO.getId());
-        assertNull(lobbyPutDTO.getCreator_userid());
-        assertNull(lobbyPutDTO.getInvited_userid());
+        assertNull(lobbyPutDTO.getCreatorUserId());
+        assertNull(lobbyPutDTO.getInvitedUserId());
         //assertNull(lobbyPutDTO.getLobbyToken());
     }
 
@@ -379,27 +377,27 @@ public class DTOMapperTest {
     public void testConvertEntityToLobbyPostDTOSuccess() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(1L);
-        lobby.setCreator_userid(2L);
-        lobby.setInvited_userid(3L);
+        lobby.setCreatorUserId(2L);
+        lobby.setInvitedUserId(3L);
 
         LobbyPostDTO lobbyPostDTO = dtoMapper.convertEntityToLobbyPostDTO(lobby);
 
         assertNotNull(lobbyPostDTO);
         assertEquals(1L, lobbyPostDTO.getId());
-        assertEquals(2L, lobbyPostDTO.getCreator_userid());
+        assertEquals(2L, lobbyPostDTO.getCreatorUserId());
     }
 
     @Test
     public void testConvertEntityToLobbyPostDTOFailure() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(null);
-        lobby.setCreator_userid(null);
+        lobby.setCreatorUserId(null);
 
         LobbyPostDTO lobbyPostDTO = dtoMapper.convertEntityToLobbyPostDTO(lobby);
 
         assertNotNull(lobbyPostDTO);
         assertNull(lobbyPostDTO.getId());
-        assertNull(lobbyPostDTO.getCreator_userid());
+        assertNull(lobbyPostDTO.getCreatorUserId());
     }
 
     @Test
@@ -448,8 +446,8 @@ public class DTOMapperTest {
     @Test
     public void testConvertGamePostDTOtoEntitySuccess() {
         GamePostDTO gamePostDTO = new GamePostDTO();
-        gamePostDTO.setCreator_userid(1L);
-        gamePostDTO.setInvited_userid(2L);
+        gamePostDTO.setCreatorUserId(1L);
+        gamePostDTO.setInvitedUserId(2L);
         gamePostDTO.setMaxStrikes(3);
 
         Game game = dtoMapper.convertGamePostDTOtoEntity(gamePostDTO);
@@ -463,8 +461,8 @@ public class DTOMapperTest {
     @Test
     public void testConvertGamePostDTOtoEntityFailure() {
         GamePostDTO gamePostDTO = new GamePostDTO();
-        gamePostDTO.setCreator_userid(null);
-        gamePostDTO.setInvited_userid(null);
+        gamePostDTO.setCreatorUserId(null);
+        gamePostDTO.setInvitedUserId(null);
         gamePostDTO.setMaxStrikes(0);
 
         Game game = dtoMapper.convertGamePostDTOtoEntity(gamePostDTO);
@@ -752,8 +750,8 @@ public class DTOMapperTest {
         // Given
         Lobby lobby = new Lobby();
         lobby.setLobbyid(123L);
-        lobby.setCreator_userid(456L);
-        lobby.setInvited_userid(789L);
+        lobby.setCreatorUserId(456L);
+        lobby.setInvitedUserId(789L);
 
         // When
         LobbyGetDTO lobbyGetDTO = dtoMapper.convertEntityToLobbyGetDTO(lobby);
@@ -761,8 +759,8 @@ public class DTOMapperTest {
         // Then
         assertNotNull(lobbyGetDTO);
         assertEquals(123L, lobbyGetDTO.getId());
-        assertEquals(456L, lobbyGetDTO.getCreator_userid());
-        assertEquals(789L, lobbyGetDTO.getInvited_userid());
+        assertEquals(456L, lobbyGetDTO.getCreatorUserId());
+        assertEquals(789L, lobbyGetDTO.getInvitedUserId());
     }
 
     @Test
@@ -770,8 +768,8 @@ public class DTOMapperTest {
         // Given
         Lobby lobby = new Lobby();
         lobby.setLobbyid(123L);
-        lobby.setCreator_userid(456L);
-        lobby.setInvited_userid(789L);
+        lobby.setCreatorUserId(456L);
+        lobby.setInvitedUserId(789L);
 
         // When
         LobbyPutDTO lobbyPutDTO = dtoMapper.convertEntityToLobbyPutDTO(lobby);
@@ -779,8 +777,8 @@ public class DTOMapperTest {
         // Then
         assertNotNull(lobbyPutDTO);
         assertEquals(123L, lobbyPutDTO.getId());
-        assertEquals(456L, lobbyPutDTO.getCreator_userid());
-        assertEquals(789L, lobbyPutDTO.getInvited_userid());
+        assertEquals(456L, lobbyPutDTO.getCreatorUserId());
+        assertEquals(789L, lobbyPutDTO.getInvitedUserId());
     }
 
     @Test
@@ -788,7 +786,7 @@ public class DTOMapperTest {
         // Given
         Lobby lobby = new Lobby();
         lobby.setLobbyid(123L);
-        lobby.setCreator_userid(456L);
+        lobby.setCreatorUserId(456L);
         //lobby.setInvited_userid(789L);
 
         // When
@@ -797,7 +795,7 @@ public class DTOMapperTest {
         // Then
         assertNotNull(lobbyPostDTO);
         assertEquals(123L, lobbyPostDTO.getId());
-        assertEquals(456L, lobbyPostDTO.getCreator_userid());
+        assertEquals(456L, lobbyPostDTO.getCreatorUserId());
         //assertEquals(789L, lobbyPostDTO.getInvited_userid());
     }
 
@@ -839,8 +837,8 @@ public class DTOMapperTest {
     public void testconvertGamePostDTOtoEntity() {
         // Given
         GamePostDTO gamePostDTO = new GamePostDTO();
-        gamePostDTO.setCreator_userid(123L);
-        gamePostDTO.setInvited_userid(456L);
+        gamePostDTO.setCreatorUserId(123L);
+        gamePostDTO.setInvitedUserId(456L);
         gamePostDTO.setMaxStrikes(3);
 
         // When

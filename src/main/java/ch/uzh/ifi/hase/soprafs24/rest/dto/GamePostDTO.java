@@ -2,24 +2,24 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 public class GamePostDTO {
 
-    private Long creator_userid;
-    private Long invited_userid;
+    private Long creatorUserId;
+    private Long invitedUserId;
     private int maxStrikes;
 
-    public Long getCreator_userid(){
-        return creator_userid;
+    public Long getCreatorUserId(){
+        return creatorUserId;
     }
 
-    public void setCreator_userid(Long creator_userid){
-        this.creator_userid = creator_userid;
+    public void setCreatorUserId(Long creatorUserId){
+        this.creatorUserId = creatorUserId;
     }
 
-    public Long getInvited_userid() {
-        return invited_userid;
+    public Long getInvitedUserId() {
+        return invitedUserId;
     }
 
-    public void setInvited_userid(Long invited_userid) {
-        this.invited_userid = invited_userid;
+    public void setInvitedUserId(Long invitedUserId) {
+        this.invitedUserId = invitedUserId;
     }
 
     public void setMaxStrikes(int maxStrikes) {

@@ -90,25 +90,25 @@ public interface DTOMapper {
     ImageDTO convertEntityToImageDTO(Image image); // dario added for Image
 
     @Mapping(source = "lobbyid", target = "id")
-    @Mapping(source = "creator_userid", target = "creator_userid")
-    @Mapping(source = "invited_userid", target = "invited_userid")
+    @Mapping(source = "creatorUserId", target = "creatorUserId")
+    @Mapping(source = "invitedUserId", target = "invitedUserId")
     LobbyGetDTO convertEntityToLobbyGetDTO(Lobby lobby);
     // source = Lobby, target = LobbyGetDTO
 
     @Mapping(source = "lobbyid", target = "id")
-    @Mapping(source = "creator_userid", target = "creator_userid")
-    @Mapping(source = "invited_userid", target = "invited_userid")
+    @Mapping(source = "creatorUserId", target = "creatorUserId")
+    @Mapping(source = "invitedUserId", target = "invitedUserId")
     @Mapping(source = "lobbyToken", target = "lobbyToken")
     LobbyPutDTO convertEntityToLobbyPutDTO(Lobby lobby);
 
     @Mapping(source = "lobbyid", target = "id")
-    @Mapping(source = "creator_userid", target = "creator_userid")
+    @Mapping(source = "creatorUserId", target = "creatorUserId")
     LobbyPostDTO convertEntityToLobbyPostDTO(Lobby lobby);
     // source = Lobby, target = LobbyGetDTO
 
 //  @Mapping(source = "id", target = "lobbyid")
-//  @Mapping(source = "creator_userid", target = "creator_userid")
-//  @Mapping(source = "invited_userid", target = "invited_userid")
+//  @Mapping(source = "creatorUserId", target = "creatorUserId")
+//  @Mapping(source = "invitedUserId", target = "invitedUserId")
 //  @Mapping(source = "lobbyToken", target = "lobbyToken")
 //  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
@@ -123,11 +123,17 @@ public interface DTOMapper {
     ResponsePostDTO convertEntitytoReponsePostDTO(Response response);
 
 
-    @Mapping(source = "creator_userid", target = "creatorPlayerId")
-    @Mapping(source = "invited_userid", target = "invitedPlayerId")
+    @Mapping(source = "creatorUserId", target = "creatorPlayerId")
+    @Mapping(source = "invitedUserId", target = "invitedPlayerId")
     @Mapping(source = "maxStrikes", target = "maxStrikes")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
     // source = GamePostDTO, target = Game
+
+    @Mapping(source = "gameId", target = "gameId")
+    @Mapping(source = "creatorPlayerId", target = "creatorPlayerId")
+    @Mapping(source = "invitedPlayerId", target = "invitedPlayerId")
+    @Mapping(source = "maxStrikes", target = "maxStrikes")
+    GameGetDTO convertEntityToGameGetDTO(Game game);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "id", target = "id")
