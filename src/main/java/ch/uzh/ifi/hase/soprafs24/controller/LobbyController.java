@@ -33,10 +33,10 @@ public class LobbyController {
         this.gameUserService = gameUserService;
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<String> handleException(Exception ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+//    }
 
     @GetMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
@@ -100,16 +100,42 @@ public class LobbyController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void joinLobby(@PathVariable("lobbyId") String id1, @PathVariable("userId") String id2) {
+        Long lobbyId = Long.valueOf(id1);
+        Long userId = Long.valueOf(id2);
+
+        if (!lobbyService.checkIfLobbyExists(lobbyId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby with ID " + lobbyId + " does not exist");
+        }
+
+        Lobby lobby = lobbyService.getLobby(lobbyId);
+        if (lobby.getInvited_userid() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
+        } else {
+            User user = lobbyService.getUser(userId);
+            lobbyService.addUserToLobby(lobby, user);
+            user.setStatus(UserStatus.INLOBBY_PREPARING);
+            gameUserService.saveUserChanges(user);
+
+            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+            webSocketMessenger.sendMessage("/lobbies/" + lobbyId, "user-joined", u);
+        }
+
+        /*
         // smailalijagic: update lobby for guest
         // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
         Long lobbyId = Long.valueOf(id1);
         Long userId = Long.valueOf(id2);
 
-        if (lobbyService.checkIfLobbyExists(lobbyId)) {
-            Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
-            if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
-                throw new ResponseStatusException(HttpStatus.IM_USED, "Lobby code is not valid anymore or already in use");
-            }
+        if (!lobbyService.checkIfLobbyExists(lobbyId) || lobbyService.checkIfLobbyExists(lobbyId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby with ID " + lobbyId + " does not exist"); // Throw RuntimeException if lobby doesn't exist
+        }
+
+        Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+
+        if (lobby.getInvited_userid() != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
+        }
+        else {
             User user = lobbyService.getUser(userId); // smailalijagic: get user
             lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
             user.setStatus(UserStatus.INLOBBY_PREPARING);
@@ -118,10 +144,29 @@ public class LobbyController {
             UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 
             webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
-
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
         }
+
+        */
+
+
+//        if (lobbyService.checkIfLobbyExists(lobbyId)) {
+//            Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
+//            if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
+//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
+//            }
+//            User user = lobbyService.getUser(userId); // smailalijagic: get user
+//            lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
+//            user.setStatus(UserStatus.INLOBBY_PREPARING);
+//            gameUserService.saveUserChanges(user);
+//
+//            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+//
+//            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
+//
+//        } else {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
+//        }
+
     }
 
     @MessageMapping("/updateReadyStatus")

@@ -72,7 +72,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         }
         if (newUser.getUsername() == null || newUser.getPassword() == null) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Password or username was not set");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Password or username was not set");
         }
         newUser.setStatus(UserStatus.ONLINE);
         newUser.setToken(UUID.randomUUID().toString());
