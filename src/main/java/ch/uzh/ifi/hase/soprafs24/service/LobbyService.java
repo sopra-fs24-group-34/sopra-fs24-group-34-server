@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
@@ -90,7 +89,7 @@ public class LobbyService {
 
   public Boolean isLobbyOwner(Long lobbyid, AuthenticationDTO authenticationDTO) {
     Lobby lobby = lobbyRepository.findByLobbyid(lobbyid);
-    User host = getUser(lobby.getCreator_userid());
+    User host = getUser(lobby.getCreatorUserId());
     return authenticationService.isAuthenticated(host, authenticationDTO);
   }
 
@@ -111,7 +110,7 @@ public class LobbyService {
   public Long createLobby(Long userId){
     Lobby newlobby = new Lobby();
     newlobby.setToken(UUID.randomUUID().toString());
-    newlobby.setCreator_userid(userId);
+    newlobby.setCreatorUserId(userId);
 
     newlobby = lobbyRepository.save(newlobby);
     lobbyRepository.flush();
@@ -152,7 +151,7 @@ public class LobbyService {
 
   public void addUserToLobby(Lobby lobby, User user) {
     Long userId = user.getId();
-    lobby.setInvited_userid(userId);
+    lobby.setInvitedUserId(userId);
     lobby = lobbyRepository.save(lobby);
     lobbyRepository.flush();
     user.setStatus(UserStatus.INLOBBY_PREPARING);
@@ -166,24 +165,24 @@ public class LobbyService {
         Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
         UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(userRepository.findUserById(userId));
 
-        if(Objects.equals(lobby.getCreator_userid(), userId)) {
+        if(Objects.equals(lobby.getCreatorUserId(), userId)) {
             User host = userRepository.findUserById(userId);
             host.setStatus(UserStatus.ONLINE);
             userRepository.save(host);
             try {
-                User guest = userRepository.findUserById(lobby.getInvited_userid());
+                User guest = userRepository.findUserById(lobby.getInvitedUserId());
                 guest.setStatus(UserStatus.ONLINE);
                 userRepository.save(guest);
             } catch (Exception e) {
                 log.debug("No guest in lobby");
             }
             userRepository.flush();
-            lobby.setCreator_userid(null);
-            lobby.setInvited_userid(null);
+            lobby.setCreatorUserId(null);
+            lobby.setInvitedUserId(null);
             webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "lobby-closed", "");
             deleteLobby(lobby);
-        } else if(Objects.equals(lobby.getInvited_userid(), userId)) {
-            lobby.setInvited_userid(null);
+        } else if(Objects.equals(lobby.getInvitedUserId(), userId)) {
+            lobby.setInvitedUserId(null);
             userRepository.findUserById(userId).setStatus(UserStatus.ONLINE);
             webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-left", userGetDTO);
         }
@@ -201,8 +200,8 @@ public Long getGameIdFromLobbyId(Long lobbyId) {
 public void translateAddUserToLobby(Long lobbyId, Long userId) {
       Lobby lobby = lobbyRepository.findByLobbyid(lobbyId);
       User user = userRepository.findUserById(userId);
-      if(!Objects.equals(userId, lobby.getCreator_userid()) &&
-              !Objects.equals(userId, lobby.getInvited_userid())) {
+      if(!Objects.equals(userId, lobby.getCreatorUserId()) &&
+              !Objects.equals(userId, lobby.getInvitedUserId())) {
           addUserToLobby(lobby, user);
           webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", user);
       }

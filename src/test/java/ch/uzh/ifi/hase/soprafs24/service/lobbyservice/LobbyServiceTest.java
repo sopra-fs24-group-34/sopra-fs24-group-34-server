@@ -10,18 +10,21 @@ import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.service.AuthenticationService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
+
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class LobbyServiceTest {
@@ -121,7 +124,7 @@ class LobbyServiceTest {
         Long userId = 1L;
         AuthenticationDTO authenticationDTO = new AuthenticationDTO();
         Lobby lobby = new Lobby();
-        lobby.setCreator_userid(userId);
+        lobby.setCreatorUserId(userId);
         when(lobbyRepository.findByLobbyid(lobbyId)).thenReturn(lobby);
         when(authenticationService.isAuthenticated(any(), any())).thenReturn(true);
 
@@ -451,7 +454,7 @@ class LobbyServiceTest {
         // Given
         AuthenticationDTO authenticationDTO = new AuthenticationDTO();
         Lobby lobby = new Lobby();
-        lobby.setCreator_userid(1L);
+        lobby.setCreatorUserId(1L);
         User host = new User();
         when(lobbyRepository.findByLobbyid(1L)).thenReturn(lobby);
         when(userRepository.findUserById(1L)).thenReturn(host);

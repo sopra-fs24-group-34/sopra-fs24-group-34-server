@@ -73,8 +73,8 @@ public class GameServiceTest {
         testGuess.setImageId(1L);
 
         gamePostDTO = new GamePostDTO();
-        gamePostDTO.setCreator_userid(1L);
-        gamePostDTO.setInvited_userid(2L);
+        gamePostDTO.setCreatorUserId(1L);
+        gamePostDTO.setInvitedUserId(2L);
 
         authDTO = new AuthenticationDTO();
         authDTO.setId(1L);

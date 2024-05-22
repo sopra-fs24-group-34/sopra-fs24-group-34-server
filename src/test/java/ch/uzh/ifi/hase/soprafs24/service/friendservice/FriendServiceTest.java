@@ -1,25 +1,18 @@
 package ch.uzh.ifi.hase.soprafs24.service.friendservice;
 
-import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
-import ch.uzh.ifi.hase.soprafs24.service.GameService;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
-import org.hibernate.annotations.common.util.impl.Log_$logger;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -243,7 +236,7 @@ public class FriendServiceTest {
     public void inviteFriendToLobby_validInputs() {
         Lobby lobby = new Lobby();
         lobby.setLobbyid(3L);
-        lobby.setCreator_userid(1L);
+        lobby.setCreatorUserId(1L);
 
         creator.setStatus(UserStatus.INLOBBY_PREPARING);
         invitedUser.setStatus(UserStatus.ONLINE);
@@ -268,7 +261,7 @@ public class FriendServiceTest {
         creator.setStatus(UserStatus.INLOBBY_PREPARING);
         Lobby lobby = new Lobby();
         lobby.setLobbyid(3L);
-        lobby.setCreator_userid(1L);
+        lobby.setCreatorUserId(1L);
         LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
         lobbyInvitationPutDTO.setAnswer(true);
         lobbyInvitationPutDTO.setLobbyId(3L);
@@ -293,7 +286,7 @@ public class FriendServiceTest {
         creator.setStatus(UserStatus.ONLINE);
         Lobby lobby = new Lobby();
         lobby.setLobbyid(3L);
-        lobby.setCreator_userid(1L);
+        lobby.setCreatorUserId(1L);
         LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
         lobbyInvitationPutDTO.setAnswer(true);
         lobbyInvitationPutDTO.setLobbyId(3L);

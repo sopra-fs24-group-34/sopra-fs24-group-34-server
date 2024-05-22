@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -22,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -80,8 +78,8 @@ public class GameServiceIntegrationTest {
         userRepository.flush();
 
         lobby = new Lobby();
-        lobby.setCreator_userid(creator.getId());
-        lobby.setInvited_userid(invited.getId());
+        lobby.setCreatorUserId(creator.getId());
+        lobby.setInvitedUserId(invited.getId());
         lobby.setLobbyid(3L);
 
         lobbyRepository.save(lobby);
@@ -98,8 +96,8 @@ public class GameServiceIntegrationTest {
 
         gamePostDTO = new GamePostDTO();
         gamePostDTO.setMaxStrikes(3);
-        gamePostDTO.setCreator_userid(1L);
-        gamePostDTO.setInvited_userid(2L);
+        gamePostDTO.setCreatorUserId(1L);
+        gamePostDTO.setInvitedUserId(2L);
     }
 
     @AfterEach

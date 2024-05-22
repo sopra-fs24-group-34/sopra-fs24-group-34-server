@@ -1,19 +1,13 @@
 package ch.uzh.ifi.hase.soprafs24.service;
 
-import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
-import ch.uzh.ifi.hase.soprafs24.service.GameService;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -69,8 +63,8 @@ public class GameServiceIntegrationTest {
         userRepository.flush();
 
         lobby = new Lobby();
-        lobby.setCreator_userid(creator.getId());
-        lobby.setInvited_userid(invited.getId());
+        lobby.setCreatorUserId(creator.getId());
+        lobby.setInvitedUserId(invited.getId());
         lobby.setLobbyid(3L);
 
         lobbyRepository.save(lobby);

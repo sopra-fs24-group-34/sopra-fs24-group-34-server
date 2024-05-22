@@ -108,7 +108,7 @@ public class LobbyController {
         }
 
         Lobby lobby = lobbyService.getLobby(lobbyId);
-        if (lobby.getInvited_userid() != null) {
+        if (lobby.getInvitedUserId() != null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
         } else {
             User user = lobbyService.getUser(userId);

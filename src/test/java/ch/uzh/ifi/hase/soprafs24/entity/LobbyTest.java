@@ -23,10 +23,10 @@ public class LobbyTest {
         Lobby lobby = new Lobby();
 
         // Set creatorUserId
-        lobby.setCreator_userid(2L);
+        lobby.setCreatorUserId(2L);
 
         // Verify creatorUserId
-        assertEquals(2L, lobby.getCreator_userid());
+        assertEquals(2L, lobby.getCreatorUserId());
     }
 
     @Test
@@ -35,10 +35,10 @@ public class LobbyTest {
         Lobby lobby = new Lobby();
 
         // Set invitedUserId
-        lobby.setInvited_userid(3L);
+        lobby.setInvitedUserId(3L);
 
         // Verify invitedUserId
-        assertEquals(3L, lobby.getInvited_userid());
+        assertEquals(3L, lobby.getInvitedUserId());
     }
 
     @Test

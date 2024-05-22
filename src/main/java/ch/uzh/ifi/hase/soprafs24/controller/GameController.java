@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class GameController {
@@ -45,24 +46,35 @@ public class GameController {
     return gameService.getGame(gameid);
   }
 
-  @MessageMapping("/startGame")
+  @MessageMapping("/createGame")
   public Game createGame(String stringJsonRequest) {
-    // smailalijagic:
-    // 1. correct Lobby, till: gameid is not created yet, compare with lobbyid
-    // 2. User1 online?
-    // 3. User2 online?
-    // 4. remove lobby
-    // 5. load game --> game logic (follows)
     Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
     Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
     GamePostDTO gamePostDTO = gson.fromJson(gson.toJson(requestMap.get("gamePostDTO")), GamePostDTO.class);
     AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
     Game createdGame = gameService.createGame(lobbyId, gamePostDTO, authenticationDTO);
+    GameGetDTO gameGetDTO = DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
 
-    webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
+    webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-created", gameGetDTO);
 
     return createdGame;
+  }
+
+  @MessageMapping("/startGame")
+  public void startGame(String stringJsonRequest) {
+    Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
+    Long lobbyId = gson.fromJson(gson.toJson(requestMap.get("lobbyId")), Long.class);
+    Long gameId = gson.fromJson(gson.toJson(requestMap.get("gameId")), Long.class);
+    AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
+
+    if(lobbyService.isLobbyOwner(lobbyId, authenticationDTO)) {
+        Game createdGame = gameService.getGame(gameId);
+        GameGetDTO gameGetDTO = DTOMapper.INSTANCE.convertEntityToGameGetDTO(createdGame);
+        webSocketMessenger.sendMessage("/lobbies/" + lobbyId, "game-started", gameGetDTO);
+    } else {
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User is not the owner of the lobby");
+    }
   }
 
   @GetMapping("/player/{playerid}")
