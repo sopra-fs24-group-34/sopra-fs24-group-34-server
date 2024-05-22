@@ -91,7 +91,7 @@ class GameControllerTest {
         gameController.createGame(requestJson);
 
         verify(gameService, times(1)).createGame(anyLong(), any(GamePostDTO.class), any(AuthenticationDTO.class));
-        verify(webSocketMessenger, times(1)).sendMessage(anyString(), anyString(), any(Game.class));
+        verify(webSocketMessenger, times(1)).sendMessage(anyString(), anyString(), any(GameGetDTO.class));
     }
 
     @Test
