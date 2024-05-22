@@ -5,7 +5,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
-import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -106,15 +102,6 @@ public class GameUserServiceIntegrationTest {
 
 
     @Test
-    void checkStrikes_validInput() {
-        when(gameUserService.getPlayer(1L)).thenReturn(player);
-
-        Boolean result = gameUserService.checkStrikes(player.getPlayerId());
-
-        assertTrue(result);
-    }
-
-    @Test
     void getStrikes_validInput(){
         when(gameUserService.getPlayer(1L)).thenReturn(player);
 
@@ -149,7 +136,7 @@ public class GameUserServiceIntegrationTest {
         when(playerrepository.findByPlayerId(1L)).thenReturn(player);
         when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
 
-        GameStatus result = gameUserService.determineStatus(1L);
+        GameStatus result = gameUserService.determineGameStatus(1L);
 
         assertEquals(result, GameStatus.CHOOSING);
     }
@@ -204,26 +191,5 @@ public class GameUserServiceIntegrationTest {
 //        assertEquals(user.getTotalplayed(), 1L);
 //    }
 
-    @Test
-    void updategamelobbylist_validInputs() {
-        Game game = new Game();
-        game.setGameId(1L);
-        Lobby lobby = new Lobby();
-        lobby.setLobbyid(1L);
-        lobby.setGame(game);
-        List<Lobby> list = new ArrayList<>();
-        list.add(lobby);
-        User user = new User();
-        user.setId(1L);
-        user.setUsergamelobbylist(list);
-
-        List<Lobby> lobbylist = user.getUsergamelobbylist();
-
-        assertNotNull(lobby.getGame());
-
-        gameUserService.updategamelobbylist(user);
-
-        assertNull(lobby.getGame());
-    }
 
 }

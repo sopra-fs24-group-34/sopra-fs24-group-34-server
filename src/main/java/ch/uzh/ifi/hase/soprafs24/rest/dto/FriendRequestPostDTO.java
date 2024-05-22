@@ -2,8 +2,8 @@ package ch.uzh.ifi.hase.soprafs24.rest.dto;
 
 public class FriendRequestPostDTO {
 
-        private Long senderId;
-        private String receiverUserName;
+    private Long senderId;
+    private String receiverUserName;
 
     public Long getSenderId() {
         return senderId;

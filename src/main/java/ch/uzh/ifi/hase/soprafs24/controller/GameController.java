@@ -58,9 +58,7 @@ public class GameController {
     GamePostDTO gamePostDTO = gson.fromJson(gson.toJson(requestMap.get("gamePostDTO")), GamePostDTO.class);
     AuthenticationDTO authenticationDTO = gson.fromJson(gson.toJson(requestMap.get("authenticationDTO")), AuthenticationDTO.class);
 
-    Game game = DTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
-
-    Game createdGame = gameService.createGame(lobbyId, game, authenticationDTO);
+    Game createdGame = gameService.createGame(lobbyId, gamePostDTO, authenticationDTO);
 
     webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "game-started", createdGame);
 
@@ -126,14 +124,6 @@ public class GameController {
       gameService.deleteGameImage(gameId, imageId);
     }
 
-
-    @PutMapping("/games/Lobbies/return/{userId}")
-    @ResponseStatus
-    @ResponseBody
-    public void returnToLobby(@PathVariable Long userId) {
-        gameUserService.returnToLobby(userId);
-    }
-
     @GetMapping("/games/{gameId}/history/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -142,5 +132,4 @@ public class GameController {
 
     }
 
-
-}
+  }

@@ -12,4 +12,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     @Query("SELECT COUNT(i) FROM Image i")
     int countAllImages();
+
+    boolean existsByNormalizedUrl(String normalizedUrl);
 }

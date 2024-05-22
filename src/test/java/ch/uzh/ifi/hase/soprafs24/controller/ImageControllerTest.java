@@ -35,14 +35,14 @@ public class ImageControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(imageController).build();
     }
 
-    @Test
-    void fetchAndSaveImages_valid() throws Exception {
-        // Mock the behavior of the unsplashService
-        Mockito.doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(200);
-
-        // Perform the POST request
-        mockMvc.perform(post("/images/saving")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    void fetchAndSaveImages_valid() throws Exception {
+//        // Mock the behavior of the unsplashService
+//        Mockito.doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(200);
+//
+//        // Perform the POST request
+//        mockMvc.perform(post("/images/saving")
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//    }
 }

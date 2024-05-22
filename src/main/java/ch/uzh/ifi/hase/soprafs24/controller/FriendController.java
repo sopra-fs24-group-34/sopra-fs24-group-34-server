@@ -36,7 +36,6 @@ public class FriendController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public void sendFriendRequest(@RequestBody FriendRequestPostDTO friendRequestPostDTO) {
-        System.out.println("DO FRIEND REQUEST POST");
         friendService.createFriendRequest(friendRequestPostDTO);
     }
 
@@ -47,7 +46,6 @@ public class FriendController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public boolean answerFriendRequest(@RequestBody FriendRequestPutDTO friendRequestPutDTO){
-        System.out.println("DO FRIEND ANSWER POST");
         return friendService.answerFriendRequest(friendRequestPutDTO);
 
     }
@@ -57,11 +55,9 @@ public class FriendController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public void lobbyInvite(@RequestBody LobbyInvitationPostDTO lobbyInvitationPostDTO) {
-        System.out.println("DO LOBBY INVITE POST");
         Long userId = lobbyInvitationPostDTO.getCreatorId();
         String invitedUsername = lobbyInvitationPostDTO.getInvitedUserName();
         Long lobbyId = lobbyInvitationPostDTO.getLobbyId();
-        System.out.println("1: " + invitedUsername);
 
         friendService.inviteFriendtoLobby(userId, invitedUsername, lobbyId);
     }
@@ -70,7 +66,6 @@ public class FriendController {
     @PutMapping("/lobbies/invitation/answer")
     @ResponseStatus(HttpStatus.OK)
     public void handleGameInvitation(@RequestBody LobbyInvitationPutDTO lobbyInvitationPutDTO){
-        System.out.println("DO LOBBY ANSWER POST");
         friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
 
     }
@@ -89,24 +84,30 @@ public class FriendController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<Friend> getAllFriends(@PathVariable Long userId) {
-        System.out.println("DO FRIENDS GETTER");
         User user = userService.getUser(userId);
         return friendService.getFriends(user);
     }
+
+    @GetMapping("/users/{userId}/friends/online")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<Friend> getAllOnlineFriends(@PathVariable Long userId) {
+        User user = userService.getUser(userId);
+        return friendService.getOnlineFriends(user);
+    }
+
+
 
     // Get all friend requests
     @GetMapping("/users/{userId}/friends/requests")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<FriendGetDTO> getFriendRequests(@PathVariable Long userId) {
-        System.out.println("DO FRIEND REQUESTS GETTER");
         User receiver = userService.getUser(userId);
         List<FriendRequest> friendRequests = friendService.getFriendRequests(receiver);
         List<FriendGetDTO> friendGetDTOs = new ArrayList<>();
         for (FriendRequest friendRequest : friendRequests) {
             FriendGetDTO friendGetDTO = friendService.convertFriendRequestToFriend(friendRequest);
-            System.out.println(friendGetDTO.getFriendUsername());
-            System.out.println(friendGetDTO.getFriendId());
             friendGetDTOs.add(friendGetDTO);
         }
         return friendGetDTOs;
@@ -116,7 +117,6 @@ public class FriendController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<LobbyInvitation> getLobbyInvitations(@PathVariable Long userId){
-        System.out.println("DO LOBBY INVITATIONS GETTER");
         User receiver = userService.getUser(userId);
         List<LobbyInvitation> lobbyInvitations = friendService.getLobbyInviations(receiver);
         return lobbyInvitations;

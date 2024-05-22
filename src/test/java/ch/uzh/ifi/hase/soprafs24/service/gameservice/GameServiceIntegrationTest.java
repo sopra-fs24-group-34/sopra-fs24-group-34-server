@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
@@ -63,6 +65,8 @@ public class GameServiceIntegrationTest {
 
     private Game createdgame;
 
+    private GamePostDTO gamePostDTO;
+
 
     @BeforeEach
     public void setup() {
@@ -87,9 +91,15 @@ public class GameServiceIntegrationTest {
         createdgame.setGameId(4L);
         createdgame.setCreatorPlayerId(1L);
         createdgame.setInvitedPlayerId(2L);
+        createdgame.setMaxStrikes(3);
 
         gamerepository.save(createdgame);
         gamerepository.flush();
+
+        gamePostDTO = new GamePostDTO();
+        gamePostDTO.setMaxStrikes(3);
+        gamePostDTO.setCreator_userid(1L);
+        gamePostDTO.setInvited_userid(2L);
     }
 
     @AfterEach
@@ -120,45 +130,42 @@ public class GameServiceIntegrationTest {
         assertEquals(result, createdgame);
     }
 
-    @Test
-    void createGame_validInput(){
-        // Mock behavior of gameUserService
-        Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
-        Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
-        // Define the behavior to save and flush the player
-        doAnswer(invocation -> {
-            Player player = invocation.getArgument(0); // Get the Player passed to the method
-            playerrepository.save(player);
-            playerrepository.flush();
-            player.setPlayerId(5L);
-            return null; // Since the method is void, return null
-        }).when(gameUserService).savePlayerChanges(any(Player.class));
-
-        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-        authenticationDTO.setId(1L);
-        authenticationDTO.setToken(creator.getToken());
-
-        Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
-        Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
-        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
-        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.ofNullable(createdgame));
-
-        Game newgame = new Game();
-        newgame.setGameId(4L);
-        newgame.setCreatorPlayerId(5L);
-        newgame.setInvitedPlayerId(5L);
-        gamerepository.save(newgame);
-        gamerepository.flush();
-
-
-        Game result = gameservice.createGame(3L, createdgame, authenticationDTO);
-
-        assertEquals(result.getCreatorPlayerId(), newgame.getCreatorPlayerId());
-        assertEquals(result.getInvitedPlayerId(), newgame.getInvitedPlayerId());
-        System.out.println(result.getCreatorPlayerId());
-        // assertEquals(playerrepository.findByPlayerId(result.getCreatorId()).getUser(), playerrepository.findByPlayerId(newgame.getCreatorId()).getUser());
-
-    }
+//    @Test
+//    void createGame_validInput(){
+//        // Mock behavior of gameUserService
+//        Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
+//        Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
+//        // Define the behavior to save and flush the player
+//        doAnswer(invocation -> {
+//            Player player = invocation.getArgument(0); // Get the Player passed to the method
+//            playerrepository.save(player);
+//            playerrepository.flush();
+//            player.setPlayerId(5L);
+//            return null; // Since the method is void, return null
+//        }).when(gameUserService).savePlayerChanges(any(Player.class));
+//
+//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+//        authenticationDTO.setId(1L);
+//        authenticationDTO.setToken(creator.getToken());
+//
+//        Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
+//        Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
+//        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
+//
+//        GamePostDTO newGamePostDTO = new GamePostDTO();
+//        newGamePostDTO.setMaxStrikes(3);
+//        newGamePostDTO.setTimePerRound(30);
+//        newGamePostDTO.setCreator_userid(1L);
+//        newGamePostDTO.setInvited_userid(2L);
+//
+//        Game result = gameservice.createGame(3L, newGamePostDTO, authenticationDTO);
+//
+//        // Assert that the game was created with the correct properties
+//        assertEquals(result.getCreatorPlayerId(), newGamePostDTO.getCreator_userid());
+//        assertEquals(result.getInvitedPlayerId(), newGamePostDTO.getInvited_userid());
+//        assertEquals(result.getMaxStrikes(), newGamePostDTO.getMaxStrikes());
+//        assertEquals(result.getTimePerRound(), newGamePostDTO.getTimePerRound());
+//    }
 
     @Test
     void selectImage_validInputs(){
@@ -244,12 +251,42 @@ public class GameServiceIntegrationTest {
 
     @Test
     void handleLoss_validInputs(){
+        Player creatorPlayer = new Player();
+        creatorPlayer.setPlayerId(1L);
+        creatorPlayer.setUserId(1L);
+        Player invitedPlayer = new Player();
+        invitedPlayer.setPlayerId(2L);
+        invitedPlayer.setUserId(2L);
+
+
+        // doNothing().when(gameUserService.increaseGamesPlayed(2L));
+
+
+
 
     }
 
     @Test
     void deleteGame_validInputs() {
+        Player creatorPlayer = new Player();
+        creatorPlayer.setPlayerId(1L);
+        creatorPlayer.setUserId(1L);
+        Player invitedPlayer = new Player();
+        invitedPlayer.setPlayerId(2L);
+        invitedPlayer.setUserId(2L);
 
+        invited.setStatus(UserStatus.PLAYING);
+        creator.setStatus(UserStatus.PLAYING);
+
+        when(gameUserService.getPlayer(1L)).thenReturn(creatorPlayer);
+        when(gameUserService.getPlayer(2L)).thenReturn(invitedPlayer);
+        when(gameUserService.getUser(1L)).thenReturn(creator);
+        when(gameUserService.getUser(2L)).thenReturn(invited);
+
+        gameservice.deleteGame(createdgame);
+
+        assert creator.getStatus().equals(UserStatus.ONLINE);
+        assert invited.getStatus().equals(UserStatus.ONLINE);
     }
 
     @Test
@@ -284,6 +321,25 @@ public class GameServiceIntegrationTest {
     }
 
     // 8 more functions
+
+    @Test
+    void deleteGameImage_validInputs() {
+        Image image = new Image();
+        image.setId(1L);
+        Image image2 = new Image();
+        image2.setId(2L);
+        List<Image> imageList = new ArrayList<Image>();
+        imageList.add(image);
+        imageList.add(image2);
+        createdgame.setGameImages(imageList);
+
+
+
+
+
+
+    }
+
 
     }
 

@@ -1,174 +1,194 @@
-//
-//package ch.uzh.ifi.hase.soprafs24.controller;
-//
-//import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
-//import ch.uzh.ifi.hase.soprafs24.entity.Game;
-//import ch.uzh.ifi.hase.soprafs24.entity.User;
-//import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
-//import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
-//import ch.uzh.ifi.hase.soprafs24.service.GameService;
-//import com.fasterxml.jackson.core.JsonProcessingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.Mockito;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-//import org.springframework.web.server.ResponseStatusException;
-//
-//import java.util.Collections;
-//import java.util.List;
-//
-//import static org.assertj.core.api.Assertions.*;
-//import static org.hamcrest.Matchers.hasSize;
-//import static org.hamcrest.Matchers.is;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.eq;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.verify;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-//
-//
-///* *
-// * UserControllerTest
-// * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
-// * request without actually sending them over the network.
-// * This tests if the UserController works.
-// */
-//
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//public class GameControllerTest {
-//
-//        @Autowired
-//        private MockMvc mockMvc;
-//
-//        @MockBean
-//        private GameService gameService;
-//
-//        @Test
-//        public void createGame_validInput_gameCreated() throws Exception {
-//
-//            Long lobbyId = 1L;
-//            GamePostDTO gamePostDTO = new GamePostDTO();
-//            gamePostDTO.setCreator_userid(1L);
-//            gamePostDTO.setInvited_userid(2L);
-//
-//            //nedim-j: probably not correct, please adjust
-//            AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//            authenticationDTO.setId(1L);
-//            authenticationDTO.setToken("123");
-//
-//            // Mock the response from game service
-//            Game createdGame = new Game();
-//            createdGame.setGameId(1L);
-//            given(gameService.creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class))).willReturn(createdGame);
-//
-//            MockHttpServletRequestBuilder postRequest = post("/game/{lobbyid}/start", lobbyId)
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .content(asJsonString(gamePostDTO));
-//
-//            mockMvc.perform(postRequest)
-//                    .andExpect(status().isOk())
-//                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-//                    .andExpect(jsonPath("$.gameId", is(createdGame.getGameId().intValue())));
-//
-//            // verify that creategame was called with the expected arguments
-//            verify(gameService).creategame(eq(lobbyId), any(Game.class), any(AuthenticationDTO.class));
-//        }
-//
-//
-///*
+package ch.uzh.ifi.hase.soprafs24.controller;
+
+import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
+import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
+import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
 //@WebMvcTest(GameController.class)
-//public class GameControllerTest {
+public class GameControllerTest {
+
+    @Mock
+    private GameService gameService;
+
+    @Mock
+    private GameUserService gameUserService;
+
+    @Mock
+    private WebSocketMessenger webSocketMessenger;
+
+    @Mock
+    private LobbyService lobbyService;
+
+    @InjectMocks
+    private GameController gameController;
+
+    //@Autowired
+    private MockMvc mockMvc;
+
+    private Gson gson = new Gson();
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(gameController).build();
+    }
+
+    @Test
+    void testGetGames() throws Exception {
+        List<Game> games = Arrays.asList(new Game(), new Game());
+        when(gameService.getGames()).thenReturn(games);
+
+        mockMvc.perform(get("/games")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new ObjectMapper().writeValueAsString(games)));
+
+        verify(gameService, times(1)).getGames();
+    }
+
+    @Test
+    void testGetGame() throws Exception {
+        Long gameId = 1L;
+        Game game = new Game();
+        when(gameService.getGame(gameId)).thenReturn(game);
+
+        mockMvc.perform(get("/games/{gameId}", gameId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new ObjectMapper().writeValueAsString(game)));
+
+        verify(gameService, times(1)).getGame(gameId);
+    }
+
+//    @Test
+//    void testCreateGame() {
+//        String jsonRequest = "{\"lobbyId\": 1, \"gamePostDTO\": {}, \"authenticationDTO\": {}}";
+//        Map<String, Object> requestMap = gson.fromJson(jsonRequest, Map.class);
+//        Long lobbyId = 1L;
+//        GamePostDTO gamePostDTO = new GamePostDTO();
+//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
+//        Game createdGame = new Game();
+//        when(gameService.createGame(anyLong(), any(GamePostDTO.class), any(AuthenticationDTO.class))).thenReturn(createdGame);
 //
-//  @Autowired
-//  private MockMvc mockMvc;
+//        gameController.createGame(jsonRequest);
 //
-//  @MockBean
-//  private GameService gameService; ;
-//
-//  @Test
-//  public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
-//    // given
-//    User user = new User();
-//    user.setPassword("Firstname Lastname");
-//    user.setUsername("firstname@lastname");
-//    user.setStatus(UserStatus.OFFLINE);
-//
-//    List<User> allUsers = Collections.singletonList(user);
-//
-//    // this mocks the UserService -> we define above what the userService should
-//    // return when getUsers() is called
-//    given(userService.getUsers()).willReturn(allUsers);
-//
-//    // when
-//    MockHttpServletRequestBuilder getRequest = get("/register").contentType(MediaType.APPLICATION_JSON);
-//
-//    // then
-//    mockMvc.perform(getRequest).andExpect(status().isOk())
-//        .andExpect(jsonPath("$", hasSize(1)))
-//        .andExpect(jsonPath("$[0].password", is(user.getPassword())))
-//        .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-//        .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
-//  }
-//
-//  @Test
-//  public void createUser_validInput_userCreated() throws Exception {
-//    // given
-//    User user = new User();
-//    user.setId(1L);
-//    user.setPassword("Test User");
-//    user.setUsername("testUsername");
-//    user.setToken("1");
-//    user.setStatus(UserStatus.ONLINE);
-//
-//    UserPostDTO userPostDTO = new UserPostDTO();
-//    userPostDTO.setPassword("Test User");
-//    userPostDTO.setUsername("testUsername");
-//
-//    given(userService.createUser(Mockito.any())).willReturn(user);
-//
-//    // when/then -> do the request + validate the result
-//    MockHttpServletRequestBuilder postRequest = post("/register")
-//        .contentType(MediaType.APPLICATION_JSON)
-//        .content(asJsonString(userPostDTO));
-//
-//    // then
-//    mockMvc.perform(postRequest)
-//        .andExpect(status().isCreated())
-//        .andExpect(jsonPath("$.id", is(user.getId().intValue())))
-//        .andExpect(jsonPath("$.password", is(user.getPassword())))
-//        .andExpect(jsonPath("$.username", is(user.getUsername())))
-//        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
-//  }
-//*/
-//  /**
-//   * Helper Method to convert userPostDTO into a JSON string such that the input
-//   * can be processed
-//   * Input will look like this: {"name": "Test User", "username": "testUsername"}
-//   *
-//   * @param object
-//   * @return string
-//   */
-//  private String asJsonString(final Object object) {
-//    try {
-//      return new ObjectMapper().writeValueAsString(object);
-//    } catch (JsonProcessingException e) {
-//      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-//          String.format("The request body could not be created.%s", e.toString()));
+//        verify(gameService, times(1)).createGame(lobbyId, gamePostDTO, authenticationDTO);
+//        verify(webSocketMessenger, times(1)).sendMessage("/lobbies/" + lobbyId, "game-started", createdGame);
 //    }
-//  }
-//}
+
+    @Test
+    void testGetPlayer() throws Exception {
+        Long playerId = 1L;
+        Player player = new Player();
+        when(gameUserService.getPlayer(playerId)).thenReturn(player);
+
+        mockMvc.perform(get("/player/{playerid}", playerId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new ObjectMapper().writeValueAsString(player)));
+
+        verify(gameUserService, times(1)).getPlayer(playerId);
+    }
+
+//    @Test
+//    void testChooseImage() {
+//        String jsonRequest = "{\"guessPostDTO\": {}}";
+//        GuessPostDTO guessPostDTO = new GuessPostDTO();
+//        Guess guess = new Guess();
+//        RoundDTO roundDTO = new RoundDTO(1, 1L);
+//        when(DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(any(GuessPostDTO.class))).thenReturn(guess);
+//        when(gameService.chooseImage(any(Guess.class))).thenReturn(roundDTO);
+//        when(gameService.bothPlayersChosen(anyLong())).thenReturn(true);
+//
+//        gameController.chooseImage(jsonRequest);
+//
+//        verify(gameService, times(1)).chooseImage(guess);
+//        verify(webSocketMessenger, times(1)).sendMessage("/games/" + guess.getGameId(), "round0", roundDTO);
+//    }
+
+//    @Test
+//    void testGuessImage() {
+//        String jsonRequest = "{\"guessPostDTO\": {}}";
+//        GuessPostDTO guessPostDTO = new GuessPostDTO();
+//        Guess guess = new Guess();
+//        Response response = new Response();
+//        when(DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(any(GuessPostDTO.class))).thenReturn(guess);
+//        when(gameService.guessImage(any(Guess.class))).thenReturn(response);
+//
+//        gameController.guessImage(jsonRequest);
+//
+//        verify(gameService, times(1)).guessImage(guess);
+//        verify(webSocketMessenger, times(1)).sendMessage("/games/" + guess.getGameId(), "round-update", response);
+//    }
+
+    @Test
+    void testGetGameImages() throws Exception {
+        Long gameId = 1L;
+        List<ImageDTO> images = Arrays.asList(new ImageDTO(), new ImageDTO());
+        when(gameService.getGameImages(gameId)).thenReturn(images);
+
+        mockMvc.perform(get("/games/{gameId}/images", gameId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(new ObjectMapper().writeValueAsString(images)));
+
+        verify(gameService, times(1)).getGameImages(gameId);
+    }
+
+    @Test
+    void testDeleteGameImage() throws Exception {
+        Long gameId = 1L;
+        Long imageId = 1L;
+
+        mockMvc.perform(delete("/games/{gameId}/images/{imageId}", gameId, imageId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(gameService, times(1)).deleteGameImage(gameId, imageId);
+    }
+
+//    @Test
+//    void testGetGameHistory() throws Exception {
+//        Long gameId = 1L;
+//        Long userId = 1L;
+//        GameHistory gameHistory = new GameHistory();
+//        when(gameService.getGameHistory(gameId, userId)).thenReturn(gameHistory);
+//
+//        mockMvc.perform(get("/games/{gameId}/history/{userId}", gameId, userId)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(content().json(new ObjectMapper().writeValueAsString(gameHistory)));
+//
+//        verify(gameService, times(1)).getGameHistory(gameId, userId);
+//    }
+}
+

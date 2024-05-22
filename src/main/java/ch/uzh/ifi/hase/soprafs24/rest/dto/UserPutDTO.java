@@ -50,9 +50,9 @@ public class UserPutDTO {
     return profilePicture;
   }
 
-  public void setProfilePicture(String profilePicture) {
-    this.profilePicture = profilePicture;
-  }
+//  public void setProfilePicture(String profilePicture) {
+//    this.profilePicture = profilePicture;
+//  }
 
   public String getToken() {
     return token;
@@ -86,21 +86,21 @@ public class UserPutDTO {
     this.friendsList = friendsList;
   }
 
-  public List<Lobby> getUsergamelobbylist() {
-    return usergamelobbylist;
-  }
-
-  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
-    this.usergamelobbylist = usergamelobbylist;
-  }
+//  public List<Lobby> getUsergamelobbylist() {
+//    return usergamelobbylist;
+//  }
+//
+//  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
+//    this.usergamelobbylist = usergamelobbylist;
+//  }
 
   public Long getTotalplayed() {
     return totalplayed;
   }
 
-  public void setTotalplayed(Long totalplayed) {
-    this.totalplayed = totalplayed;
-  }
+//  public void setTotalplayed(Long totalplayed) {
+//    this.totalplayed = totalplayed;
+//  }
 
   public Long getTotalwins() {
     return totalwins;

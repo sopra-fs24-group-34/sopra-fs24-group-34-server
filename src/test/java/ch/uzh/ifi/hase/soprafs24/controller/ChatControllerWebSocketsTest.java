@@ -95,7 +95,8 @@ class ChatControllerWebSocketsTest {
     }
 }
 
-
+/*
+<<<<<<< Updated upstream
 //
 //import ch.uzh.ifi.hase.soprafs24.entity.Chat;
 //import ch.uzh.ifi.hase.soprafs24.entity.Game;
@@ -220,3 +221,14 @@ class ChatControllerWebSocketsTest {
 //        verify(chatServiceWebSockets, times(1)).getAllMessages(gameId);
 //    }
 //}
+=======
+        when(chatServiceWebSockets.getAllMessages(gameId)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/games/{gameId}/chat", gameId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]"));
+
+        verify(chatServiceWebSockets, times(1)).getAllMessages(gameId);
+    }
+}*/

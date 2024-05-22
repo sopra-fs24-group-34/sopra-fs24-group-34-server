@@ -13,20 +13,17 @@ public class Game implements Serializable {
     private Long gameId;
 
     @Column(nullable = true)
-    private Long maxguesses; // smailalijagic: handle guesses for each player in frontend
-
-    @Column(nullable = true)
     private Long creatorPlayerId; // smailalijagic: creator
 
     @Column(nullable = true)
     private Long invitedPlayerId; // smailalijagic: invited user
 
-    @Column(nullable = true)
-    private Long guessingtime; // smailalijagic:
-
     //@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
     @Column(length = 7000) // smailalijagic: 7000bytes --> 1750-7000 (=1000 words) chars max. possible = 65'535 bytes --> 16'383-65'535 chars
     private Chat chat = new Chat();
+
+    @Column(nullable = true)
+    private int maxStrikes; // smailalijagic: handle guesses for each player in frontend
 
     @Column
     private int currentRound;
@@ -57,20 +54,12 @@ public class Game implements Serializable {
         this.gameId = gameId;
     }
 
-    public Long getMaxGuesses() {
-        return maxguesses;
+    public int getMaxStrikes() {
+        return maxStrikes;
     }
 
-    public void setMaxGuesses(Long maxguesses) {
-        this.maxguesses = maxguesses;
-    }
-
-    public Long getGuessingtime() {
-        return guessingtime;
-    }
-
-    public void setGuessingtime(Long guessingtime) {
-        this.guessingtime = guessingtime;
+    public void setMaxStrikes(int maxguesses) {
+        this.maxStrikes = maxguesses;
     }
 
     public Long getCreatorPlayerId() {

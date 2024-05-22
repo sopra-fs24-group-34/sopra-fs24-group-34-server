@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,7 +12,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 
 @Service     //Service to handle User and PLayer methods that need USer and PLayer repository, done to reduce coupling
@@ -21,14 +19,12 @@ import java.util.List;
 public class GameUserService {
     private final PlayerRepository playerRepository;
     private final UserRepository userRepository;
-    private final LobbyRepository lobbyRepository;
     private final GameRepository gameRepository;
 
   @Autowired
-  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository, @Qualifier("gameRepository") GameRepository gameRepository) {
+  public GameUserService(@Qualifier("playerRepository") PlayerRepository playerRepository, @Qualifier("userRepository") UserRepository userRepository, @Qualifier("gameRepository") GameRepository gameRepository) {
     this.userRepository = userRepository;
     this.playerRepository = playerRepository;
-    this.lobbyRepository = lobbyRepository;
     this.gameRepository = gameRepository;
   }
 
@@ -69,30 +65,13 @@ public class GameUserService {
       playerRepository.save(player);
       playerRepository.flush();
   }
-  public void saveuserchanges(User user){
-      userRepository.save(user);
-      userRepository.flush();
-  }
-
-
 
   public void saveUserChanges(User user){
       userRepository.save(user);
       userRepository.flush();
 }
 
-    public Boolean checkStrikes(Long playerid) {
-      //nedim-j: returns true, if player has less than max strikes and can play on
-        Player player = getPlayer(playerid);
-        //nedim-j: for M4 need some variable maxGuesses instead of 2
-        int maxGuesses = 3;
-        if (player.getStrikes() >= maxGuesses){
-            return false;
-        }
-        return true;
-    }
-
-    public int getStrikes(Long playerId) {
+  public int getStrikes(Long playerId) {
       return getPlayer(playerId).getStrikes();
     }
 
@@ -104,7 +83,7 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-    public GameStatus determineStatus(Long gameId) {
+    public GameStatus determineGameStatus(Long gameId) {
         Game game = new Game();
         try {
             game = gameRepository.findByGameId(gameId);
@@ -117,7 +96,7 @@ public class GameUserService {
         Player invited = playerRepository.findByPlayerId(game.getInvitedPlayerId());
         if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
             return GameStatus.CHOOSING;
-        } else if(!checkStrikes(creator.getPlayerId()) || !checkStrikes(invited.getPlayerId())) {
+        } else if((creator.getStrikes() >= game.getMaxStrikes()) || (invited.getStrikes() >= game.getMaxStrikes())) {
             return GameStatus.END;
         }
         return GameStatus.GUESSING;
@@ -165,38 +144,6 @@ public class GameUserService {
       userRepository.flush();
   }
 
-  public void updategamelobbylist(User user) {
-      // deleting the game from game lobby list and setting it to null
-      try {
-          List<Lobby> newUserGamelobbylist = user.getUsergamelobbylist();
-
-          if (user.getUsergamelobbylist() != null) {
-              for (Lobby lobby : newUserGamelobbylist) {
-                  lobby.setGame(null);
-              }
-
-              //Update the user
-              user.setUsergamelobbylist(newUserGamelobbylist);
-
-              userRepository.save(user);
-              userRepository.flush();
-          }
-      } catch (Exception e) {
-          System.out.println("User is null in GameUserService.updategamelobbylist");
-      }
-
-  }
-
-  public void returnToLobby(Long userId) {
-      User user = userRepository.findUserById(userId);
-      user.setStatus(UserStatus.INLOBBY);
-      userRepository.save(user);
-      userRepository.flush();
-  }
-
-
-
-
   public GameHistory createGameHistory(User user) {
         GameHistory gameHistory = new GameHistory();
         gameHistory.setTotalgamesplayed(user.getTotalplayed());
@@ -205,10 +152,6 @@ public class GameUserService {
         return gameHistory;
   }
 
-
-    //
-    // check Functions
-    //
   public Boolean checkIfUserOnline(Long userid){
     User user = userRepository.findUserById(userid);
     return user.getStatus() == UserStatus.ONLINE;
@@ -218,14 +161,6 @@ public class GameUserService {
   public Boolean checkIfUserExists(Long userid){
         User user = userRepository.findUserById(userid);
         return user != null; //user = null-> user does not exist
-    }
-
-  public Boolean checkIfPlayerinGame(Game game, Long playerid){
-        // till: get players from the game
-        playerRepository.findByPlayerId(playerid);
-
-        // check if the player is in the game players list, returns true when in game and false when not
-        return game.getCreatorPlayerId().equals(playerid) || game.getInvitedPlayerId().equals(playerid);
     }
 
 

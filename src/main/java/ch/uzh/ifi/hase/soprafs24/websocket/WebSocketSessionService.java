@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs24.entity.Game;
 
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
+import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class WebSocketSessionService {
 
     //nedim-j: ensure that there is only one instance of SessionService
     private static WebSocketSessionService instance;
+    private static UserService userService;
     private static LobbyService lobbyService;
     private static GameService gameService;
     private static WebSocketMessenger webSocketMessenger;
@@ -27,6 +29,9 @@ public class WebSocketSessionService {
     private static final int lobbyTimeoutThreshold = 3;
     private static final int timeoutPollDelay = 1;
     private static final int closeSessionsDelay = 2;
+
+    @Autowired
+    public void setUserService(UserService userService) { WebSocketSessionService.userService = userService; }
 
     @Autowired
     public void setLobbyService(LobbyService lobbyService) {
@@ -43,7 +48,7 @@ public class WebSocketSessionService {
         WebSocketSessionService.webSocketMessenger = webSocketMessenger;
     }
 
-    public WebSocketSessionService() {
+    private WebSocketSessionService() {
         // Private constructor to prevent instantiation
     }
 
@@ -67,8 +72,8 @@ public class WebSocketSessionService {
         } else if(destinationSplit[1].equals("games") && (destinationSplit.length < 4)/*!destinationSplit[3].equals("chat")*/){
             mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
-        printSessionsMap();
-        printActiveSessions();
+        //printSessionsMap();
+        //printActiveSessions();
         //nedim-j: handling gameIds not necessary i think. there's no games without a lobby and games are already assigned to a lobby entity.
     }
 
@@ -181,6 +186,7 @@ public class WebSocketSessionService {
                 System.out.println("User left by closing session!");
                 try {
                     lobbyService.removeUserFromLobby(lobbyId, userId);
+                    userService.deleteUserIfGuest(userId);
                 } catch(Exception e) {
                     System.out.println(e);
                 }
@@ -241,17 +247,6 @@ public class WebSocketSessionService {
                 e.printStackTrace();
             }
         }
-
-        //nedim-j: add logic which checks that the same user rejoined
-        /*
-        if (sessionsMap.containsKey(lobbyId) && sessionsMap.get(lobbyId).size() >= 2) {
-            timer.cancel(); // Cancel the timer
-            System.out.println("User rejoined!");
-            webSocketMessenger.sendMessage("/games/"+gameId, "user-rejoined", timeoutThreshold);
-        }
-
-         */
-
     }
 
 
@@ -361,6 +356,7 @@ public class WebSocketSessionService {
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
         for(WebSocketSession session : sessions) {
             try {
+                userService.deleteUserIfGuest(Long.valueOf(session.getAttributes().get("userId").toString()));
                 session.close();
                 sessions.remove(session);
             } catch (Exception e) {

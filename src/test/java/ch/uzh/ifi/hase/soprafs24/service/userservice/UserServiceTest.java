@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.service.userservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs24.entity.Friend;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
@@ -88,6 +89,45 @@ public class UserServiceTest {
         user = userService.updateUser(updateduser, 1L);
 
         assertEquals(user.getUsername(), "testuser");
+
+    }
+
+    @Test
+    void updateUser_UserHasFriends_UpdatesFriendListOfFriends() {
+        //create 2 Users and Friend version of them to add each other and ultimately check if the User is updated in the friends list
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+        Friend userFriend = new Friend();
+        userFriend.setFriendId(1L);
+        userFriend.setFriendUsername("testuser");
+        //2nd user and Friend version of it
+        User invited = new User();
+        invited.setUsername("invited");
+        invited.setPassword("testpassword");
+        invited.setId(2L);
+        Friend invitedFriend = new Friend();
+        invitedFriend.setFriendId(2L);
+        invitedFriend.setFriendUsername("invited");
+        //add each other as friends
+        user.addFriend(invitedFriend);
+        invited.addFriend(userFriend);
+
+        //New values for User
+        User updateduser = new User();
+        updateduser.setUsername("testuser123");
+        updateduser.setPassword("testpassword");
+        updateduser.setId(2L);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+        when(userRepository.findUserById(2L)).thenReturn(invited);
+
+        userService.updateUser(updateduser, 1L);
+
+        Friend friend = invited.getFriendsList().get(0);
+        assertEquals(friend.getFriendUsername(), "testuser123");
+
 
     }
 
@@ -320,7 +360,6 @@ public class UserServiceTest {
 
     }
 
-    //smailalijagic: fails at the moment
     @Test
     void getUser_NonExistingUserId_ThrowsResponseStatusException() {
         // Given
@@ -449,7 +488,7 @@ public class UserServiceTest {
         User offlineUser = new User();
         offlineUser.setId(2L);
         offlineUser.setUsername("RegularUser");
-        offlineUser.setStatus(UserStatus.INLOBBY);
+        offlineUser.setStatus(UserStatus.INLOBBY_PREPARING);
 
         // Arrange
         Long userId = offlineUser.getId();
@@ -502,5 +541,280 @@ public class UserServiceTest {
         assertNotNull(userService.getUser(userId)); // smailalijagic: user was not deleted
         verify(userRepository, never()).deleteById(userId);
     }
+
+    @Test
+    public void deleteUser_UserHasFriends_DeletesUserFromFriendsList() {
+        //create 2 Users and Friend version of them to add each other and ultimately check if the User is updated in the friends list
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("testpassword");
+        user.setId(1L);
+        user.setStatus(UserStatus.ONLINE);
+        Friend userFriend = new Friend();
+        userFriend.setFriendId(1L);
+        userFriend.setFriendUsername("testuser");
+        //2nd user and Friend version of it
+        User invited = new User();
+        invited.setUsername("invited");
+        invited.setPassword("testpassword");
+        invited.setId(2L);
+        Friend invitedFriend = new Friend();
+        invitedFriend.setFriendId(2L);
+        invitedFriend.setFriendUsername("invited");
+        //add each other as friends
+        user.addFriend(invitedFriend);
+        invited.addFriend(userFriend);
+
+        when(userRepository.findUserById(1L)).thenReturn(user);
+        when(userRepository.findUserById(2L)).thenReturn(invited);
+
+
+        assert !invited.getFriendsList().isEmpty();
+
+        userService.deleteUser(1L);
+
+        assert invited.getFriendsList().isEmpty();
+
+    }
+
+    @Test
+    public void testGetUsers() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        List<User> users = new ArrayList<>();
+        users.add(testUser);
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        List<User> foundUsers = userService.getUsers();
+
+        assertEquals(users.size(), foundUsers.size());
+        verify(userRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void testGetUser_validId() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
+
+        User foundUser = userService.getUser(testUser.getId());
+
+        assertNotNull(foundUser);
+        assertEquals(testUser.getId(), foundUser.getId());
+        verify(userRepository, times(2)).findUserById(testUser.getId());
+    }
+
+    @Test
+    public void testGetUser_invalidId() {
+        when(userRepository.findUserById(anyLong())).thenReturn(null);
+
+        assertThrows(ResponseStatusException.class, () -> userService.getUser(2L));
+    }
+
+    @Test
+    public void testGetUserByUsername_validUsername() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findByUsername(testUser.getUsername())).thenReturn(testUser);
+
+        User foundUser = userService.getUserByUsername(testUser.getUsername());
+
+        assertNotNull(foundUser);
+        assertEquals(testUser.getUsername(), foundUser.getUsername());
+        verify(userRepository, times(2)).findByUsername(testUser.getUsername());
+    }
+
+    @Test
+    public void testGetUserByUsername_invalidUsername() {
+        when(userRepository.findByUsername(anyString())).thenReturn(null);
+
+        assertThrows(ResponseStatusException.class, () -> userService.getUserByUsername("nonExistentUser"));
+    }
+
+//    @Test
+//    public void testCreateUser_success() {
+//        User newUser = new User();
+//        newUser.setUsername("newUser");
+//        newUser.setPassword("newPassword");
+//
+//        when(userRepository.save(any(User.class))).thenReturn(newUser);
+//
+//        AuthenticationDTO authDTO = userService.createUser(newUser);
+//
+//        assertNotNull(authDTO);
+//        verify(userRepository, times(2)).save(any(User.class));
+//    }
+
+    @Test
+    public void testCreateUser_duplicateUsername() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findByUsername(anyString())).thenReturn(testUser);
+
+        User newUser = new User();
+        newUser.setUsername("testUser");
+        newUser.setPassword("newPassword");
+
+        assertThrows(ResponseStatusException.class, () -> userService.createUser(newUser));
+    }
+
+    @Test
+    public void testCreateUser_missingFields() {
+        User newUser = new User();
+        newUser.setUsername(null);
+        newUser.setPassword(null);
+
+        assertThrows(ResponseStatusException.class, () -> userService.createUser(newUser));
+    }
+
+    @Test
+    public void testCreateGuestUser_success() {
+        User newGuestUser = new User();
+        newGuestUser.setUsername("Guest");
+        newGuestUser.setPassword("guestPassword");
+
+        when(userRepository.save(any(User.class))).thenReturn(newGuestUser);
+
+        AuthenticationDTO authDTO = userService.createGuestUser(newGuestUser);
+
+        assertNotNull(authDTO);
+        verify(userRepository, times(2)).save(any(User.class));
+    }
+
+    @Test
+    public void testLoginUser_success() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findByUsernameAndPassword(testUser.getUsername(), testUser.getPassword())).thenReturn(testUser);
+
+        AuthenticationDTO authDTO = userService.loginUser(testUser);
+
+        assertNotNull(authDTO);
+        verify(userRepository, times(1)).findByUsernameAndPassword(testUser.getUsername(), testUser.getPassword());
+    }
+
+    @Test
+    public void testLoginUser_invalidCredentials() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findByUsernameAndPassword(anyString(), anyString())).thenReturn(null);
+
+        assertThrows(ResponseStatusException.class, () -> userService.loginUser(testUser));
+    }
+
+    @Test
+    public void testUpdateUser_success() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        User updatedUser = new User();
+        updatedUser.setUsername("updatedUser");
+        updatedUser.setPassword("updatedPassword");
+
+        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        User updated = userService.updateUser(updatedUser, testUser.getId());
+
+        assertNotNull(updated);
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    public void testDeleteUserIfGuest() {
+        User guestUser = new User();
+        guestUser.setId(2L);
+        guestUser.setUsername("GUESTuser");
+        guestUser.setStatus(UserStatus.ONLINE);
+
+        when(userRepository.findUserById(guestUser.getId())).thenReturn(guestUser);
+
+        userService.deleteUserIfGuest(guestUser.getId());
+
+        verify(userRepository, times(1)).deleteById(guestUser.getId());
+    }
+
+    @Test
+    public void testDeleteUser() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
+
+        userService.deleteUser(testUser.getId());
+
+        verify(userRepository, times(1)).deleteById(testUser.getId());
+    }
+
+    @Test
+    public void testChangeUserStatus_success() {
+        User testUser = new User();
+        testUser.setId(1L);
+        testUser.setUsername("testUser");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ONLINE);
+        testUser.setToken(UUID.randomUUID().toString());
+
+        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        userService.changeUserStatus(testUser.getId(), "OFFLINE");
+
+        assertEquals(UserStatus.OFFLINE, testUser.getStatus());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+//    @Test
+//    public void testChangeUserStatus_invalidStatus() {
+//        User testUser = new User();
+//        testUser.setId(1L);
+//        testUser.setUsername("testUser");
+//        testUser.setPassword("testPassword");
+//        testUser.setStatus(UserStatus.ONLINE);
+//        testUser.setToken(UUID.randomUUID().toString());
+//
+//        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
+//
+//        assertThrows(ResponseStatusException.class, () -> userService.changeUserStatus(testUser.getId(), "INVALID_STATUS"));
+//    }
 
 }

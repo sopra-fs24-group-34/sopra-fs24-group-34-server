@@ -23,10 +23,10 @@ public class GameTest {
         Game game = new Game();
 
         // Set maxGuesses
-        game.setMaxGuesses(5L);
+        game.setMaxStrikes(5);
 
         // Verify maxGuesses
-        assertEquals(5L, game.getMaxGuesses());
+        assertEquals(5, game.getMaxStrikes());
     }
 
     @Test
@@ -53,15 +53,4 @@ public class GameTest {
         assertEquals(20L, game.getInvitedPlayerId());
     }
 
-    @Test
-    public void testSetGuessingTimeSuccess() {
-        // Create a Game instance
-        Game game = new Game();
-
-        // Set guessingTime
-        game.setGuessingtime(30L);
-
-        // Verify guessingTime
-        assertEquals(30L, game.getGuessingtime());
-    }
 }

@@ -1,10 +1,11 @@
-package ch.uzh.ifi.hase.soprafs24.service;
+package ch.uzh.ifi.hase.soprafs24.service.friendservice;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.hibernate.annotations.common.util.impl.Log_$logger;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +91,50 @@ public class FriendServiceTest {
     }
 
     @Test
+    public void createFriendRequest_alreadySentFriendRequest_ThrowsException() {
+        FriendRequestPostDTO friendRequestPostDTO = new FriendRequestPostDTO();
+        friendRequestPostDTO.setSenderId(1L);
+        friendRequestPostDTO.setReceiverUserName("invitedUser");
+        creator.addFriendRequest(friendRequest);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findByUsername("invitedUser")).thenReturn(invitedUser);
+
+        assertThrows(ResponseStatusException.class, () -> friendService.createFriendRequest(friendRequestPostDTO));
+    }
+
+    @Test
+    public void createFriendRequest_alreadyReceivedFriendRequestFromUser_ThrowsException() {
+        FriendRequestPostDTO friendRequestPostDTO = new FriendRequestPostDTO();
+        friendRequestPostDTO.setSenderId(1L);
+        friendRequestPostDTO.setReceiverUserName("invitedUser");
+        FriendRequest friendRequest1 = new FriendRequest();
+        friendRequest1.setReceiverId(1L);
+        friendRequest1.setSenderId(2L);
+        creator.addFriendRequest(friendRequest1);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findByUsername("invitedUser")).thenReturn(invitedUser);
+
+        assertThrows(ResponseStatusException.class, () -> friendService.createFriendRequest(friendRequestPostDTO));
+    }
+
+    @Test
+    public void createFriendRequest_userAlreadyYourFriend_ThrowsException() {
+        FriendRequestPostDTO friendRequestPostDTO = new FriendRequestPostDTO();
+        friendRequestPostDTO.setSenderId(1L);
+        friendRequestPostDTO.setReceiverUserName("invitedUser");
+        Friend friend = new Friend();
+        friend.setFriendId(2L);
+        creator.addFriend(friend);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findByUsername("invitedUser")).thenReturn(invitedUser);
+
+        assertThrows(ResponseStatusException.class, () -> friendService.createFriendRequest(friendRequestPostDTO));
+    }
+
+    @Test
     public void getFriendRequests_validInputs() {
         creator.addFriendRequest(friendRequest);
 
@@ -142,17 +188,43 @@ public class FriendServiceTest {
     }
 
     @Test
+    public void getOnlineFriends_validInputs() {
+        //till: One User is online, one's offline, only the online User should be added to the list
+        User user = new User();
+        user.setId(3L);
+        user.setStatus(UserStatus.ONLINE);
+        invitedUser.setStatus(UserStatus.OFFLINE);
+        Friend friend = new Friend();
+        friend.setFriendId(3L);
+        Friend invitedFriend = new Friend();
+        invitedFriend.setFriendId(2L);
+
+        when(userRepository.findUserById(3L)).thenReturn(user);
+        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
+
+        assert friendService.getFriends(creator).isEmpty();
+
+        creator.addFriend(friend);
+        creator.addFriend(invitedFriend);
+
+        List<Friend> result = friendService.getOnlineFriends(creator);
+        assert result.contains(friend);
+        assert !result.contains(invitedFriend);
+
+    }
+
+    @Test
     public void getFriends_validInputs() {
         Friend friend = new Friend();
-        friend.setFriendId(2L);
+        friend.setFriendId(1L);
 
         assert friendService.getFriends(creator).isEmpty();
 
         creator.addFriend(friend);
 
         List<Friend> result = friendService.getFriends(creator);
-        assert result.contains(friend);
 
+        assert result.contains(friend);
     }
 
     @Test
@@ -173,11 +245,12 @@ public class FriendServiceTest {
         lobby.setLobbyid(3L);
         lobby.setCreator_userid(1L);
 
-        creator.setStatus(UserStatus.INLOBBY);
+        creator.setStatus(UserStatus.INLOBBY_PREPARING);
         invitedUser.setStatus(UserStatus.ONLINE);
 
         when(userRepository.findUserById(1L)).thenReturn(creator);
         when(userRepository.findByUsername("invitedUser")).thenReturn(invitedUser);
+        when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
 
         //Before
         assert creator.getLobbyInvitations().isEmpty();
@@ -190,27 +263,53 @@ public class FriendServiceTest {
     }
 
     //smailalijagic: fails because Status is never changed and lobby seems to be empty?
-//    @Test
-//    public void answerLobbyInvitation_validInputs() {
-//        creator.setStatus(UserStatus.INLOBBY);
-//        Lobby lobby = new Lobby();
-//        lobby.setLobbyid(3L);
-//        lobby.setCreator_userid(1L);
-//        LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
-//        lobbyInvitationPutDTO.setAnswer(true);
-//        lobbyInvitationPutDTO.setLobbyId(3L);
-//        lobbyInvitationPutDTO.setInvitedUserId(2L);
-//        lobbyInvitationPutDTO.setCreatorId(1L);
-//
-//        when(userRepository.findUserById(1L)).thenReturn(creator);
-//        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
-//        when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
-//
-//        friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
-//
-//        assertEquals(2L, lobby.getInvited_userid());
-//        assertEquals(UserStatus.INLOBBY, invitedUser.getStatus());
-//    }
+    @Test
+    public void answerLobbyInvitation_validInputs() {
+        creator.setStatus(UserStatus.INLOBBY_PREPARING);
+        Lobby lobby = new Lobby();
+        lobby.setLobbyid(3L);
+        lobby.setCreator_userid(1L);
+        LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
+        lobbyInvitationPutDTO.setAnswer(true);
+        lobbyInvitationPutDTO.setLobbyId(3L);
+        lobbyInvitationPutDTO.setInvitedUserId(2L);
+        lobbyInvitationPutDTO.setCreatorId(1L);
+        LobbyInvitation lobbyInvitation = new LobbyInvitation();
+        lobbyInvitation.setCreatorUsername("creator");
+        lobbyInvitation.setLobbyId(3L);
+        lobbyInvitation.setCreatorId(1L);
+        invitedUser.addLobbyInvitation(lobbyInvitation);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
+
+        friendService.answerLobbyInvitation(lobbyInvitationPutDTO);
+
+        assert (!invitedUser.getLobbyInvitations().contains(lobbyInvitation));
+    }
+
+    @Test
+    public void answerLobbyInvitation_UserNotInLobby_throwsException() {
+        creator.setStatus(UserStatus.ONLINE);
+        Lobby lobby = new Lobby();
+        lobby.setLobbyid(3L);
+        lobby.setCreator_userid(1L);
+        LobbyInvitationPutDTO lobbyInvitationPutDTO = new LobbyInvitationPutDTO();
+        lobbyInvitationPutDTO.setAnswer(true);
+        lobbyInvitationPutDTO.setLobbyId(3L);
+        lobbyInvitationPutDTO.setInvitedUserId(2L);
+        lobbyInvitationPutDTO.setCreatorId(1L);
+        LobbyInvitation lobbyInvitation = new LobbyInvitation();
+        lobbyInvitation.setCreatorUsername("creator");
+        lobbyInvitation.setLobbyId(3L);
+        lobbyInvitation.setCreatorId(1L);
+        invitedUser.addLobbyInvitation(lobbyInvitation);
+
+        when(userRepository.findUserById(1L)).thenReturn(creator);
+        when(userRepository.findUserById(2L)).thenReturn(invitedUser);
+
+        assertThrows(ResponseStatusException.class, () -> friendService.answerLobbyInvitation(lobbyInvitationPutDTO));
+    }
 
     @Test
     public void deleteFriend_validInputs() {
@@ -235,6 +334,16 @@ public class FriendServiceTest {
         //After
         assert creator.getFriendsList().isEmpty();
         assert invitedUser.getFriendsList().isEmpty();
+    }
+
+    @Test
+    public void getLobbyInvitations() {
+        LobbyInvitation lobbyInvitation = new LobbyInvitation();
+        creator.addLobbyInvitation(lobbyInvitation);
+
+        List<LobbyInvitation> result = friendService.getLobbyInviations(creator);
+
+        assert result.contains(lobbyInvitation);
     }
 
 }
