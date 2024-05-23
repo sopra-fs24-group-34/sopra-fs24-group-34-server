@@ -1,31 +1,46 @@
-# SoPra FS24 group 34 Server
+# SoPra FS24 group 34 Server - Guess Who?
+
+## Introduction
+Does the person have brown eyes? No! Did you forgot this game? "Guess Who" is back. We implemented the traditional tabletop game where users have to guess characters by asking yes or no characters. 
+The rules are simple:
+1. **Setup**:  Each player selects a character card without revealing it to their opponent. This card represents the character the opponent must guess
+2. **Taking Turns**: Players take turns asking yes or no questions about the opponent's character in order to narrow down the possibilities.
+3. **Elimination**: Based on the answers to the questions, players can start eliminating characters that do not fit the description until they are confident enough to make a guess.
+4. **Winning**: The first player to correctly guess their opponent's character wins the game!
 
 
-# Table of Contents
-1. [Links](#links)
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Technologies](#technologies)
+3. [High-level Components](#HLC)
+4. [Launch & Deployment](#LD)
+5. [Interface User Flow](#IUF)
+6. [Roadmap](#roadmap)
+7. [Authors and Acknowledgment](#AAA)
+8. [Licencse](#licence)
+9. [Further Material](#FM)
    1. [UML Diagram](#uml)
    2. [Component Diagram](#component)
    3. [Activity Diagram](#activity)
    4. [Figma Mockups](#figma)
-2. ...
 
+## Technologies
+For this webapplication we used ReactJS in the frontend and Java Spring in the backend. More specifically we used the following technologies
+- HTML/CSS/JavaScript/TypeScript: ...
+- Java: ...
+- Websockets: ...
 
-## Links
-- [UML Diagram](https://lucid.app/lucidchart/bdc43c7c-3a02-4163-9724-150a430a899a/edit?invitationId=inv_7c71d23b-ad34-4ca4-b878-67235064b5df&page=0_0#)
-- [Component Diagram](https://lucid.app/lucidchart/49acbc96-3e66-4064-99c4-4174bcf3b833/edit?invitationId=inv_56df17db-d1b8-4ae0-b4c8-e27462ec2213&page=0_0#)
-- [Activity Diagram](https://lucid.app/lucidchart/e5d280ab-f80c-4e6c-8c0b-7544ba9b8936/edit?invitationId=inv_10376661-1660-47e2-b32b-fbf7d82989de&page=0_0#)
-- [Figma Mockups](https://www.figma.com/file/b6orEYoJfIJ8n25mSPVsY7/Untitled?type=design&node-id=0-1&mode=design&t=ch054pYdPzTn8U1s-0)
+## High-level Components
+some text
 
-
-
-# SoPra RESTful Service Template FS24
-## Getting started with Spring Boot
+## Launch & Deployment
+### Getting started with Spring Boot
 -   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 -   Guides: http://spring.io/guides
     -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
     -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
 
-## Setup this Template with your IDE of choice
+### Setup this Template with your IDE of choice
 Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
 
 ### IntelliJ
@@ -43,7 +58,7 @@ The following extensions can help you get started more easily:
 
 **Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `soprafs24` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
 
-## Building with Gradle
+### Building with Gradle
 You can use the local Gradle Wrapper to build the application.
 -   macOS: `./gradlew`
 -   Linux: `./gradlew`
@@ -87,10 +102,10 @@ If you want to avoid running all tests with every change, use the following comm
 
 `./gradlew build --continuous -xtest`
 
-## API Endpoint Testing with Postman
+### API Endpoint Testing with Postman
 We recommend using [Postman](https://www.getpostman.com) to test your API Endpoints.
 
-## Debugging
+### Debugging
 If something is not working and/or you don't know what is going on. We recommend using a debugger and step-through the process step-by-step.
 
 To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you start with `./gradlew bootRun` command), do the following:
@@ -102,8 +117,37 @@ To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you st
 5. Set breakpoints in the application where you need it
 6. Step through the process one step at a time
 
-## Testing
+### Testing
 Have a look here: https://www.baeldung.com/spring-boot-testing
 
-## DockerHub
+### DockerHub
 Link to server: https://hub.docker.com/repository/docker/sopragroup34/server/general
+
+## Interface User Flow
+some text
+
+## Roadmap
+some text
+
+## Authors and Acknowledgment
+Frontend Developer
+- []()
+- []()
+- []()
+
+Backend Developer
+- [Smail Alijagic](https://www.github.com/smailalijagic)
+- []()
+- []()
+
+We want to express our sincere gratitude to [Marco Leder](https://www.github.com/marcoleder) for his outstanding expertise and support throughout the development of our project.
+
+
+## Licencse
+some text
+
+## Appendix
+- [UML Diagram](https://lucid.app/lucidchart/bdc43c7c-3a02-4163-9724-150a430a899a/edit?invitationId=inv_7c71d23b-ad34-4ca4-b878-67235064b5df&page=0_0#)
+- [Component Diagram](https://lucid.app/lucidchart/49acbc96-3e66-4064-99c4-4174bcf3b833/edit?invitationId=inv_56df17db-d1b8-4ae0-b4c8-e27462ec2213&page=0_0#)
+- [Activity Diagram](https://lucid.app/lucidchart/e5d280ab-f80c-4e6c-8c0b-7544ba9b8936/edit?invitationId=inv_10376661-1660-47e2-b32b-fbf7d82989de&page=0_0#)
+- [Figma Mockups](https://www.figma.com/file/b6orEYoJfIJ8n25mSPVsY7/Untitled?type=design&node-id=0-1&mode=design&t=ch054pYdPzTn8U1s-0)
