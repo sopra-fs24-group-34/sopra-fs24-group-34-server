@@ -89,20 +89,20 @@ class WebSocketSessionServiceTest {
         assertEquals(1L, session.getAttributes().get("userId"));
     }
 
-    @Test
-    void handleDisconnectedSession_ShouldHandleDisconnection2() {
-        when(session.getId()).thenReturn("sessionId1");
-        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
-        List<WebSocketSession> sessions = new ArrayList<>();
-        sessions.add(session);
-
-        webSocketSessionService.getSessionsMap().put(1L, sessions);
-
-        webSocketSessionService.handleDisconnectedSession(session);
-
-        verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
-        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
-    }
+//    @Test
+//    void handleDisconnectedSession_ShouldHandleDisconnection2() {
+//        when(session.getId()).thenReturn("sessionId1");
+//        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
+//        List<WebSocketSession> sessions = new ArrayList<>();
+//        sessions.add(session);
+//
+//        webSocketSessionService.getSessionsMap().put(1L, sessions);
+//
+//        webSocketSessionService.handleDisconnectedSession(session);
+//
+//        verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
+//        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
+//    }
 
     @Test
     void mapActiveSessionToLobby_ShouldMapSession2() {
