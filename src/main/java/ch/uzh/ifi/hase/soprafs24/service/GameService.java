@@ -331,17 +331,19 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 80;
-      if (imageCount == 0){
-          desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
-      }
+      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
+      /*if (imageCount == 0){
+          desiredImageNr = 110;
+      } */
 
       if (imageCount < desiredImageNr) {
-          // ff there are less than 120 images, fetch and save more
+          // if there are less than 120 images, fetch and save more
           int count = desiredImageNr - imageCount;
+          /*
           if (count < 15){
               count = 15;
           }
+                     */
           int i = 0;
           int keysAmount = 3; // change to amount of keys!!
           //the following is to try every api key and then throw an error in case
@@ -493,13 +495,11 @@ public class GameService {
             gameRepository.flush();
 
             // Delete the image from the database
-            imageRepository.deleteById(imageId);
+            //imageRepository.deleteById(imageId);
 
             replaceGameImages(gameId);
-            databaseImageCheck();
+            //databaseImageCheck();
 
-            // fetch and add a new image to ensure the game always has at least one image
-            //return replaceGameImages(gameId);
 
         } catch (Exception e) {
             logger.severe("Error while deleting image from game: " + e.getMessage());

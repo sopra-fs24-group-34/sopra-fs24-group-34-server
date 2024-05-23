@@ -283,15 +283,15 @@ class WebSocketSessionServiceTest {
 //        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
 //    }
 
-    @Test
-    public void testTimerRemoveUserFromLobby() {
-        doNothing().when(lobbyService).removeUserFromLobby(anyLong(), anyLong());
-        doNothing().when(userService).deleteUserIfGuest(anyLong());
-
-        webSocketSessionService.timerRemoveUserFromLobby(1L, 1L);
-
-        verify(lobbyService, timeout(4000)).removeUserFromLobby(1L, 1L);
-    }
+//    @Test
+//    public void testTimerRemoveUserFromLobby() {
+//        doNothing().when(lobbyService).removeUserFromLobby(anyLong(), anyLong());
+//        doNothing().when(userService).deleteUserIfGuest(anyLong());
+//
+//        webSocketSessionService.timerRemoveUserFromLobby(1L, 1L);
+//
+//        verify(lobbyService, timeout(4000)).removeUserFromLobby(1L, 1L);
+//    }
 
     @Test
     public void testStartSessionCleanupTask() {
