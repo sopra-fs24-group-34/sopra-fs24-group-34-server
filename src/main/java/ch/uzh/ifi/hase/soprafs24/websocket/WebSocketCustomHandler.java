@@ -18,11 +18,11 @@ public class WebSocketCustomHandler extends ExceptionWebSocketHandlerDecorator {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        System.out.println("-----------------------------------");
-        System.out.println("CH Connection established: " + session);
-        //System.out.println("CH Session attributes: " + session.getAttributes());
-        //System.out.println("CH Session userId: " + session.getAttributes().get("userId"));
-        //System.out.println("Session Handshake headers: " + session.get);
+        //System.out.println("-----------------------------------");
+        //System.out.println("WS-Handler: Connection established, " + session);
+        //System.out.println("WS-Handler: Session attributes: " + session.getAttributes());
+        //System.out.println("WS-Handler: Session userId: " + session.getAttributes().get("userId"));
+        //System.out.println("WS-Handler: Session Handshake headers: " + session.get);
         webSocketSessionService.addActiveSession(session);
         super.afterConnectionEstablished(session);
     }

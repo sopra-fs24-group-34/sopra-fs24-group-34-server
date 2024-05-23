@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -197,7 +196,7 @@ class WebSocketSessionServiceTest {
         webSocketSessionService.handleDisconnectedSession(session);
 
         verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
-        assertTrue(webSocketSessionService.getDisconnectedSessions().containsKey(1L));
+        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
     }
 
 //    @Test
@@ -337,7 +336,7 @@ class WebSocketSessionServiceTest {
         webSocketSessionService.handleDisconnectedSession(session);
 
         verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
-        assertTrue(webSocketSessionService.getDisconnectedSessions().containsKey(1L));
+        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
     }
 
 //    @Test
