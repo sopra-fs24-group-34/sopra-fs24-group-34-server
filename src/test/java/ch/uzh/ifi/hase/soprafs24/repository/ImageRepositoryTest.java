@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.repository;
 
 import ch.uzh.ifi.hase.soprafs24.entity.Image;
-import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
 import ch.uzh.ifi.hase.soprafs24.service.UnsplashService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +16,6 @@ public class ImageRepositoryTest {
 
     @Mock
     private ImageRepository imageRepository;
-
-    @InjectMocks
-    private UnsplashService unsplashService;
 
     @Test
     void findImageById_ReturnsImage_WhenImageExists() {
