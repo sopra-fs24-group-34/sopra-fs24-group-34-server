@@ -331,10 +331,10 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 120; // don't go higher or it will not work because of limited images on unsplash
+      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
 
       if (imageCount < desiredImageNr) {
-          // ff there are less than 150 images, fetch and save more
+          // ff there are less than 120 images, fetch and save more
           int count = desiredImageNr - imageCount;
           int i = 0;
           int keysAmount = 3; // change to amount of keys!!
