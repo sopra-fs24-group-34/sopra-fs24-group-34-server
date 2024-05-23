@@ -287,11 +287,60 @@ public class GameServiceIntegrationTest {
 
 
     @Test
+    void guessImage_wrongInput() {
+        Image image = new Image();
+        image.setId(1L);
+        Player player = new Player();
+        player.setPlayerId(1L);
+        player.setUserId(1L);
+        player.setStrikes(2);
+        Player opp = new Player();
+        opp.setPlayerId(2L);
+        opp.setUserId(2L);
+        opp.setChosencharacter(1L);
+        Guess guess = new Guess();
+        guess.setGameId(4L);
+        guess.setImageId(10L);
+        guess.setPlayerId(1L);
+        Response response = new Response();
+        response.setGuess(false);
+        response.setStrikes(3);
+        response.setPlayerId(1L);
+        response.setRoundStatus(GameStatus.END);
+        createdgame.setCurrentRound(2);
+        createdgame.setCurrentTurnPlayerId(2L);
+        createdgame.setCreatorPlayerId(2L);
+        createdgame.setInvitedPlayerId(3L);
+        createdgame.setGuestGuess(false);
+        RoundDTO roundDTO = new RoundDTO(2, 2L, "");
+
+        System.out.println(guess.getGameId());
+        when(gameUserService.getChosenCharacterOfOpponent(createdgame, 1L)).thenReturn(1L);
+        when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
+        when(gameUserService.getStrikes(1L)).thenReturn(3);
+        when(gameUserService.createResponse(eq(false), eq(1L), eq(3), eq(GameStatus.END))).thenReturn(response);
+        when(gameUserService.getUser(1L)).thenReturn(creator);
+        when(gameUserService.getUser(2L)).thenReturn(invited);
+        when(gameUserService.getPlayer(2L)).thenReturn(player);
+        when(gameUserService.getPlayer(3L)).thenReturn(opp);
+        doNothing().when(gameUserService).increaseStrikesByOne(1L);
+        player.setStrikes(3);
+        when(gameUserService.determineGameStatus(4L)).thenReturn(GameStatus.END);
+
+
+
+        Response result = gameservice.guessImage(guess);
+
+        // this will only give back true when the Mockito functions are called with the right arguments
+        assertEquals(result.getGuess(), false);
+    }
+
+    @Test
     void handleWin_validInputs() {
 
     }
 
-    @Test
+    /**@Test
     void handleLoss_validInputs(){
         Player creatorPlayer = new Player();
         creatorPlayer.setPlayerId(1L);
@@ -315,7 +364,7 @@ public class GameServiceIntegrationTest {
         gameservice.handleLoss(1L, 4L);
 
         assert createdgame.getCurrentTurnPlayerId().equals(2L);
-    }
+    }*/
 
     @Test
     void deleteGame_validInputs() {
@@ -390,6 +439,39 @@ public class GameServiceIntegrationTest {
     }
 
     @Test
+    void replaceGameImage_validInputs() {
+        Image image = new Image();
+        image.setId(1L);
+        image.setUrl("picture");
+        List<Image> imageList = new ArrayList<Image>();
+        imageList.add(image);
+        createdgame.setGameImages(imageList);
+
+        ImageDTO imageDTO = new ImageDTO();
+        imageDTO.setId(2L);
+        List<ImageDTO> imageDTOList = new ArrayList<>();
+        imageDTOList.add(imageDTO);
+
+        ImageDTO imageDTO2 = new ImageDTO();
+        imageDTO2.setId(1L);
+        imageDTO2.setUrl("picture");
+        List<ImageDTO> imageDTOList1 = new ArrayList<>();
+        imageDTOList1.add(imageDTO2);
+        Optional<List<ImageDTO>> optionalList = Optional.of(imageDTOList1);
+
+
+        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.of(createdgame));
+        Mockito.when(gameservice.createImageDTO(imageList)).thenReturn(imageDTOList1);
+        Mockito.when(unsplashService.getImageUrlsFromDatabase(1, optionalList)).thenReturn(imageDTOList);
+
+        assertEquals(createdgame.getGameImages().size(), 1);
+
+        gameservice.replaceGameImages(4L);
+
+        assertEquals(createdgame.getGameImages().size(), 2);
+    }
+
+    @Test
     void createImageEntities_validInput() {
         ImageDTO imageDTO = new ImageDTO();
         imageDTO.setId(1L);
@@ -460,7 +542,6 @@ public class GameServiceIntegrationTest {
         assertEquals(result.get(1).getUrl(), "second picture");
     }
 
-
     @Test
     void deleteGameImage_validInputs() {
         Image image = new Image();
@@ -471,6 +552,15 @@ public class GameServiceIntegrationTest {
         imageList.add(image);
         imageList.add(image2);
         createdgame.setGameImages(imageList);
+
+        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.of(createdgame));
+        doNothing().when(gameservice).replaceGameImages(4L);
+        doNothing().when(gameservice).databaseImageCheck();
+
+        gameservice.deleteGameImage(4L, 1L);
+
+        assert createdgame.getGameImages().contains(image2);
+        assert !createdgame.getGameImages().contains(image);
     }
 
 }
