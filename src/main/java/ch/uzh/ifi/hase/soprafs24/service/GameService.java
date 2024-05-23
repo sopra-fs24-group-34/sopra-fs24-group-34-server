@@ -331,8 +331,10 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
-
+      int desiredImageNr = 80;
+      if (imageCount == 0){
+          desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
+      }
       if (imageCount < desiredImageNr) {
           // ff there are less than 120 images, fetch and save more
           int count = desiredImageNr - imageCount;
@@ -459,7 +461,7 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while replacing image from your game", e);
         }
     }
-
+    @Transactional
     public void deleteGameImage(Long gameId, Long imageId) {
         try {
             // retrieve the game entity from (db)
@@ -474,8 +476,11 @@ public class GameService {
             // update the list of images of the game
             List<Image> currentImages = game.getGameImages();
 
-            currentImages.removeIf(image -> image.getId().equals(imageId));
+            boolean removed = currentImages.removeIf(image -> image.getId().equals(imageId));
 
+            if (!removed) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found in the game");
+            }
             // set the updated list of images to the game
             game.setGameImages(currentImages);
             
