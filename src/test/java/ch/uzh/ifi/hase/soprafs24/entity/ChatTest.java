@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ChatTest {
-
     @Test
     public void testSetMessagesAndGetMessages() {
         // Create a new chat instance
