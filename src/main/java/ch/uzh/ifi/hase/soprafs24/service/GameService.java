@@ -474,8 +474,11 @@ public class GameService {
             // update the list of images of the game
             List<Image> currentImages = game.getGameImages();
 
-            currentImages.removeIf(image -> image.getId().equals(imageId));
+            boolean removed = currentImages.removeIf(image -> image.getId().equals(imageId));
 
+            if (!removed) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Image not found in the game");
+            }
             // set the updated list of images to the game
             game.setGameImages(currentImages);
             
