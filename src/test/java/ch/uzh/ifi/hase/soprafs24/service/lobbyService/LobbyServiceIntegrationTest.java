@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.service.lobbyservice;
+package ch.uzh.ifi.hase.soprafs24.service.lobbyService;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
@@ -6,7 +6,6 @@ import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ public class LobbyServiceIntegrationTest {
 
     @Autowired
     private LobbyService lobbyService;
-
 
     @BeforeEach
     public void setup() {
