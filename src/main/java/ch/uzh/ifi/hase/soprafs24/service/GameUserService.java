@@ -82,7 +82,7 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-    public GameStatus determineGameStatus(Long gameId) {
+    public GameStatus determineGameStatus(Long gameId, boolean lastGuessCorrect) {
         Game game = new Game();
         try {
             game = gameRepository.findByGameId(gameId);
@@ -96,6 +96,8 @@ public class GameUserService {
         if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
             return GameStatus.CHOOSING;
         } else if((creator.getStrikes() >= game.getMaxStrikes()) || (invited.getStrikes() >= game.getMaxStrikes())) {
+            return GameStatus.END;
+        } else if(!lastGuessCorrect) {
             return GameStatus.END;
         }
         return GameStatus.GUESSING;

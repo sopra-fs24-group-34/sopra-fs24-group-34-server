@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
@@ -113,10 +114,9 @@ public class GameController {
 
     Guess guess = DTOMapper.INSTANCE.convertGuessPostDTOtoEntity(guessPostDTO);
     Response response = gameService.guessImage(guess);
+    GameStatus gameStatus = response.getRoundStatus();
 
-    Game game = gameService.getGame(guessPostDTO.getGameid());
-
-    RoundDTO roundDTO = gameService.updateTurn(guess.getGameId());
+    RoundDTO roundDTO = gameService.updateTurn(guess.getGameId(), gameStatus);
 
     webSocketMessenger.sendMessage("/games/" + guess.getGameId(), roundDTO.getEvent(), roundDTO);
 
@@ -129,7 +129,7 @@ public class GameController {
         Map<String, Object> requestMap = gson.fromJson(stringJsonRequest, Map.class);
         Long gameId = gson.fromJson(gson.toJson(requestMap.get("gameId")), Long.class);
 
-        RoundDTO roundDTO = gameService.updateTurn(gameId);
+        RoundDTO roundDTO = gameService.updateTurn(gameId, GameStatus.GUESSING);
 
         webSocketMessenger.sendMessage("/games/" + gameId, roundDTO.getEvent(), roundDTO);
 

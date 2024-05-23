@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -36,18 +37,20 @@ public class GameService {
   private final UnsplashService unsplashService;
   private static final Logger logger = Logger.getLogger(UnsplashService.class.getName());
   private final LobbyService lobbyService;
+  private final WebSocketMessenger webSocketMessenger;
 
 
     @Autowired
   public GameService(@Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("imageRepository") ImageRepository imageRepository,
                      GameUserService gameUserService, @Qualifier("lobbyRepository") LobbyRepository lobbyRepository,
-                     UnsplashService unsplashService, LobbyService lobbyService) {
+                     UnsplashService unsplashService, LobbyService lobbyService, WebSocketMessenger webSocketMessenger) {
     this.gameRepository = gameRepository;
     this.imageRepository = imageRepository;
     this.gameUserService = gameUserService;
     this.lobbyRepository = lobbyRepository;
     this.unsplashService = unsplashService;
     this.lobbyService = lobbyService;
+    this.webSocketMessenger = webSocketMessenger;
     }
 
   public List<Game> getGames() {
@@ -88,9 +91,10 @@ public class GameService {
         return player1.getChosencharacter() != null && player2.getChosencharacter() != null;
     }
 
-    public RoundDTO updateTurn(Long gameId) {
+    public RoundDTO updateTurn(Long gameId, GameStatus gameStatus) {
 
         Game game = gameRepository.findByGameId(gameId);
+
         Long currentTurnPlayerId = game.getCurrentTurnPlayerId();
         Long nextTurnPlayerId = currentTurnPlayerId.equals(game.getCreatorPlayerId()) ? game.getInvitedPlayerId() : game.getCreatorPlayerId();
         game.setCurrentTurnPlayerId(nextTurnPlayerId);
@@ -100,10 +104,19 @@ public class GameService {
             event = "round-update";
             game.setCurrentRound(game.getCurrentRound() + 1);
         } else {event = "turn-update";}
-        gameRepository.save(game);
-        gameRepository.flush();
 
-        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), event);
+        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), event);
+        // Check if the game status is END
+        if (gameStatus == GameStatus.END || gameStatus == GameStatus.TIE) {
+            // Delete the game
+            deleteGame(game);
+        } else {
+            // Save the changes to the game
+            gameRepository.save(game);
+            gameRepository.flush();
+        }
+
+        return roundDTO;
     }
 
 
@@ -164,67 +177,76 @@ public class GameService {
       return game;
   }
 
-  public Response guessImage(Guess guess) {
-      //till: check if game exists
-      // checkIfGameExists(guess.getGameId());
-      //till: check if Imageid exists
-      // checkIfImageExists(guess.getImageId());
-      //till: check if player is in the game
-      Game game = gameRepository.findByGameId(guess.getGameId());
-      Long playerId = guess.getPlayerId();
-      //gameUserService.checkIfPlayerinGame(game, playerId);
-
-      //get the chosencharacter of the Opponent
-      Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
-      Response r;
+    public Response guessImage(Guess guess) {
+        Long playerId = guess.getPlayerId();
+        System.out.println("Guess received from player " + playerId + " for game " + guess.getGameId());
+        Game game = gameRepository.findByGameId(guess.getGameId());
 
 
-      //tie logic
-      if (oppChosenCharacter.equals(guess.getImageId())) {
-          if (playerId == game.getInvitedPlayerId()) {
-              int strikes = gameUserService.getStrikes(playerId);
-              game.setGuestGuess(true);
-              GameStatus gameStatus = GameStatus.LASTCHANCE;
-              return gameUserService.createResponse(true, playerId, strikes, gameStatus);
-          }
-          else {
-              game.setCreatorGuess(true);
-          }
-          if (game.getCreatorGuess() && game.getGuestGuess()) {
-              r = handleTie(playerId);
-              handleTie(gameUserService.getOpponentId(game, playerId));}
-          else {
-              r = handleWin(playerId, game.getGameId());
-              gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
-          }
-          //handle opponents loss
-          deleteGame(game);
-          return r;
-      }
-      else {
-          //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
-          if (game.getGuestGuess()) {
-              r = handleWin(game.getInvitedPlayerId(), game.getGameId());
-              gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, game.getInvitedPlayerId())));
-              deleteGame(game);
-              return r;
-          }
-          gameUserService.increaseStrikesByOne(playerId);
-          int strikes = gameUserService.getStrikes(playerId);
-          GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId());
 
-          if (gameStatus != GameStatus.END) {
-              return gameUserService.createResponse(false, playerId, strikes, gameStatus);
-          }
-          else {
-              r = handleLoss(playerId, game.getGameId());
-              //handle opponents win
-              handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId()); //nedim-j: do we also send a websocket for the loss of opponent?
-              deleteGame(game);
-              return r;
-          }
-      }
-  }
+        // Get the chosen character of the opponent
+        Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
+        Response r;
+
+        // If the guess is correct
+        if (oppChosenCharacter.equals(guess.getImageId())) {
+            // If the invited player has guessed correctly
+            if (Objects.equals(playerId, game.getInvitedPlayerId())) {
+                game.setGuestGuess(true);
+                // If both players have guessed correctly, it's a tie
+                if (game.getCreatorGuess() && game.getGuestGuess()) {
+                    return handleTie(game);
+                }
+                // Otherwise, the game status is set to LASTCHANCE
+                else {
+                    int strikes = gameUserService.getStrikes(playerId);
+                    return gameUserService.createResponse(true, playerId, strikes, GameStatus.LASTCHANCE);
+                }
+            }
+            // If the creator player has guessed correctly
+            else if (Objects.equals(playerId, game.getCreatorPlayerId())) {
+                game.setCreatorGuess(true);
+                // If both players have guessed correctly, it's a tie
+                if (game.getCreatorGuess() && game.getGuestGuess()) {
+                    return handleTie(game);
+                }
+            }
+            // If the game is not a tie, handle the win
+            r = handleWin(playerId, game.getGameId());
+            gameUserService.increaseGamesPlayed(gameUserService.getOpponentId(game, playerId));
+            //deleteGame(game);
+            return r;
+        }
+        // If the guess is incorrect
+// If the guess is incorrect
+        else {
+            gameUserService.increaseStrikesByOne(playerId);
+            int strikes = gameUserService.getStrikes(playerId);
+            GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId(), false);
+
+            // If the game status was LASTCHANCE before the guess was made
+            if (gameStatus == GameStatus.LASTCHANCE) {
+                // Handle the win for the other player
+                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId());
+                // Delete the game
+                //deleteGame(game);
+                // Return a response indicating the game has ended
+                return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
+            }
+
+            // If the game is not over, return the current game status
+            if (gameStatus != GameStatus.END) {
+                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
+            }
+            // If the game is over, handle the loss
+            else {
+                r = handleLoss(playerId, game.getGameId());
+                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId());
+                //deleteGame(game);
+                return r;
+            }
+        }
+    }
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
@@ -239,6 +261,7 @@ public class GameService {
     return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
 
+  /*
     public Response handleTie(Long playerId) {
         //nedim-j: handle stats increase etc.
         gameUserService.increaseGamesPlayed(playerId);
@@ -246,6 +269,27 @@ public class GameService {
         int strikes = gameUserService.getStrikes(playerId);
         return gameUserService.createResponse(true, playerId, strikes, GameStatus.TIE);
     }
+
+   */
+
+  public Response handleTie(Game game) {
+    // Get the player IDs
+    Long creatorPlayerId = game.getCreatorPlayerId();
+    Long invitedPlayerId = game.getInvitedPlayerId();
+
+    // Handle stats increase for both players
+    gameUserService.increaseGamesPlayed(creatorPlayerId);
+    gameUserService.increaseGamesPlayed(invitedPlayerId);
+
+    // Create a response
+    int strikes = gameUserService.getStrikes(creatorPlayerId);
+    Response response = gameUserService.createResponse(true, creatorPlayerId, strikes, GameStatus.TIE);
+
+    // Delete the game
+    //deleteGame(game);
+
+    return response;
+  }
 
   public Response handleLoss(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
@@ -257,6 +301,7 @@ public class GameService {
 }
 
   public void deleteGame(Game game) {
+      System.out.println("Game deleted with ID: " + game.getGameId());
 
       //Get the users
       Player creator = gameUserService.getPlayer(game.getCreatorPlayerId());
@@ -269,23 +314,19 @@ public class GameService {
       gameUserService.saveUserChanges(host);
       gameUserService.saveUserChanges(invitedUser);
 
-      /*
-      //set the game in the Usergamelobbylist to null
-      gameUserService.updategamelobbylist(user);
-      gameUserService.updategamelobbylist(invitedUser);
-      // increase the games played
-      gameUserService.increaseGamesPlayed(game.getCreatorId());
-      gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
+      // Find the lobby that references the game
+      Lobby lobby = lobbyRepository.findByGame(game);
 
-      user.setStatus(UserStatus.ONLINE);  // till: probably needs to be changed when players go back to the lobby
-      invitedUser.setStatus(UserStatus.ONLINE);
-      gameUserService.saveuserchanges(user); // saves Status change
-      gameUserService.saveuserchanges(invitedUser);
+      // Remove the reference to the game from the lobby
+      if (lobby != null) {
+          lobby.setGame(null);
+          lobbyRepository.save(lobby);
+      }
 
-      //delete the game
-      gameRepository.delete(game);
+      // Now you can safely delete the game
+      gameRepository.deleteByGameId(game.getGameId());
 
-       */
+      webSocketMessenger.sendMessage("/lobbies/"+game.getGameId(), "game-deleted", "");
   }
 
   public GameHistory getGameHistory(Long gameId, Long userId) {
@@ -506,29 +547,6 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error while deleting image from your game", e);
         }
     }
-
-    /*
-    @Scheduled(fixedRate = 15000) // Check every 15 seconds
-    public void checkGameTimeout() {
-        //List<Game> activeGames = getActiveGames();
-        System.out.println("Scheduled activity check ");
-        for (Game game : gameRepository.findAll()) {
-            if (!WebSocketMessenger.isPlayerActive(game.getCreatorPlayerId())) {
-                gameUserService.increaseGamesPlayed(game.getCreatorPlayerId());
-                handleWin(game.getInvitedPlayerId());
-                deleteGame(game);
-            } else if (!WebSocketMessenger.isPlayerActive(game.getInvitedPlayerId())) {
-                gameUserService.increaseGamesPlayed(game.getInvitedPlayerId());
-                handleWin(game.getCreatorPlayerId());
-                deleteGame(game);
-            }
-        }
-    }
-
-     */
-
-
-
 }
 
 

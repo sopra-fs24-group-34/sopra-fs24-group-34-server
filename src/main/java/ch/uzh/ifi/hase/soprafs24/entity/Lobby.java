@@ -19,8 +19,9 @@ public class Lobby implements Serializable {
 
     private String lobbyToken;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Game game;// = new Game();
+    @OneToOne
+    @JoinColumn(name = "game_id", referencedColumnName = "gameId")
+    private Game game;
 
     public Long getLobbyid() {
         return lobbyid;

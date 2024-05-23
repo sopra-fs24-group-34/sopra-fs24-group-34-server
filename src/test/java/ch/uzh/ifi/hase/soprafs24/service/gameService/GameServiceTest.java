@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameService;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
@@ -7,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UnsplashService;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,6 +29,7 @@ public class GameServiceTest {
     private LobbyRepository lobbyRepository;
     private UnsplashService unsplashService;
     private LobbyService lobbyService;
+    private WebSocketMessenger webSocketMessenger;
 
     @BeforeEach
     public void setup() {
@@ -36,7 +39,8 @@ public class GameServiceTest {
         lobbyRepository = mock(LobbyRepository.class);
         unsplashService = mock(UnsplashService.class);
         lobbyService = mock(LobbyService.class);
-        gameService = new GameService(gameRepository, imageRepository, gameUserService, lobbyRepository, unsplashService, lobbyService);
+        webSocketMessenger = mock(WebSocketMessenger.class);
+        gameService = new GameService(gameRepository, imageRepository, gameUserService, lobbyRepository, unsplashService, lobbyService, webSocketMessenger);
     }
 
     @Test
@@ -79,7 +83,7 @@ public class GameServiceTest {
 
         when(gameRepository.findByGameId(anyLong())).thenReturn(game);
 
-        RoundDTO roundDTO = gameService.updateTurn(1L);
+        RoundDTO roundDTO = gameService.updateTurn(1L, GameStatus.GUESSING);
 
         assertEquals(2L, roundDTO.getCurrentTurnPlayerId());
         verify(gameRepository).save(game);
@@ -183,7 +187,7 @@ public class GameServiceTest {
 
         when(gameRepository.findByGameId(anyLong())).thenReturn(game);
 
-        RoundDTO roundDTO = gameService.updateTurn(1L);
+        RoundDTO roundDTO = gameService.updateTurn(1L, GameStatus.GUESSING);
 
         assertEquals(2L, roundDTO.getCurrentTurnPlayerId());
         verify(gameRepository).save(game);
