@@ -1,13 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
-import ch.uzh.ifi.hase.soprafs24.controller.UserController;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
-import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.service.ChatServiceWebSockets;
-import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -38,26 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @ExtendWith(MockitoExtension.class)
-//@WebMvcTest(UserController.class)
 public class UserControllerTest {
-
-    //@Autowired
     private MockMvc mockMvc;
 
     @Mock
     private UserService userService;
-
-    //@MockBean
-    //private GameRepository gameRepository;  // Mocking the GameRepository
-
-    //@MockBean
-    //private ChatServiceWebSockets chatServiceWebSockets; // Mocking the ChatServiceWebSockets
-
-    @Mock
-    private UserRepository userRepository; // Mocking the UserRepository
-
-    //@MockBean
-    //private FriendService friendService; // Mocking the FriendService
 
     @InjectMocks
     private UserController userController;
