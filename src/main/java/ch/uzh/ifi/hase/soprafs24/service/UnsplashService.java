@@ -40,7 +40,7 @@ public class UnsplashService {
     private List<String> accessKeys;
     private int currentKeyIndex = 0;
     private int requestsMade = 0;
-    private static final int REQUEST_LIMIT = 50;
+    private static final int REQUEST_LIMIT = 49;
 
     @PostConstruct
     public void init() {

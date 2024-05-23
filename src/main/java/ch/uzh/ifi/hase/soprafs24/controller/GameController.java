@@ -115,11 +115,12 @@ public class GameController {
     Response response = gameService.guessImage(guess);
 
     Game game = gameService.getGame(guessPostDTO.getGameid());
-    webSocketMessenger.sendMessage("/games/"+guess.getGameId(),"guess-result", response);
 
     RoundDTO roundDTO = gameService.updateTurn(guess.getGameId());
 
     webSocketMessenger.sendMessage("/games/" + guess.getGameId(), roundDTO.getEvent(), roundDTO);
+
+    webSocketMessenger.sendMessage("/games/"+guess.getGameId(),"guess-result", response);
 
   }
 
@@ -161,4 +162,4 @@ public class GameController {
 
     }
 
-  }
+}

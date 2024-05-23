@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
-import ch.uzh.ifi.hase.soprafs24.entity.Game;
-
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -12,7 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketSession;
 
 
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WebSocketSessionService {
@@ -55,6 +57,7 @@ public class WebSocketSessionService {
     public static WebSocketSessionService getInstance() {
         if (instance == null) {
             instance = new WebSocketSessionService();
+            instance.startSessionCleanupTask();
         }
         return instance;
     }
@@ -62,7 +65,25 @@ public class WebSocketSessionService {
     //nedim-j: session handling
     private final Map<Long, List<WebSocketSession>> sessionsMap = new HashMap<>(); // Map to store WebSocket sessions to corresponding lobby/game
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
-    private final Map<Long, Long> disconnectedSessions = new HashMap<>(); //userid, lobbyid
+    private final Map<Long, Long> disconnectedUserLobby = new HashMap<>(); //userid, lobbyid
+
+    //nedim-j: session cleanup
+    private final Map<String, Long> activeSessionTimestamps = new HashMap<>();
+    private final Map<Long, Long> disconnectedUserLobbyTimestamps = new HashMap<>();
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);;
+
+
+    //testing purposes
+    public Map<Long, List<WebSocketSession>> getSessionsMap() {
+        return sessionsMap;
+    }
+    Map<String, WebSocketSession> getActiveSessions() {
+        return activeSessions; // smailalijagic: do not delete, needed for testing
+    }
+    Map<Long, Long> getDisconnectedUserLobby() {
+        return disconnectedUserLobby; // smailalijagic: do not delete, needed for testing
+    }
+
 
     public void handleSubscription(String destination, String sessionId) {
         String[] destinationSplit = destination.split("/");
@@ -72,14 +93,13 @@ public class WebSocketSessionService {
         } else if(destinationSplit[1].equals("games") && (destinationSplit.length < 4)/*!destinationSplit[3].equals("chat")*/){
             mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
-        //printSessionsMap();
-        //printActiveSessions();
-        //nedim-j: handling gameIds not necessary i think. there's no games without a lobby and games are already assigned to a lobby entity.
+        printEverything();
     }
 
     public void addActiveSession(WebSocketSession session) {
         String sessionId = session.getId();
         activeSessions.put(sessionId, session);
+        activeSessionTimestamps.put(sessionId, System.currentTimeMillis());
     }
 
     public void addUserIdToActiveSession(String sessionId, String userId) {
@@ -93,7 +113,7 @@ public class WebSocketSessionService {
 
             WebSocketSession session = activeSessions.get(sessionId);
             Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
-            Long lobbyId = disconnectedSessions.get(userId);
+            Long lobbyId = disconnectedUserLobby.get(userId);
             session.getAttributes().put("lobbyId", lobbyId);
 
             List<WebSocketSession> sessionsList = sessionsMap.get(lobbyId);
@@ -102,9 +122,13 @@ public class WebSocketSessionService {
                 sessionsList.add(session);
             }
 
-            System.out.println("User " + userId + " reconnected!");
+            sessionsMap.put(lobbyId, sessionsList);
+
+            System.out.println("User " + userId + " reconnected! | Reconnecting Lobby ID: " + lobbyId);
+            activeSessionTimestamps.remove(sessionId);
             activeSessions.remove(sessionId);
-            disconnectedSessions.remove(userId);
+            disconnectedUserLobbyTimestamps.remove(userId);
+            disconnectedUserLobby.remove(userId);
 
             try {
                 // Pause the execution of the loop for the specified interval
@@ -112,9 +136,7 @@ public class WebSocketSessionService {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            
-            //System.out.println("Sending message to: " + destination);
-            //System.out.println("Game: " + gameService.getGameState(destinationId));
+
             webSocketMessenger.sendMessage("/games/"+destinationId, "update-game-state", gameService.getGameState(destinationId));
         }
     }
@@ -143,6 +165,7 @@ public class WebSocketSessionService {
             lobbyService.translateAddUserToLobby(lobbyId, userId);
             // Step 6: Remove the session from activeSessions
             activeSessions.remove(sessionId);
+            activeSessionTimestamps.remove(sessionId);
         }
     }
 
@@ -150,9 +173,10 @@ public class WebSocketSessionService {
         String sessionId = session.getId();
         Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
         Long lobbyId = Long.valueOf(session.getAttributes().get("lobbyId").toString());
-        if(!disconnectedSessions.containsKey(userId)) {
-            disconnectedSessions.put(userId, lobbyId);
-        }
+        disconnectedUserLobby.put(userId, lobbyId);
+        disconnectedUserLobbyTimestamps.put(userId, System.currentTimeMillis());
+
+        System.out.println("User timed out! | Session ID: " + sessionId + " | User ID: " + userId + " | Lobby ID: " + lobbyId);
 
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
         sessions.remove(session);
@@ -164,15 +188,13 @@ public class WebSocketSessionService {
         } catch(Exception ignored) {
         }
 
-        if(gameId != null) {
+        if(gameId != null || sessions.isEmpty()) {
             timerCloseSessions(lobbyId, gameId);
         } else {
             timerRemoveUserFromLobby(lobbyId, userId);
         }
 
-        System.out.println("-----");
-        printSessionsMap();
-        printActiveSessions();
+        printEverything();
     }
 
 
@@ -249,143 +271,79 @@ public class WebSocketSessionService {
         }
     }
 
+    public void closeSessionsOfLobbyId(Long lobbyId) {
+        List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
 
-    /*
-    public void timerRemoveUserFromLobby(Long lobbyId, Long userId) {
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                synchronized (sessionsMap) {
-                    if (!sessionsMap.containsKey(lobbyId) || sessionsMap.get(lobbyId).size() < 2) {
-                        System.out.println("User left by closing session!");
-                        try {
-                            lobbyService.removeUserFromLobby(lobbyId, userId);
-                        } catch (Exception e) {
-                            System.out.println(e);
+        for (WebSocketSession session : sessions) {
+            Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
+            userService.deleteUserIfGuest(userId);
+            try {
+                if (session.isOpen()) {
+                    session.close();
+                }
+            }
+            catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not close session " +
+                        session + " | " + e);
+            }
+        }
+
+        sessionsMap.remove(lobbyId);
+        System.out.println("Closed sessions for ID: " + lobbyId);
+        //nedim-j: delete lobby
+
+        lobbyService.deleteLobby(lobbyService.getLobby(lobbyId));
+
+        printEverything();
+    }
+
+    public void startSessionCleanupTask() {
+        scheduler.scheduleAtFixedRate(() -> {
+            long currentTime = System.currentTimeMillis();
+
+            // Cleanup activeSessions
+            Iterator<Map.Entry<String, Long>> activeSessionIterator = activeSessionTimestamps.entrySet().iterator();
+            while (activeSessionIterator.hasNext()) {
+                Map.Entry<String, Long> entry = activeSessionIterator.next();
+                String sessionId = entry.getKey();
+                long timestamp = entry.getValue();
+
+                if (currentTime - timestamp > 10_000) { // 10 seconds
+                    try {
+                        WebSocketSession session = activeSessions.get(sessionId);
+                        if (session != null && session.isOpen()) {
+                            session.close();
                         }
+                        activeSessions.remove(sessionId);
+                        System.out.println("Removed active session " + sessionId);
+                    } catch(Exception e) {
+                        System.err.println("Exception occurred during SESSION cleanup task: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    activeSessionIterator.remove();
+                }
+            }
+
+            // Cleanup disconnectedUserLobby
+            Iterator<Map.Entry<Long, Long>> disconnectedUserLobbyIterator = disconnectedUserLobbyTimestamps.entrySet().iterator();
+            while (disconnectedUserLobbyIterator.hasNext()) {
+                Map.Entry<Long, Long> entry = disconnectedUserLobbyIterator.next();
+                Long userId = entry.getKey();
+                long timestamp = entry.getValue();
+
+                if (currentTime - timestamp > 10_000) { // 10 seconds
+                    try {
+                        disconnectedUserLobby.remove(userId);
+                        userService.deleteUserIfGuest(userId);
+                        System.out.println("Removed disconnected user " + userId);
+                        disconnectedUserLobbyIterator.remove();
+                    } catch(Exception e) {
+                        System.err.println("Exception occurred during USER cleanup task: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             }
-        }, 3 * 1000);
-
-        scheduler.schedule(() -> {
-            synchronized (sessionsMap) {
-                if (sessionsMap.containsKey(lobbyId) && sessionsMap.get(lobbyId).size() >= 2) {
-                    timer.cancel();
-                }
-            }
-        }, 1, TimeUnit.SECONDS);
-    }
-
-    public void timerCloseSessions(Long lobbyId, Long gameId) {
-        webSocketMessenger.sendMessage("/games/" + gameId, "user-timeout", timeoutThreshold);
-        System.out.println("User timed out!");
-
-        Runnable task = () -> {
-            synchronized (sessionsMap) {
-                if (!sessionsMap.containsKey(lobbyId) || sessionsMap.get(lobbyId).size() < 2) {
-                    System.out.println("User disconnected!");
-                    webSocketMessenger.sendMessage("/games/" + gameId, "user-disconnected", timeoutThreshold);
-                    closeSessionsOfLobbyId(lobbyId);
-                } else {
-                    System.out.println("User rejoined! Canceling timers for lobby: " + lobbyId);
-                    cancelTimer();
-                    webSocketMessenger.sendMessage("/games/" + gameId, "user-rejoined", timeoutThreshold);
-                }
-            }
-        };
-        currentTask = scheduler.schedule(task, timeoutThreshold, TimeUnit.SECONDS);
-
-        scheduleCheckSessions(lobbyId, gameId);
-    }
-
-    private void cancelTimer() {
-        if (currentTask != null && !currentTask.isDone()) {
-            currentTask.cancel(false);
-        }
-    }
-
-    private void scheduleCheckSessions(Long lobbyId, Long gameId) {
-        if (currentTask != null && !currentTask.isDone()) {
-            currentTask.cancel(false);
-        }
-
-        currentTask = scheduler.scheduleAtFixedRate(() -> {
-            synchronized (sessionsMap) {
-                List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
-                if (sessions != null && sessions.size() >= 2) {
-                    System.out.println("User rejoined! Canceling timers for lobby: " + lobbyId);
-                    currentTask.cancel(false);
-                    webSocketMessenger.sendMessage("/games/" + gameId, "user-rejoined", timeoutThreshold);
-                }
-            }
-        }, 0, 1, TimeUnit.SECONDS);
-    }
-
-     */
-
-    /*
-    @Scheduled(fixedRate = 1000)
-    public void checkSessions() {
-        synchronized (sessionsMap) {
-            for (Map.Entry<Long, List<WebSocketSession>> entry : sessionsMap.entrySet()) {
-                Long lobbyId = entry.getKey();
-                List<WebSocketSession> sessions = entry.getValue();
-
-                Long gameId = null;
-                try {
-                    gameId = lobbyService.getGameIdFromLobbyId(lobbyId);
-                } catch(Exception ignored) {
-                }
-
-                if (gameId != null && sessions.size() >= 2) {
-                    System.out.println("User rejoined! Canceling timers for lobby: " + lobbyId);
-                    scheduler.shutdownNow();
-                    webSocketMessenger.sendMessage("/games/" + lobbyId, "user-rejoined", timeoutThreshold);
-
-                }
-            }
-        }
-    }
-
-     */
-
-
-    public void closeSessionsOfLobbyId(Long lobbyId) {
-        List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
-        for(WebSocketSession session : sessions) {
-            try {
-                userService.deleteUserIfGuest(Long.valueOf(session.getAttributes().get("userId").toString()));
-                session.close();
-                sessions.remove(session);
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not close session " +
-                        session + " | "+ e);
-            }
-        }
-
-        sessionsMap.put(lobbyId, sessions);
-
-        if(sessionsMap.get(lobbyId) == null) {
-            sessionsMap.remove(lobbyId);
-            System.out.println("Closed sessions for ID: " + lobbyId);
-
-            //nedim-j: delete lobby
-
-        } else {
-            System.out.println("Error in closing sessions for ID: " + lobbyId);
-        }
-    }
-
-    public Map<Long, List<WebSocketSession>> getSessionsMap() {
-        return sessionsMap;
-    }
-
-
-    public void printSessionAttributes(String sessionId) {
-        WebSocketSession session = activeSessions.get(sessionId);
-        System.out.println("Session attributes: " +session.getAttributes());
+        }, 0, 5, TimeUnit.SECONDS);
     }
 
 
@@ -396,7 +354,7 @@ public class WebSocketSessionService {
             Long lobbyId = entry.getKey();
             List<WebSocketSession> sessionsList = entry.getValue();
 
-            System.out.println("  Lobby/Game ID: " + lobbyId + ":");
+            System.out.println("  Lobby ID: " + lobbyId + ":");
             for (WebSocketSession session : sessionsList) {
                 if(session != null) {
                     System.out.println("    SessionID: " + session.getId() +
@@ -427,30 +385,34 @@ public class WebSocketSessionService {
         System.out.println();
     }
 
-    // Method to handle game sessions
-    public void handleGameSession(WebSocketSession session, Game game) {
-        // Initialize last activity time for the player
-        //lastActivityMap.put(playerId, System.currentTimeMillis());
-    }
+    public void printDisconnectedSessions() {
+        System.out.println("Disconnected sessions to remove:");
+        if (!disconnectedUserLobby.isEmpty()) {
+            for (Map.Entry<Long, Long> entry : disconnectedUserLobby.entrySet()) {
+                if(entry != null) {
+                    Long userId = entry.getKey();
+                    Long lobbyId = entry.getValue();
 
-    /*
-    public boolean isPlayerActive(Long playerId) {
-        // Check if player is inactive based on last activity time
-        // Return true if inactive, false otherwise
-        Long lastActivityTime = lastActivityMap.get(playerId);
-        if (lastActivityTime == null) {
-            // Player's activity status unknown, assume active
-            return true;
+                    System.out.println("  User ID: " + userId + " | Lobby ID: " + lobbyId);
+                    // You can print more details about the session if needed
+                }
+            }
+        } else {
+            System.out.println("No disconnected sessions.");
         }
-        long currentTime = System.currentTimeMillis();
-        // Check if last activity time is within threshold (e.g., 15 seconds)
-        return (currentTime - lastActivityTime) < 15000;
+        System.out.println();
     }
 
-    public void handleLobbySession(WebSocketSession session, Lobby lobby) {
-        // Initialize last activity time for the player
-        //lastActivityMap.put(playerId, System.currentTimeMillis());
+    public void printEverything() {
+        System.out.println("-----");
+        printSessionsMap();
+        printActiveSessions();
+        printDisconnectedSessions();
+        System.out.println("-----");
     }
 
-     */
+    public void printSessionAttributes(String sessionId) {
+        WebSocketSession session = activeSessions.get(sessionId);
+        System.out.println("Session attributes: " +session.getAttributes());
+    }
 }

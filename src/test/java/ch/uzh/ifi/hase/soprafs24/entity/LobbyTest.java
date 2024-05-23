@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LobbyTest {
-
     @Test
     public void testSetLobbyIdSuccess() {
         // Create a Lobby instance

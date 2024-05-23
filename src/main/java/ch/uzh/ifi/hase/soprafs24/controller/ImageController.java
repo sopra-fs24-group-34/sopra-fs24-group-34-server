@@ -16,7 +16,7 @@ public class ImageController {
 
     @PostMapping("/images/saving")
     public String fetchAndSaveImages() { //fetches from database and saves to database
-        unsplashService.saveRandomPortraitImagesToDatabase(150);
+        unsplashService.saveRandomPortraitImagesToDatabase(110);
         return "Successfully fetched and saved images to the database.";
     }
 

@@ -31,6 +31,12 @@ public class Game implements Serializable {
     @Column
     private Long currentTurnPlayerId;
 
+    @Column
+    private boolean guestGuess;
+
+    @Column
+    private boolean creatorGuess;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "game_image",
@@ -92,6 +98,17 @@ public class Game implements Serializable {
 
     public void setCurrentRound(int currentRound) {
         this.currentRound = currentRound;
+    }
+
+    public void setGuestGuess(boolean guestGuess) {this.guestGuess = guestGuess;}
+
+    public boolean getGuestGuess() {
+        return guestGuess;
+    }
+    public void setCreatorGuess(boolean creatorGuess) {this.creatorGuess = creatorGuess;}
+
+    public boolean getCreatorGuess() {
+        return creatorGuess;
     }
 
     public List<Image> getGameImages() {

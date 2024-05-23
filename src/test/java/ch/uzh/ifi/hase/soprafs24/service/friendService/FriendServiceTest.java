@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.service.friendservice;
+package ch.uzh.ifi.hase.soprafs24.service.friendService;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
