@@ -85,7 +85,7 @@
 | Date | Name | Links to Github Issues | Comments |
 | ---- | ---- | ---------------------- | -------- |
 |      | Smail Alijagic | [#180](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/180) | Finalizing tests, cleaning up code |
-| 22.05.2024 | Dario Giuliani |[#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184)                        | Finished roundbased system concering guesses and chat. Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135)|
+| 22.05.2024 | Dario Giuliani |[#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184), [#95](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/95)| Finished roundbased system concering guesses and chat. Now ties are handled correctly. Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135),[#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184) |
 |      |      |                        |          |
 |      |      |                        |          |
 |      |      |                        |          |
