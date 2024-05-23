@@ -34,12 +34,12 @@ class ImageControllerTest {
 
     @Test
     void testFetchAndSaveImages() throws Exception {
-        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(150);
+        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(110);
 
         mockMvc.perform(post("/images/saving"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Successfully fetched and saved images to the database."));
 
-        verify(unsplashService).saveRandomPortraitImagesToDatabase(150);
+        verify(unsplashService).saveRandomPortraitImagesToDatabase(110);
     }
 }
