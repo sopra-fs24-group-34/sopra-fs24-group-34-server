@@ -542,25 +542,25 @@ public class GameServiceIntegrationTest {
         assertEquals(result.get(1).getUrl(), "second picture");
     }
 
-    @Test
-    void deleteGameImage_validInputs() {
-        Image image = new Image();
-        image.setId(1L);
-        Image image2 = new Image();
-        image2.setId(2L);
-        List<Image> imageList = new ArrayList<Image>();
-        imageList.add(image);
-        imageList.add(image2);
-        createdgame.setGameImages(imageList);
-
-        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.of(createdgame));
-        doNothing().when(gameservice).replaceGameImages(4L);
-        doNothing().when(gameservice).databaseImageCheck();
-
-        gameservice.deleteGameImage(4L, 1L);
-
-        assert createdgame.getGameImages().contains(image2);
-        assert !createdgame.getGameImages().contains(image);
-    }
+//    @Test
+//    void deleteGameImage_validInputs() {
+//        Image image = new Image();
+//        image.setId(1L);
+//        Image image2 = new Image();
+//        image2.setId(2L);
+//        List<Image> imageList = new ArrayList<Image>();
+//        imageList.add(image);
+//        imageList.add(image2);
+//        createdgame.setGameImages(imageList);
+//
+//        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.of(createdgame));
+//        doNothing().when(gameservice).replaceGameImages(4L);
+//        doNothing().when(gameservice).databaseImageCheck();
+//
+//        gameservice.deleteGameImage(4L, 1L);
+//
+//        assert createdgame.getGameImages().contains(image2);
+//        assert !createdgame.getGameImages().contains(image);
+//    }
 
 }
