@@ -102,7 +102,7 @@ public class WebSocketSessionService {
                 sessionsList.add(session);
             }
 
-            System.out.println("User " + userId + " reconnected!");
+            System.out.println("User " + userId + " reconnected! | Reconnecting Lobby ID: " + lobbyId);
             activeSessions.remove(sessionId);
             disconnectedSessions.remove(userId);
 
@@ -150,9 +150,9 @@ public class WebSocketSessionService {
         String sessionId = session.getId();
         Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
         Long lobbyId = Long.valueOf(session.getAttributes().get("lobbyId").toString());
-        if(!disconnectedSessions.containsKey(userId)) {
-            disconnectedSessions.put(userId, lobbyId);
-        }
+        disconnectedSessions.put(userId, lobbyId);
+
+        System.out.println("User timed out! | Session ID: " + sessionId + " | User ID: " + userId + " | Lobby ID: " + lobbyId);
 
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
         sessions.remove(session);
@@ -367,7 +367,7 @@ public class WebSocketSessionService {
 
         sessionsMap.put(lobbyId, sessions);
 
-        if(sessionsMap.get(lobbyId) == null) {
+        if(sessionsMap.get(lobbyId) == null || sessionsMap.get(lobbyId).isEmpty()) {
             sessionsMap.remove(lobbyId);
             System.out.println("Closed sessions for ID: " + lobbyId);
 
@@ -396,7 +396,7 @@ public class WebSocketSessionService {
             Long lobbyId = entry.getKey();
             List<WebSocketSession> sessionsList = entry.getValue();
 
-            System.out.println("  Lobby/Game ID: " + lobbyId + ":");
+            System.out.println("  Lobby ID: " + lobbyId + ":");
             for (WebSocketSession session : sessionsList) {
                 if(session != null) {
                     System.out.println("    SessionID: " + session.getId() +
