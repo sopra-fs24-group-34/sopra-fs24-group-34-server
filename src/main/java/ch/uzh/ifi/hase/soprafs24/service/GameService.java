@@ -335,9 +335,13 @@ public class GameService {
       if (imageCount == 0){
           desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
       }
+
       if (imageCount < desiredImageNr) {
           // ff there are less than 120 images, fetch and save more
           int count = desiredImageNr - imageCount;
+          if (count < 15){
+              count = 15;
+          }
           int i = 0;
           int keysAmount = 3; // change to amount of keys!!
           //the following is to try every api key and then throw an error in case
