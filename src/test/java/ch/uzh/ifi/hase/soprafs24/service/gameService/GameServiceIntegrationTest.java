@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.service.gameservice;
+package ch.uzh.ifi.hase.soprafs24.service.gameService;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
@@ -28,9 +28,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class GameServiceIntegrationTest {
-
-
-
     @Mock
     private GameRepository gamerepository;
     @Mock
@@ -48,12 +45,8 @@ public class GameServiceIntegrationTest {
     @Mock
     private UnsplashService unsplashService;
 
-
     @InjectMocks
     private GameService gameservice;
-
-
-
 
     private User creator;
 
@@ -190,7 +183,6 @@ public class GameServiceIntegrationTest {
             return null; // Since the method is void, return null
         }).when(gameUserService).savePlayerChanges(any(Player.class));
 
-
         gameservice.chooseImage(guess);
 
         assertEquals(player.getChosencharacter(), 1L);
@@ -220,20 +212,17 @@ public class GameServiceIntegrationTest {
         createdgame.setCurrentTurnPlayerId(2L);
         createdgame.setCreatorPlayerId(2L);
         createdgame.setInvitedPlayerId(3L);
-        RoundDTO roundDTO = new RoundDTO(2, 2L);
-
+        RoundDTO roundDTO = new RoundDTO(2, 2L, "");
 
         System.out.println(guess.getGameId());
         Mockito.when(gameUserService.getChosenCharacterOfOpponent(createdgame, 2L)).thenReturn(1L);
         Mockito.when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
         Mockito.when(gameUserService.getStrikes(2L)).thenReturn(0);
-        Mockito.when(gameUserService.createResponse(eq(true), eq(2L), eq(0), eq(GameStatus.END), any(RoundDTO.class))).thenReturn(response);
+        Mockito.when(gameUserService.createResponse(eq(true), eq(2L), eq(0), eq(GameStatus.END))).thenReturn(response);
         Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
         Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
         Mockito.when(gameUserService.getPlayer(2L)).thenReturn(player);
         Mockito.when(gameUserService.getPlayer(3L)).thenReturn(opp);
-
-
 
         Response result = gameservice.guessImage(guess);
 
@@ -256,12 +245,7 @@ public class GameServiceIntegrationTest {
         invitedPlayer.setPlayerId(2L);
         invitedPlayer.setUserId(2L);
 
-
         // doNothing().when(gameUserService.increaseGamesPlayed(2L));
-
-
-
-
     }
 
     @Test
@@ -305,7 +289,6 @@ public class GameServiceIntegrationTest {
         assertEquals(result.getWinPercentage(), 1L);
     }
 
-
     @Test
     void checkIfImageExists_validInputs(){
         Image image = new Image();
@@ -318,8 +301,6 @@ public class GameServiceIntegrationTest {
         assertTrue(result);
     }
 
-    // 8 more functions
-
     @Test
     void deleteGameImage_validInputs() {
         Image image = new Image();
@@ -330,26 +311,5 @@ public class GameServiceIntegrationTest {
         imageList.add(image);
         imageList.add(image2);
         createdgame.setGameImages(imageList);
-
-
-
-
-
-
     }
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

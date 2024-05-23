@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
-
     @Test
     public void testSetIdSuccess() {
         // Create a User instance

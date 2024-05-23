@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import ch.uzh.ifi.hase.soprafs24.constant.*;
 
 public class ResponseTest {
-
     @Test
     public void testSetGuessSuccess() {
         // Create a Response instance

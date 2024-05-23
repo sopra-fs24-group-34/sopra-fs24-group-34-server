@@ -64,6 +64,15 @@ public class WebSocketSessionService {
     private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
     private final Map<Long, Long> disconnectedSessions = new HashMap<>(); //userid, lobbyid
 
+    Map<String, WebSocketSession> getActiveSessions() {
+        return activeSessions; // smailalijagic: do not delete, needed for testing
+    }
+
+    Map<Long, Long> getDisconnectedSessions() {
+        return disconnectedSessions; // smailalijagic: do not delete, needed for testing
+    }
+
+
     public void handleSubscription(String destination, String sessionId) {
         String[] destinationSplit = destination.split("/");
         Long destinationId = Long.valueOf(destinationSplit[2]);
