@@ -76,7 +76,9 @@ public class GameService {
       if (bothPlayersChosen(guess.getGameId())) {
           game.setCurrentTurnPlayerId(game.getInvitedPlayerId());
           game.setCurrentRound(1);
+          game.setGameStatus(GameStatus.GUESSING);
           gameRepository.save(game);
+          gameRepository.flush();
       }
 
       RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), "");
@@ -162,6 +164,7 @@ public class GameService {
     game.setInvitedPlayerId(player2.getPlayerId());
     game.setCurrentRound(0);
     game.setCurrentTurnPlayerId(null);
+    game.setGameStatus(GameStatus.CHOOSING);
 
     try {
     databaseImageCheck();}
@@ -200,6 +203,9 @@ public class GameService {
                 // Otherwise, the game status is set to LASTCHANCE
                 else {
                     int strikes = gameUserService.getStrikes(playerId);
+                    game.setGameStatus(GameStatus.LASTCHANCE);
+                    gameRepository.save(game);
+                    gameRepository.flush();
                     return gameUserService.createResponse(true, playerId, strikes, GameStatus.LASTCHANCE);
                 }
             }
@@ -208,6 +214,9 @@ public class GameService {
                 game.setCreatorGuess(true);
                 // If both players have guessed correctly, it's a tie
                 if (game.getCreatorGuess() && game.getGuestGuess()) {
+                    game.setGameStatus(GameStatus.TIE);
+                    gameRepository.save(game);
+                    gameRepository.flush();
                     return handleTie(game);
                 }
             }
@@ -222,20 +231,32 @@ public class GameService {
         else {
             gameUserService.increaseStrikesByOne(playerId);
             int strikes = gameUserService.getStrikes(playerId);
-            GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId(), false);
+
+            boolean isInvitedUser = guess.getPlayerId().equals(game.getInvitedPlayerId());
+            //GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId(), false, isInvitedUser);
+
+            GameStatus gameStatus = game.getGameStatus();
 
             // If the game status was LASTCHANCE before the guess was made
             if (gameStatus == GameStatus.LASTCHANCE) {
                 // Handle the win for the other player
+                r = handleLoss(playerId, game.getGameId());
                 handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId());
                 // Delete the game
                 //deleteGame(game);
                 // Return a response indicating the game has ended
-                return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
+                return r;
             }
-
+            // If both players have reached the maximum number of guesses, it's a tie
+            else if (gameUserService.getStrikes(game.getCreatorPlayerId()) >= game.getMaxStrikes() &&
+                    gameUserService.getStrikes(game.getInvitedPlayerId()) >= game.getMaxStrikes()) {
+                game.setGameStatus(GameStatus.TIE);
+                gameRepository.save(game);
+                gameRepository.flush();
+                return handleTie(game);
+            }
             // If the game is not over, return the current game status
-            if (gameStatus != GameStatus.END) {
+            else if (gameStatus != GameStatus.END) {
                 return gameUserService.createResponse(false, playerId, strikes, gameStatus);
             }
             // If the game is over, handle the loss
@@ -250,7 +271,8 @@ public class GameService {
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
-        return new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(),"");
+        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), "");
+        return roundDTO;
   }
 
   public Response handleWin(Long playerId, Long gameId) {
@@ -260,17 +282,6 @@ public class GameService {
     int strikes = gameUserService.getStrikes(playerId);
     return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
-
-  /*
-    public Response handleTie(Long playerId) {
-        //nedim-j: handle stats increase etc.
-        gameUserService.increaseGamesPlayed(playerId);
-        gameUserService.increaseWinTotal(playerId);
-        int strikes = gameUserService.getStrikes(playerId);
-        return gameUserService.createResponse(true, playerId, strikes, GameStatus.TIE);
-    }
-
-   */
 
   public Response handleTie(Game game) {
     // Get the player IDs
