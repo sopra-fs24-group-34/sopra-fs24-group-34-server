@@ -207,7 +207,8 @@ public class UserService {
     }
 
     public void deleteUserIfGuest(Long userId) {
-        if(userRepository.findUserById(userId).getUsername().toUpperCase().startsWith("GUEST")) {
+        User user = userRepository.findUserById(userId);
+        if(user.getUsername().toUpperCase().startsWith("GUEST")) {
             userRepository.deleteById(userId);
         }
     }

@@ -327,7 +327,7 @@ public class GameService {
     }
   }
 
-  private void databaseImageCheck() {
+  public void databaseImageCheck() {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
@@ -359,7 +359,7 @@ public class GameService {
   }
 
 
-    private Game getGameById(Long gameId) {
+    public Game getGameById(Long gameId) {
         return gameRepository.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found with id: " + gameId));
     }
@@ -371,7 +371,7 @@ public class GameService {
     }
 
 
-    private List<Image> createImageEntities(List<ImageDTO> imageDTOs) {
+    public List<Image> createImageEntities(List<ImageDTO> imageDTOs) {
         return imageDTOs.stream()
                 .map(imageDTO -> {
                     Image image = new Image();
@@ -382,7 +382,7 @@ public class GameService {
                 .collect(Collectors.toList());
     }
 
-    private List<ImageDTO> createImageDTO(List<Image> imageDTOs) {
+    public List<ImageDTO> createImageDTO(List<Image> imageDTOs) {
         return imageDTOs.stream()
                 .map(image -> {
                     ImageDTO imageDTO = new ImageDTO();
