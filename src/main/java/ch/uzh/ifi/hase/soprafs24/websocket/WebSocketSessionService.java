@@ -122,6 +122,8 @@ public class WebSocketSessionService {
                 sessionsList.add(session);
             }
 
+            sessionsMap.put(lobbyId, sessionsList);
+
             System.out.println("User " + userId + " reconnected! | Reconnecting Lobby ID: " + lobbyId);
             activeSessionTimestamps.remove(sessionId);
             activeSessions.remove(sessionId);
@@ -271,24 +273,26 @@ public class WebSocketSessionService {
 
     public void closeSessionsOfLobbyId(Long lobbyId) {
         List<WebSocketSession> sessions = sessionsMap.get(lobbyId);
-        if(sessions != null) {
-            for (WebSocketSession session : sessions) {
-                try {
-                    userService.deleteUserIfGuest(Long.valueOf(session.getAttributes().get("userId").toString()));
-                    if (session.isOpen()) {
-                        session.close();
-                    }
+
+        for (WebSocketSession session : sessions) {
+            Long userId = Long.valueOf(session.getAttributes().get("userId").toString());
+            userService.deleteUserIfGuest(userId);
+            try {
+                if (session.isOpen()) {
+                    session.close();
                 }
-                catch (Exception e) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not close session " +
-                            session + " | " + e);
-                }
+            }
+            catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not close session " +
+                        session + " | " + e);
             }
         }
 
         sessionsMap.remove(lobbyId);
         System.out.println("Closed sessions for ID: " + lobbyId);
         //nedim-j: delete lobby
+
+        lobbyService.deleteLobby(lobbyService.getLobby(lobbyId));
 
         printEverything();
     }
@@ -330,6 +334,7 @@ public class WebSocketSessionService {
                 if (currentTime - timestamp > 10_000) { // 10 seconds
                     try {
                         disconnectedUserLobby.remove(userId);
+                        userService.deleteUserIfGuest(userId);
                         System.out.println("Removed disconnected user " + userId);
                         disconnectedUserLobbyIterator.remove();
                     } catch(Exception e) {
