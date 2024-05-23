@@ -164,43 +164,67 @@ public class GameService {
       return game;
   }
 
-  public Response guessImage(Guess guess){
-    //till: check if game exists
-    // checkIfGameExists(guess.getGameId());
-    //till: check if Imageid exists
-    // checkIfImageExists(guess.getImageId());
-    //till: check if player is in the game
-    Game game = gameRepository.findByGameId(guess.getGameId());
-    Long playerId = guess.getPlayerId();
-    //gameUserService.checkIfPlayerinGame(game, playerId);
+  public Response guessImage(Guess guess) {
+      //till: check if game exists
+      // checkIfGameExists(guess.getGameId());
+      //till: check if Imageid exists
+      // checkIfImageExists(guess.getImageId());
+      //till: check if player is in the game
+      Game game = gameRepository.findByGameId(guess.getGameId());
+      Long playerId = guess.getPlayerId();
+      //gameUserService.checkIfPlayerinGame(game, playerId);
 
-    //get the chosencharacter of the Opponent
-    Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
+      //get the chosencharacter of the Opponent
+      Long oppChosenCharacter = gameUserService.getChosenCharacterOfOpponent(game, playerId);
+      Response r;
 
-    if (oppChosenCharacter.equals(guess.getImageId())){
-      Response r = handleWin(playerId,game.getGameId());
-      //handle opponents loss
-      gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
-      deleteGame(game);
-      return r;
-    } else {
-        //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
-            gameUserService.increaseStrikesByOne(playerId);
-            int strikes = gameUserService.getStrikes(playerId);
-            GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId());
 
-            if(gameStatus != GameStatus.END) {
-                return gameUserService.createResponse(false, playerId, strikes, gameStatus);
-            }
-            else {
-                Response r = handleLoss(playerId, game.getGameId());
-                //handle opponents win
-                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId()); //nedim-j: do we also send a websocket for the loss of opponent?
-                deleteGame(game);
-                return r;
-            }
-        }
-    }
+      //tie logic
+      if (oppChosenCharacter.equals(guess.getImageId())) {
+          if (playerId == game.getInvitedPlayerId()) {
+              int strikes = gameUserService.getStrikes(playerId);
+              game.setGuestGuess(true);
+              GameStatus gameStatus = GameStatus.LASTCHANCE;
+              return gameUserService.createResponse(true, playerId, strikes, gameStatus);
+          }
+          else {
+              game.setCreatorGuess(true);
+          }
+          if (game.getCreatorGuess() && game.getGuestGuess()) {
+              r = handleTie(playerId);
+              handleTie(gameUserService.getOpponentId(game, playerId));}
+          else {
+              r = handleWin(playerId, game.getGameId());
+              gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, playerId))); //nedim-j: do we also send a websocket for the loss of opponent?
+          }
+          //handle opponents loss
+          deleteGame(game);
+          return r;
+      }
+      else {
+          //if (gameUserService.checkStrikes(playerId)) { //nedim-j: maybe redundant, as we checkStrikes for both players in determineStatus
+          if (game.getGuestGuess()) {
+              r = handleWin(game.getInvitedPlayerId(), game.getGameId());
+              gameUserService.increaseGamesPlayed((gameUserService.getOpponentId(game, game.getInvitedPlayerId())));
+              deleteGame(game);
+              return r;
+          }
+          gameUserService.increaseStrikesByOne(playerId);
+          int strikes = gameUserService.getStrikes(playerId);
+          GameStatus gameStatus = gameUserService.determineGameStatus(game.getGameId());
+
+          if (gameStatus != GameStatus.END) {
+              return gameUserService.createResponse(false, playerId, strikes, gameStatus);
+          }
+          else {
+              r = handleLoss(playerId, game.getGameId());
+              //handle opponents win
+              handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId()); //nedim-j: do we also send a websocket for the loss of opponent?
+              deleteGame(game);
+              return r;
+          }
+      }
+  }
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
@@ -209,13 +233,19 @@ public class GameService {
 
   public Response handleWin(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
-
     gameUserService.increaseGamesPlayed(playerId);
     gameUserService.increaseWinTotal(playerId);
     int strikes = gameUserService.getStrikes(playerId);
-    RoundDTO roundDTO = updateTurn(gameId);
     return gameUserService.createResponse(true, playerId, strikes, GameStatus.END);
   }
+
+    public Response handleTie(Long playerId) {
+        //nedim-j: handle stats increase etc.
+        gameUserService.increaseGamesPlayed(playerId);
+        gameUserService.increaseWinTotal(playerId);
+        int strikes = gameUserService.getStrikes(playerId);
+        return gameUserService.createResponse(true, playerId, strikes, GameStatus.TIE);
+    }
 
   public Response handleLoss(Long playerId, Long gameId) {
     //nedim-j: handle stats increase etc.
@@ -223,7 +253,6 @@ public class GameService {
      //nedim-j: mb increaseLoss? round-based games could be drawn as well
     int strikes = gameUserService.getStrikes(playerId);
 
-    RoundDTO roundDTO = updateTurn(gameId);
     return gameUserService.createResponse(false, playerId, strikes, GameStatus.END);
 }
 
@@ -302,10 +331,10 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 120; // don't go higher or it will not work because of limited images on unsplash
+      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
 
       if (imageCount < desiredImageNr) {
-          // ff there are less than 150 images, fetch and save more
+          // ff there are less than 120 images, fetch and save more
           int count = desiredImageNr - imageCount;
           int i = 0;
           int keysAmount = 3; // change to amount of keys!!

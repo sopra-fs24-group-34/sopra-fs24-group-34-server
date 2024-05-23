@@ -1,7 +1,9 @@
-package ch.uzh.ifi.hase.soprafs24.service;
+package ch.uzh.ifi.hase.soprafs24.service.gameService;
 
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.*;
+import ch.uzh.ifi.hase.soprafs24.service.GameService;
+import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +20,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class GameServiceIntegrationTest {
-
-
-
+public class GameServiceIntegrationTest2 {
     @Mock
     private GameRepository gamerepository;
     @Mock
@@ -38,9 +37,6 @@ public class GameServiceIntegrationTest {
 
     @InjectMocks
     private GameService gameservice;
-
-
-
 
     private User creator;
 
@@ -212,7 +208,6 @@ public class GameServiceIntegrationTest {
 //        assertEquals(result.getGuess(), true);
 //    }
 
-
     @Test
     void checkIfImageExists_validInputs(){
         Image image = new Image();
@@ -224,5 +219,4 @@ public class GameServiceIntegrationTest {
 
         assertTrue(result);
     }
-
 }

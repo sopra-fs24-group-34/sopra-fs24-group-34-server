@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class FriendTest {
-
     @Test
     public void testSetterAndGetterSuccess() {
         // Create a Friend instance

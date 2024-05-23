@@ -254,11 +254,11 @@ public class UserService {
     }
 
     public void changeUserStatus(Long userId, String changedStatus) {
-        System.out.println("Entered changeUserStatus function with status: " + changedStatus);
+        //System.out.println("Entered changeUserStatus function with status: " + changedStatus);
         try {
             String cleanedStatus = changedStatus.trim().replaceAll("^\"|\"$", "").toUpperCase();
             UserStatus newStatus = UserStatus.valueOf(cleanedStatus);
-            System.out.println("Parsed new User Status: " + newStatus);
+            //System.out.println("Parsed new User Status: " + newStatus);
             User user = userRepository.findUserById(userId);
             if (user == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
@@ -266,7 +266,7 @@ public class UserService {
             user.setStatus(newStatus);
             userRepository.save(user);
             userRepository.flush();
-            System.out.println("User status updated successfully to: " + newStatus);
+            //System.out.println("User status updated successfully to: " + newStatus);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid status value: " + changedStatus);
         } catch (Exception e) {

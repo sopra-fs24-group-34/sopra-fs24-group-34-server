@@ -14,11 +14,7 @@ import java.util.Set;
 
 @SpringBootTest
 public class DTOMapperTest {
-
     private DTOMapper dtoMapper = Mappers.getMapper(DTOMapper.class);
-
-    //@Autowired
-    //private DTOMapper dtoMapperInjected;
 
     @Test
     public void testConvertUserPostDTOtoEntitySuccess() {
