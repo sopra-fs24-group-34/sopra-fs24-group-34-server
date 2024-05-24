@@ -26,9 +26,11 @@ The rules are simple:
    4. [Figma Mockups](#figma)
 
 ## Technologies
-The back-end is written in Java and uses Spring Boot framework. We use JPA for persistence and the deployment is handled by 
-Heroku. Communication between the server and the client is done with REST and websockets. For the websockets an additional 
-messaging protocol called STOMP is used.
+- Java and Spring Boot Framework: used Java as programming language and used the Spring Boot Framework
+- JPA: used for database persistence
+- Heroku: handling deployment
+- REST: used for communication between the client and server
+- Websockets: used for communication between the client and server using the STOMP messaging protocol
 
 ## High-level Components
 some text
@@ -60,10 +62,19 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 ```
 
 ## Interface User Flow
-some text
+[Have a detailed look of the interface user flow here](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/tree/dev)
+
 
 ## Roadmap
-some text
+### 3D animations
+- Create 3D animations for folding respectively unfolding the characters during the game.
+
+### Individual profile picture
+- Allow users to upload individual profile pictures.
+
+### Extending the game
+- Allow users to select what type of category the images in game should be.
+- For example, a user could select "cats" as category and then play "Guess Who?" with cats instead of people.
 
 ## Authors and Acknowledgment
 - [Smail Alijagic](https://www.github.com/smailalijagic)
