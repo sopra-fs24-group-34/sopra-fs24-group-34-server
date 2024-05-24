@@ -94,20 +94,6 @@ public class GameServiceTest {
         verify(gameRepository).save(game);
     }
 
-    @Test
-    public void testGetGameState() {
-        Game game = new Game();
-        game.setCurrentRound(1);
-        game.setCurrentTurnPlayerId(1L);
-
-        when(gameRepository.findByGameId(anyLong())).thenReturn(game);
-
-        RoundDTO roundDTO = gameService.getGameState(1L);
-
-        assertNotNull(roundDTO);
-        assertEquals(1, roundDTO.getRoundNumber());
-        assertEquals(1L, roundDTO.getCurrentTurnPlayerId());
-    }
 
     @Test
     public void testGetGames2() {
@@ -185,18 +171,25 @@ public class GameServiceTest {
     }
 
     @Test
-    public void testGetGameState2() {
+    void testGetGameState_GameExists() {
+        // Given
+        Long gameId = 1L;
         Game game = new Game();
-        game.setCurrentRound(1);
-        game.setCurrentTurnPlayerId(1L);
+        game.setGameId(gameId);
+        game.setCurrentRound(2);
+        game.setCurrentTurnPlayerId(3L);
+        game.setGameStatus(GameStatus.GUESSING);
 
         when(gameRepository.findByGameId(anyLong())).thenReturn(game);
 
-        RoundDTO roundDTO = gameService.getGameState(1L);
+        // When
+        RoundDTO roundDTO = gameService.getGameState(gameId);
 
+        // Then
         assertNotNull(roundDTO);
-        assertEquals(1, roundDTO.getRoundNumber());
-        assertEquals(1L, roundDTO.getCurrentTurnPlayerId());
+        assertEquals(2, roundDTO.getRoundNumber());
+        assertEquals(3L, roundDTO.getCurrentTurnPlayerId());
+        assertEquals(GameStatus.GUESSING.toString(), roundDTO.getEvent());
     }
 
 }
