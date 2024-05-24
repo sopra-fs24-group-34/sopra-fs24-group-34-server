@@ -94,7 +94,6 @@ public class WebSocketSessionService {
         } else if(destinationSplit[1].equals("games") && (destinationSplit.length < 4)/*!destinationSplit[3].equals("chat")*/){
             mapReconnectingSessionToLobby(sessionId, destination, destinationId);
         }
-        printEverything();
     }
 
     public void addActiveSession(WebSocketSession session) {
@@ -195,8 +194,6 @@ public class WebSocketSessionService {
         } else {
             timerRemoveUserFromLobby(lobbyId, userId);
         }
-
-        printEverything();
     }
 
 
@@ -295,8 +292,6 @@ public class WebSocketSessionService {
         //nedim-j: delete lobby
 
         lobbyService.deleteLobby(lobbyService.getLobby(lobbyId));
-
-        printEverything();
     }
 
     public void startSessionCleanupTask() {
@@ -346,75 +341,5 @@ public class WebSocketSessionService {
                 }
             }
         }, 0, 5, TimeUnit.SECONDS);
-    }
-
-
-    //nedim-j: for debugging
-    public void printSessionsMap() {
-        System.out.println("Sessions Map:");
-        for (Map.Entry<Long, List<WebSocketSession>> entry : sessionsMap.entrySet()) {
-            Long lobbyId = entry.getKey();
-            List<WebSocketSession> sessionsList = entry.getValue();
-
-            System.out.println("  Lobby ID: " + lobbyId + ":");
-            for (WebSocketSession session : sessionsList) {
-                if(session != null) {
-                    System.out.println("    SessionID: " + session.getId() +
-                                    " | UserID: " + session.getAttributes().get("userId")
-                            //+ " | LobbyId: " + session.getAttributes().get("lobbyId")
-                    );
-                }
-            }
-            System.out.println();
-        }
-    }
-
-    public void printActiveSessions() {
-        System.out.println("Sessions without Lobby/Game:");
-        if (!activeSessions.isEmpty()) {
-            for (Map.Entry<String, WebSocketSession> entry : activeSessions.entrySet()) {
-                if(entry != null) {
-                    String sessionId = entry.getKey();
-                    WebSocketSession session = entry.getValue();
-
-                    System.out.println("  Session ID: " + sessionId);
-                    // You can print more details about the session if needed
-                }
-            }
-        } else {
-            System.out.println("No active sessions.");
-        }
-        System.out.println();
-    }
-
-    public void printDisconnectedSessions() {
-        System.out.println("Disconnected sessions to remove:");
-        if (!disconnectedUserLobby.isEmpty()) {
-            for (Map.Entry<Long, Long> entry : disconnectedUserLobby.entrySet()) {
-                if(entry != null) {
-                    Long userId = entry.getKey();
-                    Long lobbyId = entry.getValue();
-
-                    System.out.println("  User ID: " + userId + " | Lobby ID: " + lobbyId);
-                    // You can print more details about the session if needed
-                }
-            }
-        } else {
-            System.out.println("No disconnected sessions.");
-        }
-        System.out.println();
-    }
-
-    public void printEverything() {
-        System.out.println("-----");
-        printSessionsMap();
-        printActiveSessions();
-        printDisconnectedSessions();
-        System.out.println("-----");
-    }
-
-    public void printSessionAttributes(String sessionId) {
-        WebSocketSession session = activeSessions.get(sessionId);
-        System.out.println("Session attributes: " +session.getAttributes());
     }
 }
