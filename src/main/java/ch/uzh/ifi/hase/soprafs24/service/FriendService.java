@@ -39,14 +39,14 @@ public class FriendService {
         if (receiver == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The user does not exist");
         }
-        assert sender != receiver: "You cannot send a friend request to yourself";
+        if ( sender == receiver) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You cannot send a friend request to yourself");
+        }
 
         friendRequest.setSenderUserName(sender.getUsername());
         friendRequest.setReceiverUserName(receiver.getUsername());
         friendRequest.setSenderId(sender.getId());
         friendRequest.setReceiverId(receiver.getId());
-
-        assert !sender.getFriendRequests().contains(friendRequest) : "This friend request already exists";
         //if send request was already sent it catches them and there is not send a second one
         List<FriendRequest> friendRequests = sender.getFriendRequests();
         for (FriendRequest friendRequest1 : friendRequests){
