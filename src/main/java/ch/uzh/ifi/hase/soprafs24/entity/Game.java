@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs24.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 
 @Entity
 public class Game implements Serializable {
@@ -24,6 +25,9 @@ public class Game implements Serializable {
 
     @Column(nullable = true)
     private int maxStrikes; // smailalijagic: handle guesses for each player in frontend
+
+    @Enumerated(EnumType.STRING)
+    private GameStatus gameStatus;
 
     @Column
     private int currentRound;
@@ -117,4 +121,11 @@ public class Game implements Serializable {
 
     public void setGameImages(List<Image> gameImages) { this.gameImages = gameImages;}
 
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
+    }
 }

@@ -325,7 +325,7 @@ public class GameServiceIntegrationTest {
         when(gameUserService.getPlayer(3L)).thenReturn(opp);
         doNothing().when(gameUserService).increaseStrikesByOne(1L);
         player.setStrikes(3);
-        when(gameUserService.determineGameStatus(4L)).thenReturn(GameStatus.END);
+        when(gameUserService.determineGameStatus(4L, false)).thenReturn(GameStatus.END);
 
 
 
