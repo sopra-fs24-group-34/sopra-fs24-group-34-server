@@ -51,38 +51,6 @@ public class UnsplashServiceTest {
         return method.invoke(target, args);
     }
 
-//    @Test
-//    public void testSaveRandomPortraitImagesToDatabase() {
-//        Map<String, Object> response = new HashMap<>();
-//        Map<String, String> urls = new HashMap<>();
-//        urls.put("regular", "https://images.unsplash.com/photo-1234");
-//        response.put("urls", urls);
-//        Map<String, Object>[] responses = new Map[]{response};
-//
-//        when(restTemplate.getForObject(anyString(), eq(Map[].class))).thenReturn(responses);
-//        when(imageRepository.existsByNormalizedUrl(anyString())).thenReturn(false);
-//
-//        unsplashService.saveRandomPortraitImagesToDatabase(1);
-//
-//        verify(imageRepository, times(1)).save(any(Image.class));
-//        verify(imageRepository, times(1)).flush();
-//    }
-
-//    @Test
-//    public void testSaveRandomPortraitImagesToDatabase_AlreadyExists() {
-//        Map<String, Object> response = new HashMap<>();
-//        Map<String, String> urls = new HashMap<>();
-//        urls.put("regular", "https://images.unsplash.com/photo-1234");
-//        response.put("urls", urls);
-//        Map<String, Object>[] responses = new Map[]{response};
-//
-//        when(restTemplate.getForObject(anyString(), eq(Map[].class))).thenReturn(responses);
-//        when(imageRepository.existsByNormalizedUrl(anyString())).thenReturn(true);
-//
-//        unsplashService.saveRandomPortraitImagesToDatabase(1);
-//
-//        verify(imageRepository, never()).save(any(Image.class));
-//    }
 
     @Test
     public void testSaveRandomPortraitImagesToDatabase_Exception() {
@@ -160,4 +128,18 @@ public class UnsplashServiceTest {
             unsplashService.getImageUrlsFromDatabase(1, Optional.empty());
         });
     }
+
+    @Test
+    public void testSaveRandomPortraitImagesToDatabase_ExceptionHandling() {
+        unsplashService.init();
+        when(restTemplate.getForObject(anyString(), eq(Map[].class))).thenThrow(new RuntimeException("Test exception"));
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+            unsplashService.saveRandomPortraitImagesToDatabase(1);
+        });
+
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        assertEquals("Error while saving images to database - RATE EXCEEDED", exception.getReason());
+    }
+
 }
