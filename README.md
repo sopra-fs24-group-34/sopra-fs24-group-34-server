@@ -18,7 +18,7 @@ The rules are simple:
 5. [Interface User Flow](#IUF)
 6. [Roadmap](#roadmap)
 7. [Authors and Acknowledgment](#AAA)
-8. [Licencse](#licence)
+8. [License](#license)
 9. [Further Material](#FM)
    1. [UML Diagram](#uml)
    2. [Component Diagram](#component)
@@ -91,7 +91,7 @@ We want to express our sincere gratitude to [Marco Leder](https://www.github.com
 development of our project.
 
 
-## Licencse
+## License
 [Apache-2.0 license](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/LICENSE)
 
 ## Appendix
