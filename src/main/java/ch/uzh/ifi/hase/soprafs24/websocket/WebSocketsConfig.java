@@ -17,7 +17,6 @@ public class WebSocketsConfig implements WebSocketMessageBrokerConfigurer {
         // smailalijagic: Registering WebSocket endpoint
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                //.addInterceptors(new WSHandshakeInterceptor())
                 .withSockJS();
     }
 

@@ -26,12 +26,18 @@ The rules are simple:
    4. [Figma Mockups](#figma)
 
 ## Technologies
-The back-end is written in Java and uses Spring Boot framework. We use JPA for persistence and the deployment is handled by 
-Heroku. Communication between the server and the client is done with REST and websockets. For the websockets an additional 
-messaging protocol called STOMP is used.
+- Java and Spring Boot Framework: used Java as programming language and used the Spring Boot Framework
+- JPA: used for database persistence
+- Heroku: handling deployment
+- REST: used for communication between the client and server
+- Websockets: used for communication between the client and server using the STOMP messaging protocol
+- [Unsplash](https://unsplash.com) API: this API is used for fetching pictures, the main reason for using Unsplash instead of Google Images is that Unsplash provides a built-in filter that works fine
 
 ## High-level Components
-some text
+- [ChatControllerWebSockets](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/ChatControllerWebSockets.java): Handles sending messages between clients. Whenever a question is asked or an answer is given ChatControllerWebSockets handles the logic.
+- [GameController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/GameController.java): Handles the whole game logic such as checking if the correct character was guessed.
+- [ImageController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/ImageController.java): Handles the API calls for fetching pictures and storing them in the database.
+- [LobbyController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/LobbyController.java): Handles the game settings, but is also the waiting room for users to start the game once both are ready.
 
 ## Launch & Deployment
 You can use the local Gradle Wrapper to build the application.
@@ -60,10 +66,19 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 ```
 
 ## Interface User Flow
-some text
+[Have a detailed look of the interface user flow here](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/tree/dev)
+
 
 ## Roadmap
-some text
+### 3D animations
+- Create 3D animations for folding respectively unfolding the characters during the game.
+
+### Individual profile picture
+- Allow users to upload individual profile pictures.
+
+### Extending the game
+- Allow users to select what type of category the images in game should be.
+- For example, a user could select "cats" as category and then play "Guess Who?" with cats instead of people.
 
 ## Authors and Acknowledgment
 - [Smail Alijagic](https://www.github.com/smailalijagic)

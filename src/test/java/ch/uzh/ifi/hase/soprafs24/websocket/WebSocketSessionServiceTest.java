@@ -118,34 +118,6 @@ class WebSocketSessionServiceTest {
     }
 
     @Test
-    void printSessionAttributes_ShouldPrintAttributes2() {
-        when(session.getId()).thenReturn("sessionId1");
-        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L)));
-        webSocketSessionService.addActiveSession(session);
-
-        assertDoesNotThrow(() -> webSocketSessionService.printSessionAttributes("sessionId1"));
-    }
-
-    @Test
-    void printSessionsMap_ShouldPrintSessionsMap2() {
-        when(session.getId()).thenReturn("sessionId1");
-        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
-        List<WebSocketSession> sessions = new ArrayList<>();
-        sessions.add(session);
-        webSocketSessionService.getSessionsMap().put(1L, sessions);
-
-        assertDoesNotThrow(webSocketSessionService::printSessionsMap);
-    }
-
-    @Test
-    void printActiveSessions_ShouldPrintActiveSessions2() {
-        when(session.getId()).thenReturn("sessionId1");
-        webSocketSessionService.addActiveSession(session);
-
-        assertDoesNotThrow(webSocketSessionService::printActiveSessions);
-    }
-
-    @Test
     void getInstance_ShouldReturnSameInstance3() {
         WebSocketSessionService instance1 = WebSocketSessionService.getInstance();
         WebSocketSessionService instance2 = WebSocketSessionService.getInstance();
@@ -187,34 +159,6 @@ class WebSocketSessionServiceTest {
         assertFalse(webSocketSessionService.getSessionsMap().isEmpty());
         verify(lobbyService, times(1)).translateAddUserToLobby(1L, 1L);
         assertFalse(webSocketSessionService.getActiveSessions().containsKey("sessionId1"));
-    }
-
-    @Test
-    void printSessionAttributes_ShouldPrintAttributes() {
-        when(session.getId()).thenReturn("sessionId1");
-        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L)));
-        webSocketSessionService.addActiveSession(session);
-
-        assertDoesNotThrow(() -> webSocketSessionService.printSessionAttributes("sessionId1"));
-    }
-
-    @Test
-    void printSessionsMap_ShouldPrintSessionsMap() {
-        when(session.getId()).thenReturn("sessionId1");
-        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
-        List<WebSocketSession> sessions = new ArrayList<>();
-        sessions.add(session);
-        webSocketSessionService.getSessionsMap().put(1L, sessions);
-
-        assertDoesNotThrow(webSocketSessionService::printSessionsMap);
-    }
-
-    @Test
-    void printActiveSessions_ShouldPrintActiveSessions() {
-        when(session.getId()).thenReturn("sessionId1");
-        webSocketSessionService.addActiveSession(session);
-
-        assertDoesNotThrow(webSocketSessionService::printActiveSessions);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
@@ -21,13 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 //import static ch.uzh.ifi.hase.soprafs24.websocket.WebSocketSessionService.lobbyService;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -287,6 +285,83 @@ class GameControllerTest {
 
         assertEquals(gameHistory, returnedHistory);
         verify(gameService, times(1)).getGameHistory(gameId, userId);
+    }
+
+    @Test
+    void getGames_success() {
+        when(gameService.getGames()).thenReturn(Collections.emptyList());
+
+        List<Game> games = gameController.getGames();
+
+        assertNotNull(games);
+        verify(gameService, times(1)).getGames();
+    }
+
+    @Test
+    void getGame_success() {
+        Game game = new Game();
+        when(gameService.getGame(anyLong())).thenReturn(game);
+
+        Game returnedGame = gameController.getGame("1");
+
+        assertNotNull(returnedGame);
+        verify(gameService, times(1)).getGame(1L);
+    }
+
+    @Test
+    void getplayer_success() {
+        Player player = new Player();
+        when(gameUserService.getPlayer(anyLong())).thenReturn(player);
+
+        Player returnedPlayer = gameController.getplayer(1L);
+
+        assertNotNull(returnedPlayer);
+        verify(gameUserService, times(1)).getPlayer(1L);
+    }
+
+    @Test
+    void switchTurn_success() {
+        RoundDTO roundDTO = new RoundDTO(1, 1L, "");
+        Map<String, Object> requestMap = Map.of("gameId", 1L);
+        String stringJsonRequest = gson.toJson(requestMap);
+
+        when(gameService.updateTurn(1L, GameStatus.GUESSING)).thenReturn(roundDTO);
+
+        assertDoesNotThrow(() -> gameController.switchTurn(stringJsonRequest));
+
+        verify(gameService, times(1)).updateTurn(1L, GameStatus.GUESSING);
+        verify(webSocketMessenger, times(1)).sendMessage(anyString(), eq(roundDTO.getEvent()), eq(roundDTO));
+    }
+
+    @Test
+    void getGameImages_success() {
+        List<ImageDTO> imageDTOs = Collections.emptyList();
+        when(gameService.getGameImages(anyLong())).thenReturn(imageDTOs);
+
+        List<ImageDTO> returnedImages = gameController.getGameImages(1L);
+
+        assertNotNull(returnedImages);
+        verify(gameService, times(1)).getGameImages(1L);
+    }
+
+    @Test
+    void deleteGameImage_success() {
+        doNothing().when(gameService).deleteGameImage(anyLong(), anyLong());
+
+        assertDoesNotThrow(() -> gameController.deleteGameImage(1L, 1L));
+
+        verify(gameService, times(1)).deleteGameImage(1L, 1L);
+    }
+
+    @Test
+    void getGameHistory_success() {
+        GameHistory gameHistory = new GameHistory();
+        when(gameService.getGameHistory(anyLong(), anyLong())).thenReturn(gameHistory);
+
+        GameHistory returnedGameHistory = gameController.getGameHistory(1L, 1L);
+
+        assertNotNull(returnedGameHistory);
+        verify(gameService, times(1)).getGameHistory(1L, 1L);
     }
 
 }
