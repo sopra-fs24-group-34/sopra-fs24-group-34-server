@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
@@ -137,7 +138,8 @@ public class WebSocketSessionService {
                 e.printStackTrace();
             }
 
-            webSocketMessenger.sendMessage("/games/"+destinationId, "update-game-state", gameService.getGameState(destinationId));
+            RoundDTO roundDTO = gameService.getGameState(destinationId);
+            webSocketMessenger.sendMessage("/games/"+destinationId, "update-game-state", roundDTO);
         }
     }
 

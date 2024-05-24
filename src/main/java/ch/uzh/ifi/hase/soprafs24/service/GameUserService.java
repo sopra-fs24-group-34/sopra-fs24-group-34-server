@@ -82,7 +82,11 @@ public class GameUserService {
       playerRepository.flush();
     }
 
-    public GameStatus determineGameStatus(Long gameId) {
+
+    /*
+    //nedim-j, 24.5. has to be removed, not needed
+
+    public GameStatus determineGameStatus(Long gameId, boolean lastGuessCorrect, boolean isInvitedUser) {
         Game game = new Game();
         try {
             game = gameRepository.findByGameId(gameId);
@@ -97,9 +101,13 @@ public class GameUserService {
             return GameStatus.CHOOSING;
         } else if((creator.getStrikes() >= game.getMaxStrikes()) || (invited.getStrikes() >= game.getMaxStrikes())) {
             return GameStatus.END;
+        } else if(isInvitedUser && lastGuessCorrect) {
+            return GameStatus.LASTCHANCE;
         }
         return GameStatus.GUESSING;
     }
+
+     */
 
   public Response createResponse(Boolean guess, Long playerId, int strikes, GameStatus gameStatus) {
       // creates a response that is send back to the frontend
