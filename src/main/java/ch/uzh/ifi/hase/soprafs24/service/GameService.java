@@ -268,7 +268,7 @@ public class GameService {
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
-        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), "");
+        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), game.getGameStatus().toString());
         return roundDTO;
   }
 
