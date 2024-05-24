@@ -31,9 +31,13 @@ The rules are simple:
 - Heroku: handling deployment
 - REST: used for communication between the client and server
 - Websockets: used for communication between the client and server using the STOMP messaging protocol
+- [Unsplash](https://unsplash.com) API: this API is used for fetching pictures, the main reason for using Unsplash instead of Google Images is that Unsplash provides a built-in filter that works fine
 
 ## High-level Components
-some text
+- [ChatControllerWebSockets](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/ChatControllerWebSockets.java): Handles sending messages between clients. Whenever a question is asked or an answer is given ChatControllerWebSockets handles the logic.
+- [GameController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/GameController.java): Handles the whole game logic such as checking if the correct character was guessed.
+- [ImageController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/ImageController.java): Handles the API calls for fetching pictures and storing them in the database.
+- [LobbyController](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/blob/main/src/main/java/ch/uzh/ifi/hase/soprafs24/controller/LobbyController.java): Handles the game settings, but is also the waiting room for users to start the game once both are ready.
 
 ## Launch & Deployment
 You can use the local Gradle Wrapper to build the application.
