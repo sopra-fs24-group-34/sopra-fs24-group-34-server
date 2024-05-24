@@ -1,3 +1,7 @@
+<p>
+  <img src="favicon.ico" alt="Guess Who Logo">
+</p>
+
 # SoPra FS24 group 34 Server - Guess Who?
 
 ## Introduction
