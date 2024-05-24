@@ -262,6 +262,7 @@ public class GameServiceIntegrationTest {
         Player opp = new Player();
         opp.setPlayerId(2L);
         opp.setUserId(2L);
+        opp.setStrikes(0);
         opp.setChosencharacter(1L);
         Guess guess = new Guess();
         guess.setGameId(4L);
@@ -272,7 +273,12 @@ public class GameServiceIntegrationTest {
         response.setStrikes(3);
         response.setPlayerId(1L);
         response.setRoundStatus(GameStatus.END);
+        Response response1 = new Response();
+        response1.setGuess(true);
+        response1.setStrikes(0);
+        response1.setPlayerId(2L);
         createdgame.setCurrentRound(2);
+        createdgame.setMaxStrikes(3);
         createdgame.setCurrentTurnPlayerId(2L);
         createdgame.setCreatorPlayerId(2L);
         createdgame.setInvitedPlayerId(3L);
@@ -283,12 +289,13 @@ public class GameServiceIntegrationTest {
         System.out.println(guess.getGameId());
         when(gameUserService.getChosenCharacterOfOpponent(createdgame, 1L)).thenReturn(1L);
         when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
+        when(gameUserService.getOpponentId(createdgame, 1L)).thenReturn(2L);
         when(gameUserService.getStrikes(1L)).thenReturn(3);
         when(gameUserService.createResponse(eq(false), eq(1L), eq(3), eq(GameStatus.END))).thenReturn(response);
-        //when(gameUserService.getUser(1L)).thenReturn(creator);
-        //when(gameUserService.getUser(2L)).thenReturn(invited);
-        //when(gameUserService.getPlayer(2L)).thenReturn(player);
-        //when(gameUserService.getPlayer(3L)).thenReturn(opp);
+        when(gameUserService.createResponse(true, 2L, 0, GameStatus.END)).thenReturn(response1);
+        doNothing().when(gameUserService).increaseGamesPlayed(1L);
+        doNothing().when(gameUserService).increaseWinTotal(2L);
+        doNothing().when(gameUserService).increaseGamesPlayed(2L);
         doNothing().when(gameUserService).increaseStrikesByOne(1L);
         player.setStrikes(3);
 
