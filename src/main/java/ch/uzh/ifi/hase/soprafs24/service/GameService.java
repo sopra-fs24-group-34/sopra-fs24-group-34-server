@@ -247,13 +247,10 @@ public class GameService {
                 // Return a response indicating the game has ended
                 return r;
             }
-            // If both players have reached the maximum number of guesses, it's a tie
-            else if (gameUserService.getStrikes(game.getCreatorPlayerId()) >= game.getMaxStrikes() &&
-                    gameUserService.getStrikes(game.getInvitedPlayerId()) >= game.getMaxStrikes()) {
-                game.setGameStatus(GameStatus.TIE);
-                gameRepository.save(game);
-                gameRepository.flush();
-                return handleTie(game);
+            // If a players has reached the maximum number of guesses
+            else if (gameUserService.getStrikes(playerId) == game.getMaxStrikes()){
+                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId());
+                return handleLoss(playerId, game.getGameId());
             }
             // If the game is not over, return the current game status
             else if (gameStatus != GameStatus.END) {
