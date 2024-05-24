@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 
@@ -126,44 +127,6 @@ public class GameServiceIntegrationTest {
 
         assertEquals(result, createdgame);
     }
-
-    /**@Test
-    void createGame_validInput() {
-        // Mock behavior of gameUserService
-        Mockito.when(gameUserService.getUser(1L)).thenReturn(creator);
-        Mockito.when(gameUserService.getUser(2L)).thenReturn(invited);
-        // Define the behavior to save and flush the player
-        doAnswer(invocation -> {
-            Player player = invocation.getArgument(0); // Get the Player passed to the method
-            playerrepository.save(player);
-            playerrepository.flush();
-            player.setPlayerId(5L);
-            return null; // Since the method is void, return null
-        }).when(gameUserService).savePlayerChanges(any(Player.class));
-
-        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-        authenticationDTO.setId(1L);
-        authenticationDTO.setToken(creator.getToken());
-
-        Mockito.when(lobbyRepository.findByLobbyid(3L)).thenReturn(lobby);
-        Mockito.when(lobbyService.isLobbyOwner(3L, authenticationDTO)).thenReturn(true);
-        doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
-        doNothing().when(gameservice).saveGameImages(anyLong());
-
-        GamePostDTO newGamePostDTO = new GamePostDTO();
-        newGamePostDTO.setMaxStrikes(3);
-        newGamePostDTO.setTimePerRound(30);
-        newGamePostDTO.setCreator_userid(1L);
-        newGamePostDTO.setInvited_userid(2L);
-
-        Game result = gameservice.createGame(3L, newGamePostDTO, authenticationDTO);
-
-        // Assert that the game was created with the correct properties
-        assertEquals(result.getCreatorPlayerId(), newGamePostDTO.getCreator_userid());
-        assertEquals(result.getInvitedPlayerId(), newGamePostDTO.getInvited_userid());
-        assertEquals(result.getMaxStrikes(), newGamePostDTO.getMaxStrikes());
-        assertEquals(result.getTimePerRound(), newGamePostDTO.getTimePerRound());
-    }*/
 
     @Test
     void createGame_validInput() {
@@ -299,6 +262,7 @@ public class GameServiceIntegrationTest {
         Player opp = new Player();
         opp.setPlayerId(2L);
         opp.setUserId(2L);
+        opp.setStrikes(0);
         opp.setChosencharacter(1L);
         Guess guess = new Guess();
         guess.setGameId(4L);
@@ -309,7 +273,12 @@ public class GameServiceIntegrationTest {
         response.setStrikes(3);
         response.setPlayerId(1L);
         response.setRoundStatus(GameStatus.END);
+        Response response1 = new Response();
+        response1.setGuess(true);
+        response1.setStrikes(0);
+        response1.setPlayerId(2L);
         createdgame.setCurrentRound(2);
+        createdgame.setMaxStrikes(3);
         createdgame.setCurrentTurnPlayerId(2L);
         createdgame.setCreatorPlayerId(2L);
         createdgame.setInvitedPlayerId(3L);
@@ -320,12 +289,13 @@ public class GameServiceIntegrationTest {
         System.out.println(guess.getGameId());
         when(gameUserService.getChosenCharacterOfOpponent(createdgame, 1L)).thenReturn(1L);
         when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
+        when(gameUserService.getOpponentId(createdgame, 1L)).thenReturn(2L);
         when(gameUserService.getStrikes(1L)).thenReturn(3);
         when(gameUserService.createResponse(eq(false), eq(1L), eq(3), eq(GameStatus.END))).thenReturn(response);
-        //when(gameUserService.getUser(1L)).thenReturn(creator);
-        //when(gameUserService.getUser(2L)).thenReturn(invited);
-        //when(gameUserService.getPlayer(2L)).thenReturn(player);
-        //when(gameUserService.getPlayer(3L)).thenReturn(opp);
+        when(gameUserService.createResponse(true, 2L, 0, GameStatus.END)).thenReturn(response1);
+        doNothing().when(gameUserService).increaseGamesPlayed(1L);
+        doNothing().when(gameUserService).increaseWinTotal(2L);
+        doNothing().when(gameUserService).increaseGamesPlayed(2L);
         doNothing().when(gameUserService).increaseStrikesByOne(1L);
         player.setStrikes(3);
 
@@ -371,32 +341,6 @@ public class GameServiceIntegrationTest {
         assertEquals(result.getGuess(), true);
         assertEquals(result.getRoundStatus(), GameStatus.TIE);
     }
-
-    /**@Test
-    void handleLoss_validInputs(){
-        Player creatorPlayer = new Player();
-        creatorPlayer.setPlayerId(1L);
-        creatorPlayer.setUserId(1L);
-        creatorPlayer.setStrikes(3);
-        Player invitedPlayer = new Player();
-        invitedPlayer.setPlayerId(2L);
-        invitedPlayer.setUserId(2L);
-        createdgame.setCurrentTurnPlayerId(1L);
-
-        Response response = new Response();
-        response.setPlayerId(1L);
-        response.setStrikes(3);
-
-
-        doNothing().when(gameUserService).increaseGamesPlayed(1L);
-        when(gameUserService.getStrikes(1L)).thenReturn(3);
-        when(gamerepository.findByGameId(4L)).thenReturn(createdgame);
-        when(gameUserService.createResponse(false, 1L, 3, GameStatus.END)).thenReturn(response);
-
-        gameservice.handleLoss(1L, 4L);
-
-        assert createdgame.getCurrentTurnPlayerId().equals(2L);
-    }*/
 
     @Test
     void deleteGame_validInputs() {
@@ -460,15 +404,6 @@ public class GameServiceIntegrationTest {
         Boolean result = gameservice.checkIfGameExists(4L);
 
         assertEquals(result, true);
-    }
-
-    @Test
-    void databaseImageCheck_validInput() {
-        //when(imagerepository.countAllImages()).thenReturn(100);
-
-        //doNothing().when(unsplashService).saveRandomPortraitImagesToDatabase(anyInt());
-
-
     }
 
     @Test
@@ -574,26 +509,5 @@ public class GameServiceIntegrationTest {
         assertEquals(result.get(1).getId(), 2L);
         assertEquals(result.get(1).getUrl(), "second picture");
     }
-
-//    @Test
-//    void deleteGameImage_validInputs() {
-//        Image image = new Image();
-//        image.setId(1L);
-//        Image image2 = new Image();
-//        image2.setId(2L);
-//        List<Image> imageList = new ArrayList<Image>();
-//        imageList.add(image);
-//        imageList.add(image2);
-//        createdgame.setGameImages(imageList);
-//
-//        Mockito.when(gamerepository.findById(4L)).thenReturn(Optional.of(createdgame));
-//        doNothing().when(gameservice).replaceGameImages(4L);
-//        doNothing().when(gameservice).databaseImageCheck();
-//
-//        gameservice.deleteGameImage(4L, 1L);
-//
-//        assert createdgame.getGameImages().contains(image2);
-//        assert !createdgame.getGameImages().contains(image);
-//    }
 
 }

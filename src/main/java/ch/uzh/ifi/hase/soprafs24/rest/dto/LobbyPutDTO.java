@@ -33,10 +33,6 @@ public class LobbyPutDTO {
     this.invitedUserId = invitedUserId;
   }
 
-//  public String getLobbyToken() {
-//    return lobbyToken;
-//  }
-
   public void setLobbyToken(String lobbyToken) {
     this.lobbyToken = lobbyToken;
   }

@@ -19,7 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,14 +78,6 @@ public class LobbyServiceTest {
         assertEquals(testUser.getUsername(), user.getUsername());
     }
 
-//    @Test
-//    public void testGetUserFailure() {
-//        when(userRepository.findUserById(1L)).thenReturn(null);
-//        assertThrows(ResponseStatusException.class, () -> {
-//            lobbyService.getUser(1L);
-//        });
-//    }
-
     @Test
     public void testCheckIfUserExistsTrue() {
         when(userRepository.findByUsername(anyString())).thenReturn(testUser);
@@ -109,14 +104,6 @@ public class LobbyServiceTest {
         Lobby lobby = lobbyService.getLobby(1L);
         assertEquals(testLobby.getLobbyid(), lobby.getLobbyid());
     }
-
-//    @Test
-//    public void testGetLobbyFailure() {
-//        when(lobbyRepository.findByLobbyid(1L)).thenReturn(null);
-//        assertThrows(ResponseStatusException.class, () -> {
-//            lobbyService.getLobby(1L);
-//        });
-//    }
 
     @Test
     public void testCheckIfLobbyExistsTrue() {

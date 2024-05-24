@@ -1,16 +1,16 @@
 package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
-import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class DTOMapperTest {

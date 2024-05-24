@@ -1,4 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameUserService;
+
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
@@ -16,7 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -73,17 +75,6 @@ public class GameUserServiceTest {
         assertEquals(result, user);
     }
 
-    /**
-    @Test
-    void createPlayer_validInputs() {
-        List<Player> list = new ArrayList<>();
-
-        Player newplayer = gameUserService.createPlayer(1L);
-        list.add(newplayer);
-
-        assertEquals(list.size(), 1);
-    }*/
-
     @Test
     void getOpponentId_validInputs(){
         Player player2 = new Player();
@@ -138,26 +129,6 @@ public class GameUserServiceTest {
         assertEquals(player.getStrikes(), 1);
     }
 
-    /**@Test
-    void determineStatus_wrongInputs() {
-        Player invited = new Player();
-        invited.setPlayerId(2L);
-        Game game = new Game();
-        game.setGameId(1L);
-        game.setCreatorPlayerId(player.getPlayerId());
-        game.setInvitedPlayerId(invited.getPlayerId());
-        gamerepository.save(game);
-        gamerepository.flush();
-
-        when(gamerepository.findByGameId(1L)).thenReturn(game);
-        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
-        when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
-
-        GameStatus result = gameUserService.determineGameStatus(1L, false);
-
-        assertEquals(result, GameStatus.CHOOSING);
-    }*/
-
     @Test
     void createResponse_validInputs() {
         RoundDTO roundDTO = new RoundDTO(1, 1L, "");
@@ -177,7 +148,6 @@ public class GameUserServiceTest {
         assertEquals(result.getStrikes(), response.getStrikes());
         assertEquals(result.getPlayerId(), response.getPlayerId());
         assertEquals(result.getRoundStatus(), response.getRoundStatus());
-        //assertEquals(result.getRoundDTO(), response.getRoundDTO());
     }
 
     @Test

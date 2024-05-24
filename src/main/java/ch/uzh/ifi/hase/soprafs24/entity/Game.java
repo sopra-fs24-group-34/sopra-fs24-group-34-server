@@ -1,9 +1,10 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
+import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 
 @Entity
 public class Game implements Serializable {
@@ -19,7 +20,6 @@ public class Game implements Serializable {
     @Column(nullable = true)
     private Long invitedPlayerId; // smailalijagic: invited user
 
-    //@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
     @Column(length = 7000) // smailalijagic: 7000bytes --> 1750-7000 (=1000 words) chars max. possible = 65'535 bytes --> 16'383-65'535 chars
     private Chat chat = new Chat();
 

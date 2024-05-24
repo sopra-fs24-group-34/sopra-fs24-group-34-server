@@ -2,8 +2,12 @@ package ch.uzh.ifi.hase.soprafs24.service.gameService;
 
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.service.GameService;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
@@ -17,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 public class GameServiceTest {
@@ -89,20 +94,6 @@ public class GameServiceTest {
         verify(gameRepository).save(game);
     }
 
-    @Test
-    public void testGetGameState() {
-        Game game = new Game();
-        game.setCurrentRound(1);
-        game.setCurrentTurnPlayerId(1L);
-
-        when(gameRepository.findByGameId(anyLong())).thenReturn(game);
-
-        RoundDTO roundDTO = gameService.getGameState(1L);
-
-        assertNotNull(roundDTO);
-        assertEquals(1, roundDTO.getRoundNumber());
-        assertEquals(1L, roundDTO.getCurrentTurnPlayerId());
-    }
 
     @Test
     public void testGetGames2() {
@@ -119,32 +110,6 @@ public class GameServiceTest {
         Game returnedGame = gameService.getGame(1L);
         assertEquals(game, returnedGame);
     }
-
-//    @Test
-//    public void testGetGameFailure() {
-//        when(gameRepository.findByGameId(anyLong())).thenReturn(null);
-//        assertThrows(ResponseStatusException.class, () -> gameService.getGame(1L));
-//    }
-
-//    @Test
-//    public void testChooseImageSuccess() {
-//        Guess guess = new Guess();
-//        guess.setGameId(1L);
-//        guess.setPlayerId(1L);
-//        guess.setImageId(1L);
-//
-//        Game game = new Game();
-//        Player player = new Player();
-//
-//        when(imageRepository.findImageById(anyLong())).thenReturn(new Image());
-//        when(gameRepository.findByGameId(anyLong())).thenReturn(game);
-//        when(gameUserService.getPlayer(anyLong())).thenReturn(player);
-//
-//        RoundDTO roundDTO = gameService.chooseImage(guess);
-//
-//        assertNotNull(roundDTO);
-//        verify(gameUserService).savePlayerChanges(player);
-//    }
 
     @Test
     public void testChooseImageFailure() {
@@ -193,27 +158,6 @@ public class GameServiceTest {
         verify(gameRepository).save(game);
     }
 
-//    @Test
-//    public void testCreateGameSuccess() {
-//        Lobby lobby = new Lobby();
-//        GamePostDTO gamePostDTO = new GamePostDTO();
-//        AuthenticationDTO authenticationDTO = new AuthenticationDTO();
-//        Game game = new Game();
-//        User user = new User();
-//        Player player = new Player();
-//        player.setPlayerId(1L);
-//
-//        when(lobbyRepository.findByLobbyid(anyLong())).thenReturn(lobby);
-//        when(lobbyService.isLobbyOwner(anyLong(), any(AuthenticationDTO.class))).thenReturn(true);
-//        when(gameUserService.getUser(anyLong())).thenReturn(user);
-//        when(gameUserService.getPlayer(anyLong())).thenReturn(player);
-//
-//        Game createdGame = gameService.createGame(1L, gamePostDTO, authenticationDTO);
-//
-//        assertNotNull(createdGame);
-//        verify(gameRepository).save(any(Game.class));
-//    }
-
     @Test
     public void testCreateGameFailure() {
         Lobby lobby = new Lobby();
@@ -226,103 +170,26 @@ public class GameServiceTest {
         assertThrows(ResponseStatusException.class, () -> gameService.createGame(1L, gamePostDTO, authenticationDTO));
     }
 
-//    @Test
-//    public void testGuessImageSuccess() {
-//        Guess guess = new Guess();
-//        guess.setGameId(1L);
-//        guess.setPlayerId(1L);
-//        guess.setImageId(1L);
-//
-//        Game game = new Game();
-//        when(gameRepository.findByGameId(anyLong())).thenReturn(game);
-//        when(gameUserService.getChosenCharacterOfOpponent(any(Game.class), anyLong())).thenReturn(1L);
-//        when(gameUserService.getOpponentId(any(Game.class), anyLong())).thenReturn(2L);
-//
-//        Response response = gameService.guessImage(guess);
-//
-//        assertNotNull(response);
-//    }
-
-//    @Test
-//    public void testGuessImageFailure() {
-//        Guess guess = new Guess();
-//        guess.setGameId(1L);
-//        guess.setPlayerId(1L);
-//        guess.setImageId(2L);
-//
-//        Game game = new Game();
-//        when(gameRepository.findByGameId(anyLong())).thenReturn(game);
-//        when(gameUserService.getChosenCharacterOfOpponent(any(Game.class), anyLong())).thenReturn(1L);
-//        when(gameUserService.getOpponentId(any(Game.class), anyLong())).thenReturn(2L);
-//
-//        Response response = gameService.guessImage(guess);
-//
-//        assertNotNull(response);
-//        verify(gameUserService).increaseStrikesByOne(anyLong());
-//    }
-
     @Test
-    public void testGetGameState2() {
+    void testGetGameState_GameExists() {
+        // Given
+        Long gameId = 1L;
         Game game = new Game();
-        game.setCurrentRound(1);
-        game.setCurrentTurnPlayerId(1L);
+        game.setGameId(gameId);
+        game.setCurrentRound(2);
+        game.setCurrentTurnPlayerId(3L);
+        game.setGameStatus(GameStatus.GUESSING);
 
         when(gameRepository.findByGameId(anyLong())).thenReturn(game);
 
-        RoundDTO roundDTO = gameService.getGameState(1L);
+        // When
+        RoundDTO roundDTO = gameService.getGameState(gameId);
 
+        // Then
         assertNotNull(roundDTO);
-        assertEquals(1, roundDTO.getRoundNumber());
-        assertEquals(1L, roundDTO.getCurrentTurnPlayerId());
+        assertEquals(2, roundDTO.getRoundNumber());
+        assertEquals(3L, roundDTO.getCurrentTurnPlayerId());
+        assertEquals(GameStatus.GUESSING.toString(), roundDTO.getEvent());
     }
-
-//    @Test
-//    public void testHandleWin() {
-//        Player player = new Player();
-//        player.setPlayerId(1L);
-//
-//        when(gameUserService.getStrikes(anyLong())).thenReturn(0);
-//
-//        Response response = gameService.handleWin(1L, 1L);
-//
-//        assertNotNull(response);
-//        verify(gameUserService).increaseGamesPlayed(anyLong());
-//        verify(gameUserService).increaseWinTotal(anyLong());
-//    }
-
-//    @Test
-//    public void testHandleLoss() {
-//        Player player = new Player();
-//        player.setPlayerId(1L);
-//
-//        when(gameUserService.getStrikes(anyLong())).thenReturn(0);
-//
-//        Response response = gameService.handleLoss(1L, 1L);
-//
-//        assertNotNull(response);
-//        verify(gameUserService).increaseGamesPlayed(anyLong());
-//    }
-
-//    @Test
-//    public void testDeleteGame() {
-//        Game game = new Game();
-//        Player creator = new Player();
-//        Player invitedPlayer = new Player();
-//        User host = new User();
-//        User invitedUser = new User();
-//
-//        when(gameUserService.getPlayer(game.getCreatorPlayerId())).thenReturn(creator);
-//        when(gameUserService.getUser(creator.getUserId())).thenReturn(host);
-//        when(gameUserService.getPlayer(game.getInvitedPlayerId())).thenReturn(invitedPlayer);
-//        when(gameUserService.getUser(invitedPlayer.getUserId())).thenReturn(invitedUser);
-//
-//        gameService.deleteGame(game);
-//
-//        verify(gameUserService).saveUserChanges(host);
-//        verify(gameUserService).saveUserChanges(invitedUser);
-//        //verify(gameUserService).deletePlayer(creator);
-//        //verify(gameUserService).deletePlayer(invitedPlayer);
-//        verify(gameRepository).delete(game);
-//    }
 
 }

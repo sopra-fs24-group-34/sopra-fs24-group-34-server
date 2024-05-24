@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketChannelInterceptor;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketSessionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -33,20 +31,6 @@ class WebSocketChannelInterceptorTest {
 
         messageChannel = mock(MessageChannel.class);
     }
-
-//    @Test
-//    void preSend_whenConnectCommand_success() {
-//        StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.CONNECT);
-//        accessor.setSessionId("sessionId");
-//        accessor.setNativeHeader("userId", "userId");
-//
-//        Map<String, Object> headers = new HashMap<>(accessor.toMap());
-//        message = new GenericMessage<>(new byte[0], headers);
-//
-//        webSocketChannelInterceptor.preSend(message, messageChannel);
-//
-//        verify(webSocketSessionService, times(1)).addUserIdToActiveSession("sessionId", "userId");
-//    }
 
     @Test
     void preSend_whenNonConnectCommand_noAction() {

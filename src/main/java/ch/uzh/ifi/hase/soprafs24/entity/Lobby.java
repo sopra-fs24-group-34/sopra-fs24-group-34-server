@@ -12,7 +12,6 @@ public class Lobby implements Serializable {
     @GeneratedValue
     private Long lobbyid;
 
-    //@ManyToOne(cascade = CascadeType.ALL)
     private Long creatorUserId; // smailalijagic: every lobby belongs to exactly one user
 
     private Long invitedUserId; // smailalijagic: every lobby can hold two players

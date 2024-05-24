@@ -5,27 +5,27 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.ImageRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.GamePostDTO;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
-
 import ch.uzh.ifi.hase.soprafs24.rest.dto.ImageDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.RoundDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -247,13 +247,10 @@ public class GameService {
                 // Return a response indicating the game has ended
                 return r;
             }
-            // If both players have reached the maximum number of guesses, it's a tie
-            else if (gameUserService.getStrikes(game.getCreatorPlayerId()) >= game.getMaxStrikes() &&
-                    gameUserService.getStrikes(game.getInvitedPlayerId()) >= game.getMaxStrikes()) {
-                game.setGameStatus(GameStatus.TIE);
-                gameRepository.save(game);
-                gameRepository.flush();
-                return handleTie(game);
+            // If a players has reached the maximum number of guesses
+            else if (gameUserService.getStrikes(playerId) == game.getMaxStrikes()){
+                handleWin(gameUserService.getOpponentId(game, playerId), game.getGameId());
+                return handleLoss(playerId, game.getGameId());
             }
             // If the game is not over, return the current game status
             else if (gameStatus != GameStatus.END) {
@@ -271,7 +268,7 @@ public class GameService {
 
   public RoundDTO getGameState(Long gameId) {
         Game game = getGame(gameId);
-        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), "");
+        RoundDTO roundDTO = new RoundDTO(game.getCurrentRound(), game.getCurrentTurnPlayerId(), game.getGameStatus().toString());
         return roundDTO;
   }
 
@@ -383,7 +380,7 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
+      int desiredImageNr = 100; // don't go higher or it will not work because of limited images on unsplash (max.120)
       /*if (imageCount == 0){
           desiredImageNr = 110;
       } */

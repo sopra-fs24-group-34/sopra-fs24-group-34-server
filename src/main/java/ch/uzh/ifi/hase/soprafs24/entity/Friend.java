@@ -1,8 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 @Embeddable
 public class Friend {
