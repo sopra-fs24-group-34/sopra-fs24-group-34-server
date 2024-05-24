@@ -380,7 +380,7 @@ public class GameService {
       int imageCount = imageRepository.countAllImages();
       logger.severe(String.valueOf(imageCount));
 
-      int desiredImageNr = 110; // don't go higher or it will not work because of limited images on unsplash (max.120)
+      int desiredImageNr = 100; // don't go higher or it will not work because of limited images on unsplash (max.120)
       /*if (imageCount == 0){
           desiredImageNr = 110;
       } */
