@@ -82,10 +82,10 @@
 
 ## <font style="color: #00d7ff">Week 8 _(22.05. – 24.05.)_</font>
 
-| Date | Name | Links to Github Issues | Comments |
-| ---- | ---- | ---------------------- | -------- |
-|      | Smail Alijagic | [#180](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/180) | Finalizing tests, cleaning up code |
-| 22.05.2024 | Dario Giuliani |[#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184)                        | Finished roundbased system concering guesses and chat. Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135)|
-|      |      |                        |          |
-|      |      |                        |          |
-|      |      |                        |          |
+| Date       | Name            | Links to Github Issues                                                                                                                                                     | Comments                                                                                                                                            |
+|------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+|            | Smail Alijagic  | [#180](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/180)                                                                                       | Finalizing tests, cleaning up code                                                                                                                  |
+| 22.05.2024 | Dario Giuliani  | [#186](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/186), [#184](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/184) | Finished roundbased system concering guesses and chat. Bug Fix [#135](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-server/issues/135) |
+| 23.05.2024 | Liam Kontopulos | [#82](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/82) [#99](https://github.com/sopra-fs24-group-34/sopra-fs24-group-34-client/issues/99)      | Closes after merge.                                                                               |
+|            |                 |                                                                                                                                                                            |                                                                                                                                                     |
+|            |                 |                                                                                                                                                                            |                                                                                                                                                     |
