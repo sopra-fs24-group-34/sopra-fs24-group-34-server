@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs24.websocket;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 

@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-//
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,13 +121,6 @@ public class UserService {
         } catch(Exception e) {
             return false;
         }
-        //nedim-j: should not handle that here
-        /*
-        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-        if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
-        }
-         */
     }
 
     public AuthenticationDTO loginUser(User loginUser) {

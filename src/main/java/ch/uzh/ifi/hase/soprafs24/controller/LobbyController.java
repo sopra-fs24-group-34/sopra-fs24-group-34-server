@@ -3,17 +3,20 @@ package ch.uzh.ifi.hase.soprafs24.controller;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.AuthenticationDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.GameUserService;
 import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
-import com.google.gson.*;
+import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import ch.uzh.ifi.hase.soprafs24.websocket.WebSocketMessenger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +36,6 @@ public class LobbyController {
         this.gameUserService = gameUserService;
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<String> handleException(Exception ex) {
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
-//    }
-
     @GetMapping("/lobbies")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
@@ -52,14 +50,6 @@ public class LobbyController {
         }
         return lobbyGetDTOs;
     }
-
-//  @GetMapping("lobbies/{lobbyId}")
-//  @ResponseStatus(HttpStatus.OK)
-//  @ResponseBody
-//  public LobbyGetDTO getLobby(@PathVariable("lobbyId") Long lobbyId) {
-//    Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: find lobby
-//    return DTOMapper.INSTANCE.convertEntityToLobbyGetDTO(lobby); // smailalijagic: convert lobby to api representation and return it
-//  }
 
     @GetMapping("lobbies/{lobbyId}")
     @ResponseStatus(HttpStatus.OK)
@@ -120,53 +110,6 @@ public class LobbyController {
             webSocketMessenger.sendMessage("/lobbies/" + lobbyId, "user-joined", u);
         }
 
-        /*
-        // smailalijagic: update lobby for guest
-        // smailalijagic: split into two api calls --> api.post(createGuest) -> returns UserPostDTO & takes UserPostDTO to api.put(joinLobbyAsGuest)
-        Long lobbyId = Long.valueOf(id1);
-        Long userId = Long.valueOf(id2);
-
-        if (!lobbyService.checkIfLobbyExists(lobbyId) || lobbyService.checkIfLobbyExists(lobbyId) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby with ID " + lobbyId + " does not exist"); // Throw RuntimeException if lobby doesn't exist
-        }
-
-        Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
-
-        if (lobby.getInvited_userid() != null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
-        }
-        else {
-            User user = lobbyService.getUser(userId); // smailalijagic: get user
-            lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
-            user.setStatus(UserStatus.INLOBBY_PREPARING);
-            gameUserService.saveUserChanges(user);
-
-            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-
-            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
-        }
-
-        */
-
-
-//        if (lobbyService.checkIfLobbyExists(lobbyId)) {
-//            Lobby lobby = lobbyService.getLobby(lobbyId); // smailalijagic: get lobby
-//            if (lobby.getInvited_userid() != null) { // smailalijagic: check if lobby is full
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby code is not valid anymore or already in use");
-//            }
-//            User user = lobbyService.getUser(userId); // smailalijagic: get user
-//            lobbyService.addUserToLobby(lobby, user); // smailalijagic: update lobby
-//            user.setStatus(UserStatus.INLOBBY_PREPARING);
-//            gameUserService.saveUserChanges(user);
-//
-//            UserGetDTO u = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-//
-//            webSocketMessenger.sendMessage("/lobbies/"+lobbyId, "user-joined", u);
-//
-//        } else {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby does not exist");
-//        }
-
     }
 
     @MessageMapping("/updateReadyStatus")
@@ -210,29 +153,4 @@ public class LobbyController {
             System.out.println("Something went wrong with Lobby closing: "+e);
         }
     }
-
-    /*
-    @DeleteMapping("/lobbies/{lobbyId}/start")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public Boolean deleteLobby(@PathVariable("lobbyId") String id, @RequestBody LobbyDeleteDTO lobbyDeleteDTO, User user_creator, User user_invited) {
-        // smailalijagic: when a game is started lobby should be automatically deleted --> user presses start
-        // smailalijagic: check that lobbyid exists
-        Long lobbyid = Long.valueOf(id);
-        Lobby lobbyToDelete = DTOMapper.INSTANCE.convertEntityToLobbyDeleteDTO(lobbyDeleteDTO);
-
-        assert lobbyService.checkIfLobbyExists(Long.valueOf(id));
-        // smailalijagic: check that both users exist
-        assert lobbyService.checkIfUserExists(user_creator);
-        assert lobbyService.checkIfUserExists(user_invited);
-        // smailalijagic: check that user is creator
-        assert lobbyService.isLobbyOwner(user_creator, Long.valueOf(id));
-        // 4. delete lobby
-        lobbyService.deleteLobby(lobbyToDelete);
-        // 5. load game
-        // smailalijagic: some return statement...
-        return true;
-    }
-
-     */
 }

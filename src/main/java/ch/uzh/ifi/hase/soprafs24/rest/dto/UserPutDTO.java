@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
@@ -50,10 +49,6 @@ public class UserPutDTO {
     return profilePicture;
   }
 
-//  public void setProfilePicture(String profilePicture) {
-//    this.profilePicture = profilePicture;
-//  }
-
   public String getToken() {
     return token;
   }
@@ -86,21 +81,11 @@ public class UserPutDTO {
     this.friendsList = friendsList;
   }
 
-//  public List<Lobby> getUsergamelobbylist() {
-//    return usergamelobbylist;
-//  }
-//
-//  public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
-//    this.usergamelobbylist = usergamelobbylist;
-//  }
 
   public Long getTotalplayed() {
     return totalplayed;
   }
 
-//  public void setTotalplayed(Long totalplayed) {
-//    this.totalplayed = totalplayed;
-//  }
 
   public Long getTotalwins() {
     return totalwins;

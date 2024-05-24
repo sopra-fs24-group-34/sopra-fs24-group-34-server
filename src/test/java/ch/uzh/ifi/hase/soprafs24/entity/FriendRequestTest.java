@@ -1,7 +1,8 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FriendRequestTest {
     @Test

@@ -646,20 +646,6 @@ public class UserServiceTest {
         assertThrows(ResponseStatusException.class, () -> userService.getUserByUsername("nonExistentUser"));
     }
 
-//    @Test
-//    public void testCreateUser_success() {
-//        User newUser = new User();
-//        newUser.setUsername("newUser");
-//        newUser.setPassword("newPassword");
-//
-//        when(userRepository.save(any(User.class))).thenReturn(newUser);
-//
-//        AuthenticationDTO authDTO = userService.createUser(newUser);
-//
-//        assertNotNull(authDTO);
-//        verify(userRepository, times(2)).save(any(User.class));
-//    }
-
     @Test
     public void testCreateUser_duplicateUsername() {
         User testUser = new User();
@@ -801,19 +787,5 @@ public class UserServiceTest {
         assertEquals(UserStatus.OFFLINE, testUser.getStatus());
         verify(userRepository, times(1)).save(any(User.class));
     }
-
-//    @Test
-//    public void testChangeUserStatus_invalidStatus() {
-//        User testUser = new User();
-//        testUser.setId(1L);
-//        testUser.setUsername("testUser");
-//        testUser.setPassword("testPassword");
-//        testUser.setStatus(UserStatus.ONLINE);
-//        testUser.setToken(UUID.randomUUID().toString());
-//
-//        when(userRepository.findUserById(testUser.getId())).thenReturn(testUser);
-//
-//        assertThrows(ResponseStatusException.class, () -> userService.changeUserStatus(testUser.getId(), "INVALID_STATUS"));
-//    }
 
 }

@@ -34,9 +34,6 @@ public class LobbyInvitationPutDTO {
         this.lobbyId = lobbyId;
     }
 
-//    public boolean getAnswer() {
-//        return answer;
-//    }
 
     public void setAnswer(boolean answer) {
         this.answer = answer;

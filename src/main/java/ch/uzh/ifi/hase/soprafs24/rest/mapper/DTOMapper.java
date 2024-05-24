@@ -3,7 +3,8 @@ package ch.uzh.ifi.hase.soprafs24.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -76,7 +77,7 @@ public interface DTOMapper {
     Chat convertMessagePostDTOtoEntity(MessagePostDTO messagePostDTO); // smailalijagic: added, issue #58
     // source = MessagePostDTO, target = Chat
 
-    //@Mapping(source = "id", target = "id")
+
     @Mapping(source = "lastmessage", target = "message")
     MessageGetDTO convertEntityToMessageGetDTO(Chat chat); // smailalijagic: added, issue #58
     // source = Chat, target = MessageGetDTO
@@ -105,12 +106,6 @@ public interface DTOMapper {
     @Mapping(source = "creatorUserId", target = "creatorUserId")
     LobbyPostDTO convertEntityToLobbyPostDTO(Lobby lobby);
     // source = Lobby, target = LobbyGetDTO
-
-//  @Mapping(source = "id", target = "lobbyid")
-//  @Mapping(source = "creatorUserId", target = "creatorUserId")
-//  @Mapping(source = "invitedUserId", target = "invitedUserId")
-//  @Mapping(source = "lobbyToken", target = "lobbyToken")
-//  Lobby convertLobbyPutDTOtoEntity(LobbyPutDTO lobbyPutDTO);
 
     @Mapping(source = "gameid", target = "gameId")
     @Mapping(source = "playerid", target = "playerId")

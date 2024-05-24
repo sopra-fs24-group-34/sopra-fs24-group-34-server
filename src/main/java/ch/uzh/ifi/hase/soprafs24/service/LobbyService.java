@@ -74,17 +74,6 @@ public class LobbyService {
 
   public Boolean checkIfLobbyExists(Long lobbyid) {
       return lobbyRepository.existsByLobbyid(lobbyid);
-
-      // smailalijagic: changed to boolean
-
-      /*
-      if (lobbyRepository.findByLobbyid(lobbyid) != false) {
-        return true;
-        }
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lobby not found error");
-
-       return true;// smailalijagic: lobby = null --> does not exist yet
-    */
   }
 
   public Boolean isLobbyOwner(Long lobbyid, AuthenticationDTO authenticationDTO) {
@@ -116,12 +105,6 @@ public class LobbyService {
     lobbyRepository.flush();
 
     User user = userRepository.findUserById(userId);
-
-    /*
-    List<Lobby> lobbyList = user.getUsergamelobbylist();
-    lobbyList.add(newlobby);
-    user.setUsergamelobbylist(lobbyList);
-     */
 
     user.setStatus(UserStatus.INLOBBY_PREPARING);
     userRepository.save(user);

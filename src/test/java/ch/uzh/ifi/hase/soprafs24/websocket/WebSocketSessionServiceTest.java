@@ -5,14 +5,15 @@ import ch.uzh.ifi.hase.soprafs24.service.LobbyService;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class WebSocketSessionServiceTest {
@@ -89,21 +90,6 @@ class WebSocketSessionServiceTest {
         assertEquals(1L, session.getAttributes().get("userId"));
     }
 
-//    @Test
-//    void handleDisconnectedSession_ShouldHandleDisconnection2() {
-//        when(session.getId()).thenReturn("sessionId1");
-//        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
-//        List<WebSocketSession> sessions = new ArrayList<>();
-//        sessions.add(session);
-//
-//        webSocketSessionService.getSessionsMap().put(1L, sessions);
-//
-//        webSocketSessionService.handleDisconnectedSession(session);
-//
-//        verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
-//        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
-//    }
-
     @Test
     void mapActiveSessionToLobby_ShouldMapSession2() {
         when(session.getId()).thenReturn("sessionId1");
@@ -132,21 +118,6 @@ class WebSocketSessionServiceTest {
         webSocketSessionService.addUserIdToActiveSession("sessionId1", "1");
         assertEquals(1L, session.getAttributes().get("userId"));
     }
-
-//    @Test
-//    void handleDisconnectedSession_ShouldHandleDisconnection() {
-//        when(session.getId()).thenReturn("sessionId1");
-//        when(session.getAttributes()).thenReturn(new HashMap<>(Map.of("userId", 1L, "lobbyId", 1L)));
-//        List<WebSocketSession> sessions = new ArrayList<>();
-//        sessions.add(session);
-//
-//        webSocketSessionService.getSessionsMap().put(1L, sessions);
-//
-//        webSocketSessionService.handleDisconnectedSession(session);
-//
-//        verify(lobbyService, times(1)).getGameIdFromLobbyId(1L);
-//        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
-//    }
 
     @Test
     void mapActiveSessionToLobby_ShouldMapSession() {
@@ -209,33 +180,6 @@ class WebSocketSessionServiceTest {
 
         assertTrue(webSocketSessionService.getSessionsMap().containsKey(1L));
     }
-
-//    @Test
-//    public void testHandleDisconnectedSession() {
-//        when(session.getId()).thenReturn("session1");
-//        Map<String, Object> attributes = new HashMap<>();
-//        attributes.put("userId", 1L);
-//        attributes.put("lobbyId", 1L);
-//        when(session.getAttributes()).thenReturn(attributes);
-//
-//        List<WebSocketSession> sessionsList = new ArrayList<>();
-//        sessionsList.add(session);
-//        webSocketSessionService.getSessionsMap().put(1L, sessionsList);
-//
-//        webSocketSessionService.handleDisconnectedSession(session);
-//
-//        assertTrue(webSocketSessionService.getDisconnectedUserLobby().containsKey(1L));
-//    }
-
-//    @Test
-//    public void testTimerRemoveUserFromLobby() {
-//        doNothing().when(lobbyService).removeUserFromLobby(anyLong(), anyLong());
-//        doNothing().when(userService).deleteUserIfGuest(anyLong());
-//
-//        webSocketSessionService.timerRemoveUserFromLobby(1L, 1L);
-//
-//        verify(lobbyService, timeout(4000)).removeUserFromLobby(1L, 1L);
-//    }
 
     @Test
     public void testStartSessionCleanupTask() {

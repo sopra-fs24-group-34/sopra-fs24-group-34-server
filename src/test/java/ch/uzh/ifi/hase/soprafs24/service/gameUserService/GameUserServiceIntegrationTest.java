@@ -1,4 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.service.gameUserService;
+
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
 import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
@@ -14,8 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -73,16 +75,6 @@ public class GameUserServiceIntegrationTest {
         assertEquals(result, user);
     }
 
-//    @Test
-//    void createPlayer_validInputs() {
-//        List<Player> list = new ArrayList<>();
-//
-//        Player newplayer = gameUserService.createlayer(1L);
-//        list.add(newplayer);
-//
-//        assertEquals(list.size(), 1);
-//    }
-
     @Test
     void getChosenCharacterofOpponent_validInputs() {
         Image image = new Image();
@@ -122,26 +114,6 @@ public class GameUserServiceIntegrationTest {
         assertEquals(player.getStrikes(), 1);
     }
 
-    /**@Test
-    void determineStatus_wrongInputs() {
-        Player invited = new Player();
-        invited.setPlayerId(2L);
-        Game game = new Game();
-        game.setGameId(1L);
-        game.setCreatorPlayerId(player.getPlayerId());
-        game.setInvitedPlayerId(invited.getPlayerId());
-        gamerepository.save(game);
-        gamerepository.flush();
-
-        when(gamerepository.findByGameId(1L)).thenReturn(game);
-        when(playerrepository.findByPlayerId(1L)).thenReturn(player);
-        when(playerrepository.findByPlayerId(2L)).thenReturn(invited);
-
-        GameStatus result = gameUserService.determineGameStatus(1L, false);
-
-        assertEquals(result, GameStatus.CHOOSING);
-    }*/
-
     @Test
     void createResponse_validInputs() {
         Response response = new Response();
@@ -161,34 +133,4 @@ public class GameUserServiceIntegrationTest {
         assertEquals(result.getPlayerId(), response.getPlayerId());
         assertEquals(result.getRoundStatus(), response.getRoundStatus());
     }
-
-//    @Test
-//    void increaseWinTotal_validInputs() {
-//        User user = new User();
-//        user.setId(1L);
-//        player.setUser(user);
-//        when(gameUserService.getPlayer(1L)).thenReturn(player);
-//
-//        assertNull(user.getTotalwins());
-//
-//        gameUserService.increaseWinTotal(player.getPlayerId());
-//
-//        assertNotNull(user.getTotalwins());
-//        assertEquals(user.getTotalwins(), 1L);
-//    }
-
-//    @Test
-//    void increaseGamesPlayed_validInputs() {
-//        User user = new User();
-//        user.setId(1L);
-//        player.setUser(user);
-//        when(gameUserService.getPlayer(1L)).thenReturn(player);
-//
-//        assertNull(user.getTotalplayed());
-//
-//        gameUserService.increaseGamesPlayed(player.getPlayerId());
-//
-//        assertNotNull(user.getTotalplayed());
-//        assertEquals(user.getTotalplayed(), 1L);
-//    }
 }

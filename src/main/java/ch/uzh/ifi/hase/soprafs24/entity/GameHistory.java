@@ -1,8 +1,5 @@
 package ch.uzh.ifi.hase.soprafs24.entity;
 
-import javax.persistence.Entity;
-
-
 public class GameHistory {
 
     private Long totalgamesplayed;

@@ -4,7 +4,6 @@ import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.FriendRequest;
 import ch.uzh.ifi.hase.soprafs24.entity.Lobby;
 import ch.uzh.ifi.hase.soprafs24.entity.LobbyInvitation;
-import ch.uzh.ifi.hase.soprafs24.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,14 +99,6 @@ public class UserGetDTO {
         this.friendsList = userfriendlist;
     }
 
-//    public List<Lobby> getUsergamelobbylist() {
-//        return usergamelobbylist;
-//    }
-
-//    public void setUsergamelobbylist(List<Lobby> usergamelobbylist) {
-//        this.usergamelobbylist = usergamelobbylist;
-//    }
-
     public Long getTotalplayed() {
         return totalplayed;
     }
@@ -123,10 +114,6 @@ public class UserGetDTO {
     public void setTotalwins(Long totalwins) {
         this.totalwins = totalwins;
     }
-
-//    public List<LobbyInvitation> getLobbyinvitations() {
-//        return lobbyinvitations;
-//    }
 
     public void setLobbyinvitations(List<LobbyInvitation> Lobbyinvitations) {
         lobbyinvitations = Lobbyinvitations;

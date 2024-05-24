@@ -2,8 +2,13 @@ package ch.uzh.ifi.hase.soprafs24.service.friendService;
 
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
-import ch.uzh.ifi.hase.soprafs24.repository.*;
-import ch.uzh.ifi.hase.soprafs24.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs24.repository.FriendRequestRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.LobbyRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendGetDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPostDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.FriendRequestPutDTO;
+import ch.uzh.ifi.hase.soprafs24.rest.dto.LobbyInvitationPutDTO;
 import ch.uzh.ifi.hase.soprafs24.service.FriendService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class FriendServiceTest {

@@ -3,12 +3,12 @@ package ch.uzh.ifi.hase.soprafs24.service;
 import ch.uzh.ifi.hase.soprafs24.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.*;
+import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
+import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ch.uzh.ifi.hase.soprafs24.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.PlayerRepository;
-import ch.uzh.ifi.hase.soprafs24.repository.GameRepository;
 
 import javax.transaction.Transactional;
 
@@ -81,33 +81,6 @@ public class GameUserService {
       playerRepository.save(player);
       playerRepository.flush();
     }
-
-
-    /*
-    //nedim-j, 24.5. has to be removed, not needed
-
-    public GameStatus determineGameStatus(Long gameId, boolean lastGuessCorrect, boolean isInvitedUser) {
-        Game game = new Game();
-        try {
-            game = gameRepository.findByGameId(gameId);
-        } catch (Exception e) {
-            System.out.println("Game is null");
-            return GameStatus.CHOOSING;
-        }
-
-        Player creator = playerRepository.findByPlayerId(game.getCreatorPlayerId());
-        Player invited = playerRepository.findByPlayerId(game.getInvitedPlayerId());
-        if((creator.getChosencharacter() == null) || (invited.getChosencharacter() == null)) {
-            return GameStatus.CHOOSING;
-        } else if((creator.getStrikes() >= game.getMaxStrikes()) || (invited.getStrikes() >= game.getMaxStrikes())) {
-            return GameStatus.END;
-        } else if(isInvitedUser && lastGuessCorrect) {
-            return GameStatus.LASTCHANCE;
-        }
-        return GameStatus.GUESSING;
-    }
-
-     */
 
   public Response createResponse(Boolean guess, Long playerId, int strikes, GameStatus gameStatus) {
       // creates a response that is send back to the frontend
